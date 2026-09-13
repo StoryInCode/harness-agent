@@ -10,6 +10,7 @@ Discover development-loop piece specifications, inspect validation results, and 
 - [Lifecycle state](#lifecycle-state)
 - [Human decisions](#human-decisions)
 - [Dispatch requests](#dispatch-requests)
+- [Worktree assignments](#worktree-assignments)
 - [Completion and events](#completion-and-events)
 - [Failure and cancellation](#failure-and-cancellation)
 - [Cordis API](#cordis-surface)
@@ -46,6 +47,10 @@ The [approval result declarations](../../packages/dev-loop/approval/src/types.ts
 ## Dispatch requests
 
 The [queue declarations](../../packages/dev-loop/queue/src/types.ts) define `QueueRequest` as a piece id, caller cancellation signal, and startup callback receiving the captured Agent and combined signal. `QueueTicket` contains the piece id, result promise, and awaited cancellation method; it is an operational handle, not a JSON record. `QueueEntry` is a detached scalar snapshot of canonical priority, admission time, queued/starting/running status, and optional child SessionId. The [queue package](../../packages/dev-loop/queue/README.md) owns admission, ordering, dependency wakeups, reservation lifetime, and cleanup-failure semantics. It does not select providers or create requests from approval announcements.
+
+## Worktree assignments
+
+The [worktree declarations](../../packages/dev-loop/worktree/src/types.ts) define `AssignWorktreeRequest` as a piece id, caller directory, and cancellation signal. `WorktreeAssignment` records a branded `WorktreeAssignmentId`, validated `GitCommit` base, mainline and worktree paths, piece id, and created/borrowed ownership. This retained record describes an assignment, not a live assertion that its files or HEAD remain unchanged. `WorktreeRetirement` distinguishes removal from preservation because a tree is borrowed, dirty, or at a changed HEAD. The [worktree package](../../packages/dev-loop/worktree/README.md) owns allocation, repository identity, command quiescence, and conservative retirement. It neither transfers changes nor sets child-session metadata.
 
 ## Completion and events
 
@@ -231,6 +236,35 @@ getQueuedEntries(): QueueEntry[]
 ```
 
 Source: [`packages/dev-loop/queue/src/index.ts`](../../packages/dev-loop/queue/src/index.ts)
+
+<a id="ctxdevloopworktree--devloopworktree"></a>
+
+### `ctx.devLoopWorktree` — `DevLoopWorktree`
+
+Process-lifetime assignments shared across roles; unload preserves all physical trees.
+
+```ts cordis-catalog
+/** Allocate or reuse a verified assignment, retaining files across role completion.
+ * @param request - piece, starting directory and cancellation; the first caller owns a coalesced attempt.
+ * @returns immutable assignment; cancellation joins owned commands and failures preserve residue.
+ */
+async assignWorktree(request: AssignWorktreeRequest): Promise<WorktreeAssignment>
+
+/** Read the retained assignment without probing or changing Git.
+ * @param pieceId - corpus dotted piece identity.
+ * @returns published assignment, or undefined.
+ */
+getAssignment(pieceId: string): WorktreeAssignment | undefined
+
+/** Remove only an owned, clean, unchanged tree; callers must first stop every user.
+ * @param id - retained assignment identity.
+ * @param signal - caller cancellation.
+ * @returns removal or preservation reason; failures retain both mapping and residue.
+ */
+async retireWorktree(id: WorktreeAssignmentId, signal: AbortSignal): Promise<WorktreeRetirement>
+```
+
+Source: [`packages/dev-loop/worktree/src/index.ts`](../../packages/dev-loop/worktree/src/index.ts)
 
 <a id="piece-events"></a>
 

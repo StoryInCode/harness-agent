@@ -123,6 +123,13 @@ const SERVICE_ROLES: ServiceRole[] = [
     note: 'Admits consumer-owned one-shot callbacks and retains capacity through startup, result settlement, and cleanup.',
   },
   {
+    key: 'devLoopWorktree',
+    pkg: 'dev-loop-worktree',
+    title: 'Retained piece worktrees',
+    mode: 'core',
+    note: 'Allocates detached Git checkouts and retains assignments across roles; only explicitly retires clean unchanged owned trees.',
+  },
+  {
     key: 'attachments',
     pkg: 'attachment',
     title: 'Durable binary attachment storage',
@@ -501,7 +508,7 @@ const SERVICE_ROLES: ServiceRole[] = [
     mode: 'seam',
     implementations: ['subprocess-local', 'subprocess-e2b'],
     // FORK-LOCAL: lifecycle owns and joins its Git command ranges.
-    consumers: ['bash-local', 'bash-sandbox', 'terminal-bash', 'lsp-stdio', 'subagent-acp', 'subagent-codex', 'subagent-claude-code', 'dev-loop-lifecycle'],
+    consumers: ['bash-local', 'bash-sandbox', 'terminal-bash', 'lsp-stdio', 'subagent-acp', 'subagent-codex', 'subagent-claude-code', 'dev-loop-lifecycle', 'dev-loop-worktree'],
     note: 'The bash executors, the PTY shell backend, the LSP host, and the out-of-process ACP, Codex, and Claude Code subagent backends spawn through ctx.subprocess; the service owns process coordinates, tree/session lifetime, stdio dispositions, terminal mechanics, and kill escalation.',
   },
   {
@@ -581,7 +588,7 @@ const SERVICE_ROLES: ServiceRole[] = [
     mode: 'seam',
     implementations: ['fs-local', 'fs-sandbox', 'fs-e2b'],
     // FORK-LOCAL: directory and lifecycle consume the filesystem service directly.
-    consumers: ['tool-fs', 'dev-loop-directory', 'dev-loop-lifecycle', 'dev-loop-approval'],
+    consumers: ['tool-fs', 'dev-loop-directory', 'dev-loop-lifecycle', 'dev-loop-approval', 'dev-loop-worktree'],
     companions: ['fs-observation-policy'],
     note: 'tool-fs executes read/write/edit through ctx.fs; fs-sandbox fences mutations by the shared sandbox mode; fs-observation-policy contributes observed-state checks through the fs/* event gate.',
   },

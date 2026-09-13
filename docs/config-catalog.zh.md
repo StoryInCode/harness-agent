@@ -600,6 +600,30 @@ export interface Config {
 
 Source: [`packages/dev-loop/queue/src/types.ts:7`](../packages/dev-loop/queue/src/types.ts)
 
+<a id="deepseek-aidsh-dev-loop-worktree"></a>
+
+## `@deepseek-ai/dsh-dev-loop-worktree`
+
+Requires: `fs` · `subprocess`
+
+```ts config-catalog
+/** Required command policy; only the root has a default (.worktrees). */
+export interface Config {
+  /** Main checkout directory; must identify a non-bare repository with a commit. */
+  mainlinePath: string
+  /** Ignored root beneath the canonical mainline; defaults to .worktrees. */
+  worktreeRoot?: string
+  /** Positive command deadline in milliseconds, at most 2147483647; expiry initiates cancellation. */
+  commandTimeoutMs: number
+  /** Positive safe-integer captured byte limit per output stream. */
+  outputMaxBytes: number
+  /** Positive termination/drain grace in milliseconds, at most 2147483647; not a command timeout. */
+  terminationGraceMs: number
+}
+```
+
+Source: [`packages/dev-loop/worktree/src/types.ts:9`](../packages/dev-loop/worktree/src/types.ts)
+
 <a id="deepseek-aidsh-e2b"></a>
 
 ## `@deepseek-ai/dsh-e2b`

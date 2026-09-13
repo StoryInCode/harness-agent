@@ -934,6 +934,31 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'devLoopWorktree',
+    summary: 'Process-lifetime assignments shared across roles; unload preserves all physical trees.',
+    description: 'Process-lifetime assignments shared across roles; unload preserves all physical trees.',
+    methods: [
+      {
+        signature: 'async assignWorktree(request: AssignWorktreeRequest): Promise<WorktreeAssignment>',
+        description: 'Allocate or reuse a verified assignment, retaining files across role completion.',
+        parameters: [{ name: 'request', description: 'piece, starting directory and cancellation; the first caller owns a coalesced attempt.' }],
+        returns: 'immutable assignment; cancellation joins owned commands and failures preserve residue.',
+      },
+      {
+        signature: 'getAssignment(pieceId: string): WorktreeAssignment | undefined',
+        description: 'Read the retained assignment without probing or changing Git.',
+        parameters: [{ name: 'pieceId', description: 'corpus dotted piece identity.' }],
+        returns: 'published assignment, or undefined.',
+      },
+      {
+        signature: 'async retireWorktree(id: WorktreeAssignmentId, signal: AbortSignal): Promise<WorktreeRetirement>',
+        description: 'Remove only an owned, clean, unchanged tree; callers must first stop every user.',
+        parameters: [{ name: 'id', description: 'retained assignment identity.' }, { name: 'signal', description: 'caller cancellation.' }],
+        returns: 'removal or preservation reason; failures retain both mapping and residue.',
+      },
+    ],
+  },
+  {
     key: 'directoryPicker',
     summary: 'Abstract directory-picking service.',
     description: 'Abstract directory-picking service. Subclass, implement `capability()`, and load the subclass as a plugin — it registers as `ctx.directoryPicker` (one implementation per context; loading a second throws, cordis\' standard duplicate-service behavior). The capability object must be stable for the service lifetime: consumers may capture it across calls.',
@@ -3840,6 +3865,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export interface AssembledSection {\n    name: string;\n    text: string;\n}',
   },
   {
+    name: 'AssignWorktreeRequest',
+    declaration: 'export interface AssignWorktreeRequest {\n    readonly pieceId: string;\n    readonly cwd: string;\n    readonly signal: AbortSignal;\n}',
+  },
+  {
     name: 'AssistantMessage',
     declaration: 'export interface AssistantMessage extends Message {\n    readonly role: \'assistant\';\n    readonly source: ModelMessageSource;\n}',
   },
@@ -4434,6 +4463,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'GenericResultView',
     declaration: 'export interface GenericResultView {\n    card: \'generic\';\n    title?: string;\n    content?: ContentBlock[];\n}',
+  },
+  {
+    name: 'GitCommit',
+    declaration: 'export type GitCommit = Branded<\'DevLoopGitCommit\'>;',
   },
   {
     name: 'GoalActivation',
@@ -6706,6 +6739,18 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'WorkspaceView',
     declaration: 'export interface WorkspaceView {\n    readonly workspaceId: WorkspaceId;\n    readonly path: string;\n    readonly title: string;\n    readonly sessionIds: readonly SessionId[];\n    readonly createdAt: string;\n    readonly updatedAt: string;\n}',
+  },
+  {
+    name: 'WorktreeAssignment',
+    declaration: 'export interface WorktreeAssignment {\n    readonly id: WorktreeAssignmentId;\n    readonly pieceId: string;\n    readonly mainlinePath: string;\n    readonly worktreePath: string;\n    readonly baseCommit: GitCommit;\n    readonly ownership: \'created\' | \'borrowed\';\n}',
+  },
+  {
+    name: 'WorktreeAssignmentId',
+    declaration: 'export type WorktreeAssignmentId = Branded<\'DevLoopWorktreeAssignmentId\'>;',
+  },
+  {
+    name: 'WorktreeRetirement',
+    declaration: 'export type WorktreeRetirement = {\n    readonly kind: \'removed\';\n} | {\n    readonly kind: \'preserved\';\n    readonly reason: \'borrowed\' | \'dirty\' | \'head-changed\';\n};',
   },
 ]
 

@@ -61,6 +61,7 @@ const SENTENCE_MODEL_EXPERIENCE: Readonly<Record<string, SentenceContract>> = {
   'packages/dev-loop/directory': { kind: 'none', reason: 'Host-side directory over plan specification files; registers no tool, prompt, or session event.' },
   'packages/dev-loop/lifecycle': { kind: 'none', reason: 'Host-side state machine over piece status; registers no tool, prompt, or session event.' },
   'packages/dev-loop/queue': { kind: 'none', reason: 'Host-side admission and one-shot lease scheduler; registers no tool, prompt, or session event. Dispatching consumers own model-visible work.' },
+  'packages/dev-loop/worktree': { kind: 'none', reason: 'Host-side Git allocation and retained assignment service; registers no tool, prompt, or session event. Child workspace selection belongs to its caller.' },
   'packages/util/chunked-list': { kind: 'none', reason: 'Immutable collection primitive; registers nothing model-facing.' },
   'packages/util/package-manifest': { kind: 'none', reason: 'Type declarations only; registers nothing model-facing.' },
   'packages/util/time': { kind: 'indirect', reason: 'Pure zone validation; the consumer that records a canonical zone owns the model-visible line derived from it.' },
