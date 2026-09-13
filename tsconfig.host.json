@@ -204,8 +204,10 @@
     { "path": "./packages/workspace/workspace" },
     // FORK-LOCAL: fork-owned dev-loop packages (see FORK.md).
     { "path": "./packages/dev-loop/approval" },
+    { "path": "./packages/dev-loop/command" },
     { "path": "./packages/dev-loop/directory" },
     { "path": "./packages/dev-loop/lifecycle" },
+    { "path": "./packages/dev-loop/persistence" },
     { "path": "./packages/dev-loop/queue" },
     { "path": "./packages/dev-loop/references" },
     { "path": "./packages/dev-loop/roles" },

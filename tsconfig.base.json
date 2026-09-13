@@ -257,8 +257,11 @@
       // carry (directory -> dsh-dev-loop-directory), so gen-tsconfig-paths skips
       // them and each needs a hand-written alias, like typert/ and sdk/ above.
       "@deepseek-ai/dsh-dev-loop-approval": ["./packages/dev-loop/approval/src"],
+      "@deepseek-ai/dsh-dev-loop-command": ["./packages/dev-loop/command/src/index.ts"],
       "@deepseek-ai/dsh-dev-loop-directory": ["./packages/dev-loop/directory/src"],
       "@deepseek-ai/dsh-dev-loop-lifecycle": ["./packages/dev-loop/lifecycle/src"],
+      "@deepseek-ai/dsh-dev-loop-persistence": ["./packages/dev-loop/persistence/src/index.ts"],
+      "@deepseek-ai/dsh-dev-loop-persistence/command": ["./packages/dev-loop/persistence/src/command.ts"],
       "@deepseek-ai/dsh-dev-loop-queue": ["./packages/dev-loop/queue/src"],
       "@deepseek-ai/dsh-dev-loop-references": ["./packages/dev-loop/references/src"],
       "@deepseek-ai/dsh-dev-loop-roles": ["./packages/dev-loop/roles/src"],

@@ -10,12 +10,11 @@
  * `ctx.subprocess`: the filesystem seam exposes no rename, and the corpus is
  * version-controlled. Completion awaits a serial policy hook, edits and stages
  * the disk header, moves the file, then updates memory and announces it.
- * These operations are not atomic; persistence and crash reconciliation belong
- * to the required 00.12 integration, not to unawaited announcements.
+ * Required durability records intent before policy or effects and terminal
+ * outcome before publication. Recording uncertainty quarantines the piece.
  *
- * Status is held in memory: `getStatus` is synchronous while its only source,
- * `ctx.devLoopDirectory`, reads asynchronously, so the corpus is hydrated once
- * in `[Service.init]`, which cordis awaits before the mount settles.
+ * `[Service.init]` hydrates committed state before synchronous status reads or
+ * admission. Memory mode explicitly omits durable recording and reconciliation.
  *
  * @module @deepseek-ai/dsh-dev-loop-lifecycle
  */
@@ -28,6 +27,8 @@ import {
   PieceParseError,
 } from '@deepseek-ai/dsh-dev-loop-directory'
 import type { PieceStatus } from '@deepseek-ai/dsh-dev-loop-directory'
+import { DevLoopPersistenceError, observeSource } from '@deepseek-ai/dsh-dev-loop-persistence'
+import type { DevLoopPersistence, HumanAuthorization, SourceObservation, TransitionEffects, TransitionId } from '@deepseek-ai/dsh-dev-loop-persistence'
 import { FsError } from '@deepseek-ai/dsh-fs'
 import type { SubprocessOutcome } from '@deepseek-ai/dsh-subprocess'
 import type { PieceCompletedEvent, PiecePreCompleteEvent, StateTransitionEvent } from './types.ts'
@@ -51,6 +52,8 @@ export const LEGAL_TRANSITIONS: Readonly<Record<PieceStatus, readonly PieceStatu
 
 /** Deployment budgets, defaulted and validated by the lifecycle's Config schema. */
 export interface Config {
+  /** Required mode refuses absent persistence; memory mode is explicitly nondurable. */
+  durability?: 'memory' | 'required'
   /** Positive integer termination grace in milliseconds, at most the Node timer limit. */
   terminationGraceMs?: number
   /** Positive integer in-memory byte cap for each collected command stream. */
@@ -205,6 +208,9 @@ interface HydratedPiece {
   path: string
   /** Target of the transition currently committing, or `undefined` when none is. */
   claim: PieceStatus | undefined
+  sequence: number
+  source?: SourceObservation
+  quarantined: boolean
 }
 
 /**
@@ -229,6 +235,7 @@ function transitionEvent(pieceId: string, from: PieceStatus, to: PieceStatus, re
 export class DevLoopLifecycle extends Service {
   static inject = ['devLoopDirectory', 'fs', 'subprocess']
   static Config: z<Config> = z.object({
+    durability: z.union(['memory', 'required']).default('memory'),
     terminationGraceMs: z.number().step(1).min(1).max(2_147_483_647).default(5_000),
     outputMaxBytes: z.number().step(1).min(1).default(65_536),
   })
@@ -238,6 +245,7 @@ export class DevLoopLifecycle extends Service {
 
   /** Hydrated status per piece id, keyed by the id the piece file declares. */
   private readonly pieces = new Map<string, HydratedPiece>()
+  private persistence: DevLoopPersistence | undefined
 
   /** Teardown prevents admission and cancels all forward work. */
   private readonly lifetime = new AbortController()
@@ -281,13 +289,28 @@ export class DevLoopLifecycle extends Service {
   protected async [Service.init](): Promise<void> {
     const signal = this.lifetime.signal
     signal.throwIfAborted()
+    if (this.config.durability === 'required') {
+      this.persistence = this.ctx.get('devLoopPersistence')
+      if (this.persistence === undefined) {
+        throw new DevLoopPersistenceError('DEV_LOOP_PERSISTENCE_REQUIRED', 'Required lifecycle durability needs devLoopPersistence')
+      }
+      const hydration = await this.persistence.loadLifecycle(signal)
+      signal.throwIfAborted()
+      for (const piece of hydration.pieces) {
+        this.pieces.set(piece.pieceId, {
+          status: piece.status, path: piece.source.path, source: piece.source,
+          sequence: piece.sequence, quarantined: piece.quarantined, claim: undefined,
+        })
+      }
+      return
+    }
     const setNames = await this.ctx.devLoopDirectory.listSets(signal)
     signal.throwIfAborted()
     for (const setName of setNames) {
       const scan = await this.ctx.devLoopDirectory.scanSet(setName, signal)
       signal.throwIfAborted()
       for (const record of scan.pieces) {
-        this.pieces.set(record.id, { status: record.status, path: record.path, claim: undefined })
+        this.pieces.set(record.id, { status: record.status, path: record.path, claim: undefined, sequence: 0, quarantined: false })
       }
       for (const rejection of scan.rejected) {
         const pieceId = rejection.path.slice(rejection.path.lastIndexOf('/') + 1, rejection.path.lastIndexOf('/') + 1 + PIECE_ID_LENGTH)
@@ -329,32 +352,136 @@ export class DevLoopLifecycle extends Service {
    * @param to - the status to move to.
    * @param reason - why the transition happened; recorded on the event.
    * @param signal - optional caller cancellation, combined with lifecycle disposal.
-   * @returns after memory publication and synchronous announcement dispatch; no durable record is written.
-   * @throws Hook, filesystem, command or cancellation errors before publication leave memory unchanged.
+   * @param _authorization - trusted human Consumer acceptance, required for durable todo-to-pending.
+   * @returns after terminal recording in required mode, memory publication and synchronous announcement dispatch.
+   * @throws Hook, filesystem, command or cancellation errors before publication leave committed memory unchanged.
+   * Required-mode recording uncertainty quarantines the piece. Cancellation never cancels terminal recording.
    * Recovery is awaited on a fresh lifetime; PieceRecoveryFailedError retains both failures.
    * A synchronous announcement error propagates after commit without rollback; async listeners are not awaited.
    */
-  async transition(pieceId: string, expected: PieceStatus, to: PieceStatus, reason?: string, signal?: AbortSignal): Promise<void> {
+  async transition(
+    pieceId: string, expected: PieceStatus, to: PieceStatus, reason?: string, signal?: AbortSignal, _authorization?: HumanAuthorization,
+  ): Promise<void> {
     const operationSignal = signal === undefined ? this.lifetime.signal : AbortSignal.any([signal, this.lifetime.signal])
     operationSignal.throwIfAborted()
     const piece = this.claim(pieceId, expected, to)
-    if (to === 'done') {
-      // Register before invoking hooks: a hook may synchronously start disposal.
-      const operation = Promise.resolve().then(() => this.complete(pieceId, piece, expected, reason, operationSignal))
-      this.active.add(operation)
-      try {
-        await operation
-      } finally {
-        this.active.delete(operation)
+    // Register before invoking providers or hooks, which may synchronously dispose this service.
+    const operation = Promise.resolve().then(() => this.execute(pieceId, piece, expected, to, reason, operationSignal, _authorization))
+    this.active.add(operation)
+    try {
+      await operation
+    } finally {
+      this.active.delete(operation)
+    }
+  }
+
+  /** Read complete source only when the provider's byte count establishes faithful UTF-8 decoding. */
+  private async observe(path: string, signal: AbortSignal): Promise<SourceObservation> {
+    const fs = this.ctx.fs
+    const target = await fs.resolve(path, { signal })
+    const before = await fs.stat(target, signal)
+    if (before === undefined) throw new FsError(`piece file "${path}" is absent`, 'FS_NOT_FOUND')
+    const content = await fs.readText(target, signal)
+    const after = await fs.stat(target, signal)
+    if (before.size === undefined || before.size !== Buffer.byteLength(content, 'utf8') || after?.version !== before.version) {
+      throw new DevLoopPersistenceError('PIECE_REVIEW_STALE', `Cannot establish byte-faithful source for "${path}"`)
+    }
+    return observeSource(path, content, before.version)
+  }
+
+  /** An admitted intent owns terminal recording even after caller cancellation or disposal. */
+  private async execute(
+    pieceId: string, piece: HydratedPiece, from: PieceStatus, to: PieceStatus,
+    reason: string | undefined, signal: AbortSignal, authorization: HumanAuthorization | undefined,
+  ): Promise<void> {
+    const effects: { -readonly [K in keyof TransitionEffects]: TransitionEffects[K] } = {
+      header: 'none', index: 'none', move: 'none', cleanup: 'not-needed',
+    }
+    const persistence = this.persistence
+    let id: TransitionId | undefined
+    let source: SourceObservation | undefined
+    let newPath = piece.path
+    try {
+      signal.throwIfAborted()
+      if (persistence !== undefined) {
+        if (to === 'pending' && authorization === undefined) {
+          throw new DevLoopPersistenceError('PIECE_AUTHORIZATION_REQUIRED', `Piece "${pieceId}" requires human acceptance`)
+        }
+        source = await this.observe(piece.path, signal)
+        const reviewed = to === 'pending' ? authorization?.source : to === 'done' ? piece.source : undefined
+        if (reviewed !== undefined && (reviewed.path !== source.path || reviewed.rawDigest !== source.rawDigest
+          || reviewed.contentDigest !== source.contentDigest || (to === 'pending' && reviewed.version !== source.version))) {
+          throw new DevLoopPersistenceError('PIECE_REVIEW_STALE', `Piece "${pieceId}" differs from its accepted source`)
+        }
+        const separator = piece.path.lastIndexOf('/')
+        const destinationPath = to === 'done'
+          ? `${piece.path.slice(0, separator)}/${DONE_DIRECTORY}/${piece.path.slice(separator + 1)}` : piece.path
+        try {
+          id = await persistence.beginTransition({
+            pieceId, expected: from, from, to, source, destinationPath, sequence: piece.sequence + 1,
+            signal, ...(reason === undefined ? {} : { reason }), ...(authorization === undefined ? {} : { authorization }),
+          })
+        } catch (error) {
+          if (error instanceof DevLoopPersistenceError) throw error
+          throw new DevLoopPersistenceError('DEV_LOOP_INTENT_WRITE_FAILED', `Cannot record intent for "${pieceId}"`, effects, { cause: error })
+        }
+        piece.sequence++
       }
-      return
+      signal.throwIfAborted()
+      if (to === 'done') {
+        const completed = await this.complete(pieceId, piece, reason, signal, effects, source)
+        newPath = completed.path
+        source = completed.source
+      }
+      signal.throwIfAborted()
+      if (persistence !== undefined && id !== undefined) {
+        const terminalSource = await this.observe(newPath, signal)
+        if (source !== undefined && (terminalSource.contentDigest !== source.contentDigest
+          || terminalSource.rawDigest !== source.rawDigest)) {
+          throw new DevLoopPersistenceError('PIECE_REVIEW_STALE', `Piece "${pieceId}" changed during its transition`)
+        }
+        source = terminalSource
+      }
+    } catch (error) {
+      if (effects.move !== 'none' || effects.header === 'unknown' || effects.index === 'unknown'
+        || effects.cleanup === 'failed' || effects.cleanup === 'unknown') piece.quarantined = persistence !== undefined
+      try {
+        if (persistence !== undefined && id !== undefined) {
+          await this.recordTerminal(persistence, id, { kind: 'failed', code: error instanceof Error && 'code' in error ? String(error.code) : 'PIECE_TRANSITION_FAILED', effects }, piece)
+        }
+      } finally {
+        piece.claim = undefined
+      }
+      throw error
+    }
+    try {
+      if (persistence !== undefined && id !== undefined && source !== undefined) {
+        await this.recordTerminal(persistence, id, { kind: 'committed', source, effects }, piece)
+      }
+    } finally {
+      piece.claim = undefined
     }
     piece.status = to
-    piece.claim = undefined
-    const event = transitionEvent(pieceId, expected, to, reason)
-    // No announcement is declared for returning a blocked piece to the queue.
+    piece.path = newPath
+    if (source !== undefined) piece.source = source
+    const event = transitionEvent(pieceId, from, to, reason)
+    if (to === 'done') this.ctx.emit('piece/completed', { ...event, to: 'done', newPath })
     if (to === 'pending') this.ctx.emit('piece/approved', event)
     if (to === 'blocked') this.ctx.emit('piece/blocked', event)
+  }
+
+  /** Recording uncertainty leaves the intent unresolved and forbids further admission. */
+  private async recordTerminal(
+    persistence: DevLoopPersistence, id: TransitionId,
+    observation: import('@deepseek-ai/dsh-dev-loop-persistence').TransitionObservation, piece: HydratedPiece,
+  ): Promise<void> {
+    try {
+      await persistence.finishTransition(id, observation)
+    } catch (error) {
+      piece.quarantined = true
+      if (error instanceof DevLoopPersistenceError) throw error
+      throw new DevLoopPersistenceError('DEV_LOOP_TERMINAL_WRITE_FAILED', 'Cannot record lifecycle terminal outcome', observation.effects, { cause: error })
+    }
   }
 
   /**
@@ -367,27 +494,60 @@ export class DevLoopLifecycle extends Service {
   private claim(pieceId: string, expected: PieceStatus, to: PieceStatus): HydratedPiece {
     const piece = this.requirePiece(pieceId)
     const held = piece.claim ?? piece.status
-    if (held !== expected) throw new StalePieceStatusError(pieceId, expected, held)
+    if (piece.claim !== undefined || held !== expected) throw new StalePieceStatusError(pieceId, expected, held)
     if (!this.canTransition(expected, to)) throw new InvalidStateTransitionError(pieceId, expected, to)
     piece.claim = to
     return piece
   }
 
+  /** Locate Directory's last initial Status field; fenced headings do not end the header. */
+  private headerStatus(content: string): { start: number; end: number } | undefined {
+    let offset = 0
+    let replacement: { start: number; end: number } | undefined
+    let fence: string | undefined
+    for (const physical of content.split(/(?<=\n)/u)) {
+      const line = physical.replace(/\r?\n$/u, '')
+      const marker = /^ {0,3}(`{3,}|~{3,})/u.exec(line)?.[1]
+      if (fence !== undefined) {
+        if (marker !== undefined && marker[0] === fence[0] && marker.length >= fence.length) fence = undefined
+      } else if (marker !== undefined) {
+        fence = marker
+      } else if (line.startsWith('## ')) {
+        break
+      }
+      let segmentOffset = 0
+      for (const segment of line.split('·')) {
+        const match = /^(\s*\*\*Status:\*\*\s*)(todo|pending|blocked|done)(\s*)$/u.exec(segment)
+        const prefix = match?.[1]
+        const status = match?.[2]
+        if (prefix !== undefined && status !== undefined) {
+          const start = offset + segmentOffset + prefix.length
+          replacement = { start, end: start + status.length }
+        }
+        segmentOffset += segment.length + 1
+      }
+      offset += physical.length
+    }
+    return replacement
+  }
+
   /**
-   * Await policy and the completing move before publishing memory and announcing.
-   * Failure releases the claim; callers must inspect recovery failures before retrying.
+   * Await policy and the completing move, retaining independent effect and restoration facts.
+   * The caller owns the claim through terminal recording and publication.
    *
    * @param pieceId - the piece completing.
    * @param piece - its hydrated state, already claimed for `done`.
-   * @param from - the status it held, recorded on the event.
    * @param reason - why it completed.
    * @param signal - combined caller and lifecycle cancellation.
    */
   private async complete(
-    pieceId: string, piece: HydratedPiece, from: PieceStatus, reason: string | undefined, signal: AbortSignal,
-  ): Promise<void> {
+    pieceId: string, piece: HydratedPiece, reason: string | undefined, signal: AbortSignal,
+    effects: { -readonly [K in keyof TransitionEffects]: TransitionEffects[K] },
+    source: SourceObservation | undefined,
+  ): Promise<{ path: string; source: SourceObservation | undefined }> {
     let restoreHeader: (() => Promise<unknown>) | undefined
     let newPath: string
+    let terminalSource: SourceObservation | undefined
     try {
       signal.throwIfAborted()
       await this.ctx.serial('piece/pre-complete', {
@@ -411,37 +571,63 @@ export class DevLoopLifecycle extends Service {
       if (observed === undefined) throw new FsError(`piece file "${path}" is absent`, 'FS_NOT_FOUND')
       const content = await fs.readText(target, signal)
       signal.throwIfAborted()
-      const section = content.search(/^## /m)
-      const header = section < 0 ? content : content.slice(0, section)
-      const status = /(?:^|·)[ \t]*\*\*Status:\*\*[ \t]*(todo|pending|done|blocked)(?=[ \t]*(?:·|\r?$))/m.exec(header)
-      if (status === null) throw new FsError(`piece file "${path}" has no valid Status header`, 'FS_EDIT_NOT_FOUND')
-      // Include the preceding header so a matching example in the body cannot be edited.
-      const oldString = content.slice(0, status.index + status[0].length)
-      const newString = oldString.replace(/(?:todo|pending|done|blocked)$/, 'done')
+      if (source !== undefined && (observed.size === undefined || observed.size !== Buffer.byteLength(content, 'utf8')
+        || observed.version !== source.version || observeSource(path, content, observed.version).rawDigest !== source.rawDigest)) {
+        throw new DevLoopPersistenceError('PIECE_REVIEW_STALE', `Piece "${pieceId}" changed before its header edit`)
+      }
+      const status = this.headerStatus(content)
+      if (status === undefined) throw new FsError(`piece file "${path}" has no valid Status header`, 'FS_EDIT_NOT_FOUND')
+      // The complete prefix distinguishes the parsed header from repeated body examples.
+      const oldString = content.slice(0, status.end)
+      const newString = content.slice(0, status.start) + 'done'
       // Already-done headers are guarded too; the resulting token still owns recovery.
-      const edited = await fs.editText(target, { oldString, newString, replaceAll: false }, { version: observed.version }, signal)
+      const edit = fs.editText(target, { oldString, newString, replaceAll: false }, { version: observed.version }, signal)
+      const edited = await edit.catch(async (error: unknown) => {
+        if (source !== undefined) {
+          effects.header = 'unknown'
+          effects.cleanup = 'unknown'
+          let current: SourceObservation | undefined
+          try {
+            current = await this.observe(path, new AbortController().signal)
+          } catch {
+            // A failed observation cannot establish whether the rejected edit changed bytes.
+          }
+          if (current?.rawDigest === source.rawDigest) {
+            effects.header = 'none'
+            effects.cleanup = 'not-needed'
+          } else if (current !== undefined
+            && current.rawDigest === observeSource(path, newString + content.slice(oldString.length), current.version).rawDigest) {
+            effects.header = 'applied'
+            restoreHeader = () => fs.editText(target, {
+              oldString: newString, newString: oldString, replaceAll: false,
+            }, { version: current.version }, new AbortController().signal)
+          }
+        }
+        throw error
+      })
+      effects.header = 'applied'
+      if (source !== undefined) terminalSource = observeSource(newPath, newString + content.slice(oldString.length), edited.version)
       restoreHeader = () => fs.editText(target, {
         oldString: newString, newString: oldString, replaceAll: false,
       }, { version: edited.version }, new AbortController().signal)
-      await this.run(pieceId, ['git', 'add', '-u', '--', fileName], cwd, signal)
+      await this.run(pieceId, ['git', 'add', '-u', '--', fileName], cwd, signal, (value) => { effects.index = value })
       await this.run(pieceId, ['mkdir', '-p', DONE_DIRECTORY], cwd, signal)
-      await this.run(pieceId, ['git', 'mv', '--', fileName, destination], cwd, signal)
+      await this.run(pieceId, ['git', 'mv', '--', fileName, destination], cwd, signal, (value) => { effects.move = value })
       // All pre-publication awaits share the recovery owner, including this final cancellation check.
       signal.throwIfAborted()
     } catch (error) {
       try {
-        await restoreHeader?.()
+        if ((this.persistence === undefined || effects.move === 'none') && restoreHeader !== undefined) {
+          await restoreHeader()
+          effects.cleanup = 'restored'
+        }
       } catch (recoveryError) {
+        effects.cleanup = 'failed'
         throw new PieceRecoveryFailedError(pieceId, error, recoveryError)
-      } finally {
-        piece.claim = undefined
       }
       throw error
     }
-    piece.status = 'done'
-    piece.path = newPath
-    piece.claim = undefined
-    this.ctx.emit('piece/completed', { ...transitionEvent(pieceId, from, 'done', reason), to: 'done', newPath })
+    return { path: newPath, source: terminalSource }
   }
 
   /**
@@ -452,7 +638,10 @@ export class DevLoopLifecycle extends Service {
    * @param cwd - absolute directory in the filesystem backend's execution world.
    * @param signal - aborts the process through the subprocess provider.
    */
-  private async run(pieceId: string, argv: readonly string[], cwd: string, signal: AbortSignal): Promise<void> {
+  private async run(
+    pieceId: string, argv: readonly string[], cwd: string, signal: AbortSignal,
+    effect?: (value: 'applied' | 'unknown') => void,
+  ): Promise<void> {
     signal.throwIfAborted()
     const handle = this.ctx.subprocess.spawn({
       argv,
@@ -468,6 +657,10 @@ export class DevLoopLifecycle extends Service {
     let outcome: SubprocessOutcome
     try {
       outcome = await handle.done
+      effect?.(outcome.exitCode === 0 && outcome.signal === null ? 'applied' : 'unknown')
+    } catch (error) {
+      effect?.('unknown')
+      throw error
     } finally {
       try {
         handle.terminate()
@@ -489,6 +682,7 @@ export class DevLoopLifecycle extends Service {
   private requirePiece(pieceId: string): HydratedPiece {
     const piece = this.pieces.get(pieceId)
     if (piece === undefined) throw this.absence(pieceId)
+    if (piece.quarantined) throw new DevLoopPersistenceError('PIECE_QUARANTINED', `Piece "${pieceId}" requires inspection before admission`)
     return piece
   }
 

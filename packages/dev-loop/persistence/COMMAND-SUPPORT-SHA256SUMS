@@ -1,0 +1,8 @@
+03ec5f550672c6c37a653ae09596206c2797839b6af8551cf92826cc8932665d  packages/dev-loop/command/src/errors.ts
+f90cbe88db01b74c88ed303c653203eaec5e2796cc1a6e7bdb7be1e6460f2c35  packages/dev-loop/command/src/index.ts
+652aa8c0ca8e91111e1ea947dbb8061f7ed974b0e5de30152d3a243b5042ccd9  packages/dev-loop/command/src/input.ts
+5e896cd8bd98a0966ac934e02ff9bd405e582489e0306c8a7fd350628df223fb  packages/dev-loop/command/src/observations.ts
+1ca32d77bd036a58399743451cf1ed1858ac0bce5da49d69aa2878186b1d64fa  packages/dev-loop/command/src/review.ts
+fc15bb573b04d0bb4dbb1e47f3db8a025bbf4fbd90091d922b12dd062373662c  packages/dev-loop/command/src/types.ts
+eab76b63aa27b9200052146351fed73ea3eb220f38c8a635c96bd991a71a7d4b  packages/dev-loop/command/package.json
+61c29f3e83272d0a4d97a74dc4148cf2aefb916ddff2faa12b8087f2204a8d11  packages/dev-loop/command/tsconfig.json

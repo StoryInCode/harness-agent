@@ -1,0 +1,8 @@
+3fa45e6a2038212a67d6d7ec6ef15f2cd87bcf415b21a9dea0f206955d2f5181  packages/dev-loop/persistence/tests/lifecycle-supplement.spec.ts
+ff0ae55e984665b800859e803cefe346a3f89343380f0708765eccc63bea936d  packages/dev-loop/persistence/tests/persistence-api-supplement.spec.ts
+c65ee97f41ed75a639f4848673c504e19b4f1afe609c1c533c444ec63b3ea2c2  packages/dev-loop/persistence/tests/reconcile-supplement.spec.ts
+24abf621c6ef9aca8bfcdd24f80229bff04ed8ce881004a95f72ba43c34a010e  packages/dev-loop/persistence/tests/records-supplement.spec.ts
+a6d6ab4c1b02a60a1aaa8626f1acb45bec5bc50eca594cf8b784ba6f6e334737  packages/dev-loop/persistence/tests/recovery-audit-supplement.spec.ts
+7d46ec13b70722fec1a5212f6b3f9d20f6c12c5a8c036e08070481109fec3d05  packages/dev-loop/persistence/tests/recovery-command-supplement.spec.ts
+84a5c3809e76e41b0944e16d491fd3011a4cf769642f7ed45219708bfb00e7d7  packages/dev-loop/persistence/tests/source-supplement.spec.ts
+9dc507b979fdf5defd402ed4deedcdd21d062a221d72c1f99f72939e2bbbde61  packages/dev-loop/persistence/tests/SUPPLEMENT-RED.md

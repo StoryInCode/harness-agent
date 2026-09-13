@@ -34,6 +34,7 @@
   "peerDependencies": {
     "@deepseek-ai/cordis": "workspace:^",
     "@deepseek-ai/dsh-dev-loop-directory": "workspace:^",
+    "@deepseek-ai/dsh-dev-loop-persistence": "workspace:^",
     "@deepseek-ai/dsh-fs": "workspace:^",
     "@deepseek-ai/dsh-subprocess": "workspace:^"
   },
@@ -45,6 +46,7 @@
     "@deepseek-ai/cordis-plugin-include": "workspace:^",
     "@deepseek-ai/cordis-plugin-loader": "workspace:^",
     "@deepseek-ai/dsh-dev-loop-directory": "workspace:^",
+    "@deepseek-ai/dsh-dev-loop-persistence": "workspace:^",
     "@deepseek-ai/dsh-fs": "workspace:^",
     "@deepseek-ai/dsh-fs-local": "workspace:^",
     "@deepseek-ai/dsh-subprocess": "workspace:^",

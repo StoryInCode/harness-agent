@@ -1,6 +1,6 @@
 /**
  * Human approval Consumer of the directory, lifecycle and user-question services.
- * Approval is an in-memory compare-and-set, not durable revision-bound authorization.
+ * Acceptance binds the actual tool invocation and displayed source to Lifecycle.
  * @module @deepseek-ai/dsh-dev-loop-approval
  */
 import type { Context } from '@deepseek-ai/cordis'
@@ -11,6 +11,7 @@ import type { AskUserQuestionAnswer } from '@deepseek-ai/dsh-user-questions'
 import '@deepseek-ai/dsh-fs'
 import { PieceNotFoundError } from '@deepseek-ai/dsh-dev-loop-directory'
 import '@deepseek-ai/dsh-dev-loop-lifecycle'
+import { observeSource } from '@deepseek-ai/dsh-dev-loop-persistence'
 import type { PresentPieceResult } from './types.ts'
 
 export type { ApprovalDecision, PresentPieceResult } from './types.ts'
@@ -87,6 +88,10 @@ async function presentPiece(ctx: Context, pieceId: string, exec: ToolRunContext,
   const afterRead = await ctx.fs.stat(target, signal)
   signal.throwIfAborted()
   if (afterRead?.version !== observed.version) throw staleReview()
+  const bytes = Buffer.byteLength(content, 'utf8')
+  if (observed.size === undefined || afterRead.size === undefined || observed.size !== bytes || afterRead.size !== bytes) {
+    throw new HarnessError('Source byte size is unknown or differs from the reviewed UTF-8 bytes.', 'PIECE_REVIEW_STALE')
+  }
   const current = ctx.devLoopDirectory.validate(record.path, content)
   if (current.id !== pieceId) throw staleReview()
   const answer = await ctx.userQuestions.ask({
@@ -103,8 +108,12 @@ async function presentPiece(ctx: Context, pieceId: string, exec: ToolRunContext,
   if (result.decision === 'accept') {
     const reviewed = await ctx.fs.stat(target, signal)
     signal.throwIfAborted()
-    if (reviewed?.version !== observed.version) throw staleReview()
-    await ctx.devLoopLifecycle.transition(pieceId, 'todo', 'pending', undefined, signal)
+    if (reviewed?.version !== observed.version || reviewed.size !== bytes) throw staleReview()
+    await ctx.devLoopLifecycle.transition(pieceId, 'todo', 'pending', undefined, signal, {
+      kind: 'tool', callId: exec.callId, sessionId: exec.agent.session.id,
+      decision: 'accept', answer: { id: 'decision', selected: ['Accept'] },
+      source: observeSource(record.path, content, observed.version),
+    })
   }
   return result
 }

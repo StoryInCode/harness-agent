@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-Change a development-loop piece's status through a compare-and-set writer that rejects stale or illegal transitions. Completion awaits policy listeners, rewrites the disk header, and stages a move into the set's `done/` directory. Cancellation waits for active work and guarded header recovery. Status remains in memory; this package alone does not enforce verification or provide restart durability.
+Change a development-loop piece's status through a compare-and-set writer that rejects stale or illegal transitions. Completion awaits policy listeners, rewrites the disk header, and stages a move into the set's `done/` directory. Cancellation waits for active work and guarded header recovery. Memory mode is nondurable; required mode uses the persistence provider for restart reconciliation and durable-before-visible publication. This package alone does not enforce verification.
 
 ## Table of Contents
 
@@ -28,18 +28,21 @@ Mount the service through a host composition with `devLoopDirectory`, `fs`, and 
 
 ### Configuration
 
-Cordis validates these optional fields at mount and supplies them to every subprocess request.
+Cordis validates these optional fields at mount. Subprocess limits apply to every subprocess request; durability selects the status recording policy. Required mode needs `devLoopPersistence` and `inject: ['devLoopPersistence']` on the Lifecycle composition entry so Loader waits for it. Missing required persistence rejects initialization.
 
 | Field | Default | Accepted values |
 |---|---|---|
 | `terminationGraceMs` | `5000` | Positive integer milliseconds, at most `2147483647` |
 | `outputMaxBytes` | `65536` | Positive integer bytes per collected stream |
+| `durability` | `memory` | `memory` or `required`; required mode awaits persistence hydration and writes |
 
 ### Status changes
 
 `getStatus(pieceId)` returns held logical state, not a fresh disk read. `canTransition(from, to)` checks the exported `LEGAL_TRANSITIONS` table: `todo → pending`, `pending → done`, `pending → blocked`, and `blocked → todo`. `done` has no outgoing edge.
 
-Call `transition(pieceId, expected, to, reason?, signal?)` with the observed status. A stale or competing claim rejects with `StalePieceStatusError` (`PIECE_STALE_STATUS`); an illegal edge rejects with `InvalidStateTransitionError` (`INVALID_STATE_TRANSITION`). Non-completing transitions change memory only, so the disk header can still declare `todo` when approved memory holds `pending`.
+Call `transition(pieceId, expected, to, reason?, signal?, authorization?)` with the observed status. A stale or competing claim rejects with `StalePieceStatusError` (`PIECE_STALE_STATUS`); an illegal edge rejects with `InvalidStateTransitionError` (`INVALID_STATE_TRANSITION`). Neither rejection creates an intent. Non-completing transitions leave the disk header unchanged; required mode records their logical status durably.
+
+Trusted human Consumers supply the sixth argument from the actual tool or command invocation, never model arguments. Required todo-to-pending admission rejects missing acceptance with `PIECE_AUTHORIZATION_REQUIRED` and changed reviewed source with `PIECE_REVIEW_STALE`. Memory mode remains nondurable even when a Consumer forwards authorization. Required hydration quarantines inconsistent history/source observations; `getStatus` and transitions then reject with `PIECE_QUARANTINED`, not an apparently usable status.
 
 ### Completion policy and announcements
 
@@ -65,9 +68,9 @@ The optional fifth argument cancels forward work together with lifecycle disposa
 
 The claim is synchronous, before the first await, while readers continue to see committed memory. Completion checks Git tracking, obtains a filesystem stat version, and edits the actual header through `fs.editText`. The literal edit includes the preceding header to avoid changing a matching example in the body. Already-done headers remain guarded and can be promoted by a live pending retry.
 
-The checked command sequence is tracking → header edit → `git add -u` → `mkdir -p done` → `git mv` → memory publication → announcement. Tracking precedes mutation; `git add -u` cannot start tracking an untracked source. Git stages the header and rename without creating a commit. The filesystem API provides neither directory creation nor rename.
+The completion effect sequence is tracking → header edit → `git add -u` → `mkdir -p done` → `git mv`. Required-mode terminal recording precedes memory publication and announcement. Tracking precedes mutation; `git add -u` cannot start tracking an untracked source. Git stages the header and rename without creating a commit. The filesystem API provides neither directory creation nor rename.
 
-Header editing, Git index changes, file movement, and memory publication are not one transaction. Recovery restores only the owned header; the index can retain staged completion content, and directory creation can remain. A process crash may prevent recovery entirely. The required [00.12 persistence integration](../../../plans/pieces/00-dev-loop/00.12-loop-persistence.md) must reconcile location, header, and durable status and introduce an awaited persistence operation before notification.
+Header editing, Git index changes, file movement, and memory publication are not one transaction. Recovery restores only the owned header; the index can retain staged completion content, and directory creation can remain. A process crash may prevent recovery entirely. Required mode awaits a durable intent before policy or effects and the terminal update before memory publication or notification. [Persistence](../persistence/README.md) owns history, reconciliation, complete-record limits, and observation-only acknowledgment. Terminal recording failure quarantines the piece and retains an unresolved intent; cancellation does not cancel the recording obligation. Effect records distinguish forward header/index/move observations from later cleanup.
 
 No invariant companion is published: legality is enforced directly from one table rather than independently maintained observations. Cross-process file/index/record reconciliation is not supplied by that check. Exact operations and event declarations live in [src/index.ts](src/index.ts); shared event fields live in [src/types.ts](src/types.ts).
 
@@ -86,13 +89,12 @@ Nothing here enters a model request, so provider cache reuse is unaffected.
 The local operation does not constitute the full autonomous development loop.
 
 - **Integration is required:** human approval (00.03), verification (00.10), persistence/reconciliation (00.12), and claim checks (00.13) remain separate obligations. Passing lifecycle tests proves none of those full-loop requirements.
-- **State is process-local:** hydration occurs once at mount, external file edits do not refresh held status, and non-completing transitions do not update disk. There is no durable transition record or restart reconciliation here.
+- **Memory mode is process-local:** hydration occurs once at mount and external file edits do not refresh held status. Required mode hydrates committed history through persistence; it does not recreate live execution or automatically repair quarantine.
 - **Completion is not a document-format validator:** it requires a valid status header but does not revalidate all corpus sections after an external edit. A format policy must be installed on `piece/pre-complete` when required.
 - **Recovery is compensating, not atomic:** staged changes can remain after failure. Concurrent edits are protected by filesystem version guards, not by a cross-process Git transaction. Cancellation during movement can leave an uncertain outcome requiring inspection.
 - **Completion requires a tracked Git source and a POSIX execution world:** `mkdir -p` is not portable to native Windows. Portable directory creation requires a filesystem capability change.
 - **Reopening is unspecified:** 02.04 and the supervisor plan disagree on the target status; `done` stays absorbing until the plan owner resolves that policy.
 
-<a id="dev-note"></a>
 ### Dev Note
 
 None.

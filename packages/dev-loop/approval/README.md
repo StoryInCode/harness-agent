@@ -5,8 +5,6 @@ kind: "package-reference"
 
 # @deepseek-ai/dsh-dev-loop-approval
 
-English | [中文](README.zh.md)
-
 ## Summary
 
 Ask a human to Accept, Question, or Change one specification piece. The tool displays the complete current markdown, warns about missing teaching subsections, and queues only an unchanged todo piece explicitly accepted by the human. Questions and feedback never authorize work. This fork-owned consumer uses the existing user-question interface; it does not provide a new browser panel or durable approval storage.
@@ -28,13 +26,13 @@ Call `present_piece_for_approval` with `{"pieceId":"00.03"}` from a live root ag
 
 Only one exact decision selection with no custom decision text is accepted. Skipped, duplicate, unrecognized, or multiple choices fail with `APPROVAL_DECISION_REQUIRED`. Duplicate feedback answers also fail. Feedback is trimmed and omitted when blank. The result is a strict object such as `{"pieceId":"00.03","decision":"change","feedback":"Explain the alternatives."}`.
 
-Accept invokes the lifecycle compare-and-set from `todo` to `pending`, returning only after that operation succeeds. Question and Change leave lifecycle state untouched. This tool never rewrites the piece file or starts implementation work itself.
+Accept invokes the lifecycle compare-and-set from `todo` to `pending`, returning only after that operation succeeds. It supplies trusted authorization containing the actual tool call ID, receiving Session ID, exact Accept decision, and displayed source/version in both memory and required modes. UserQuestions supplies no receipt ID. Question and Change leave lifecycle state untouched. This tool never rewrites the piece file or starts implementation work itself.
 
 ### Review warnings and failures
 
 The source is read in full and revalidated with the directory's configured parser options. Teaching checks recognize markdown subheadings and bold list labels inside `## Teach me while you build`, outside fenced code. Each missing label appends `Review warning: missing teaching subsection: <name>.`, where `<name>` is `Approaches considered` or `Prior art inspected`; original source remains intact.
 
-Missing pieces report `PIECE_NOT_FOUND`; malformed pieces retain their parser diagnosis. Non-todo lifecycle status reports `PIECE_NOT_APPROVABLE`. Changed source versions or a mismatched parsed id report `PIECE_REVIEW_STALE` and require a fresh presentation. A competing lifecycle transition fails the acceptance rather than producing a successful result.
+Missing pieces report `PIECE_NOT_FOUND`; malformed pieces retain their parser diagnosis. Non-todo lifecycle status reports `PIECE_NOT_APPROVABLE`. Changed source versions, a mismatched parsed id, or unknown/mismatched UTF-8 byte counts report `PIECE_REVIEW_STALE` and require a fresh presentation. BOM-prefixed source is unsupported because the local text provider strips the BOM; stripped text cannot establish the original byte identity. A competing lifecycle transition fails the acceptance rather than producing a successful result.
 
 A missing caller reports `CALLER_NOT_LIVE`. The question service checks that a supplied caller is the exact live root and rejects owned children with `DELEGATED_CALLER`; it reports `NO_PROVIDER` when no answerer claims the request. Provider failures and cancellation return tool errors without approval.
 
@@ -80,7 +78,7 @@ The tool result appends to the conversation rather than replacing earlier messag
 
 ## Known Limitations and Deferred Work
 
-- **Approval is not durable:** acceptance updates lifecycle memory and emits its announcement. Revision-bound evidence and restart reconciliation belong to 00.12; this tool does not automatically re-present interrupted reviews.
+- **Durability belongs to Lifecycle:** required mode records revision-bound acceptance through [persistence](../persistence/README.md) before publication; memory mode remains nondurable. This tool does not automatically re-present interrupted reviews or repair quarantined pieces.
 - **Freshness is not a cross-service transaction:** a final file-version check narrows the review race but cannot prevent an external edit between that check and lifecycle commit.
 - **Generic UI constraints:** the decision question can offer custom text, but this tool rejects it as authorization. Missing teaching subsections warn rather than veto; broader verification belongs to its policy consumers.
 - **Composition and demo are separate:** this fork-owned package does not install the 00.14 dev-loop preset. A mounted Web demonstration and complete-loop approval evidence are not established by package tests.

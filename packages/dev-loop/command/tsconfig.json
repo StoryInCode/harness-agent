@@ -4,12 +4,14 @@
   "include": ["src"],
   "references": [
     { "path": "../../../vendor/cordis" },
-    { "path": "../../llm/llm" },
-    { "path": "../../core/tools" },
-    { "path": "../../interaction/user-questions" },
+    { "path": "../../../vendor/schemastery" },
+    { "path": "../../core/agent" },
+    { "path": "../../interaction/commands" },
     { "path": "../../fs/fs" },
+    { "path": "../../util/values" },
     { "path": "../directory" },
     { "path": "../lifecycle" },
-    { "path": "../persistence" }
+    { "path": "../persistence" },
+    { "path": "../queue" }
   ]
 }

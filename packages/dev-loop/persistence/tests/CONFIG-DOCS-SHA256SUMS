@@ -1,0 +1,3 @@
+# Supersedes only the historical types.ts hash fa0253ef1f482eb98cc65395997f8957065e5ed79c7fabb2fe1df7d36e95db85.
+# Parent-authorized JSDoc-only amendment: Config.repositoryRoot, maxRecordBytes, maxHistoryRecords; no DTO fields changed.
+7e309426f270b24c75c50d8541889f7416ee8758d3691388fbfe6451a41d6eb1  packages/dev-loop/persistence/src/types.ts

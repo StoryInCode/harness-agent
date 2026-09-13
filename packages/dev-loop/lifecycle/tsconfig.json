@@ -12,6 +12,7 @@
     { "path": "../../../vendor/cordis" },
     { "path": "../../../vendor/schemastery" },
     { "path": "../directory" },
+    { "path": "../persistence" },
     { "path": "../../fs/fs" },
     { "path": "../../subprocess/subprocess" }
   ]
