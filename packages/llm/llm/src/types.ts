@@ -236,6 +236,12 @@ export interface LlmConfigurableProvider {
    * from outside.
    */
   declared?: boolean
+  /**
+   * Whether the route uses a model subscription rather than API billing.
+   * OAuth alone does not imply a subscription; Google Cloud ADC is excluded.
+   * Only the owning adapter can answer. Absent means no claim.
+   */
+  subscription?: boolean
   /** Configuration diagnostic for repair; unaffected models may remain serviceable. */
   error?: string
 }

@@ -98,6 +98,22 @@ const GROUP_ORDER = [
 ]
 
 const SERVICE_ROLES: ServiceRole[] = [
+  // FORK-LOCAL: concrete development-loop services, not swappable provider registries.
+  {
+    key: 'devLoopDirectory',
+    pkg: 'dev-loop-directory',
+    title: 'Piece discovery and validation',
+    mode: 'core',
+    consumers: ['dev-loop-lifecycle'],
+    note: 'Reads the configured corpus through ctx.fs and returns validated records and independent file rejections.',
+  },
+  {
+    key: 'devLoopLifecycle',
+    pkg: 'dev-loop-lifecycle',
+    title: 'Guarded piece transitions',
+    mode: 'core',
+    note: 'Owns process-local status, transition claims, and compensating Git promotion through filesystem and subprocess services.',
+  },
   {
     key: 'attachments',
     pkg: 'attachment',
@@ -476,7 +492,8 @@ const SERVICE_ROLES: ServiceRole[] = [
     title: 'Subprocess seam',
     mode: 'seam',
     implementations: ['subprocess-local', 'subprocess-e2b'],
-    consumers: ['bash-local', 'bash-sandbox', 'terminal-bash', 'lsp-stdio', 'subagent-acp', 'subagent-codex', 'subagent-claude-code'],
+    // FORK-LOCAL: lifecycle owns and joins its Git command ranges.
+    consumers: ['bash-local', 'bash-sandbox', 'terminal-bash', 'lsp-stdio', 'subagent-acp', 'subagent-codex', 'subagent-claude-code', 'dev-loop-lifecycle'],
     note: 'The bash executors, the PTY shell backend, the LSP host, and the out-of-process ACP, Codex, and Claude Code subagent backends spawn through ctx.subprocess; the service owns process coordinates, tree/session lifetime, stdio dispositions, terminal mechanics, and kill escalation.',
   },
   {
@@ -555,7 +572,8 @@ const SERVICE_ROLES: ServiceRole[] = [
     title: 'Filesystem provider seam',
     mode: 'seam',
     implementations: ['fs-local', 'fs-sandbox', 'fs-e2b'],
-    consumers: ['tool-fs'],
+    // FORK-LOCAL: directory and lifecycle consume the filesystem service directly.
+    consumers: ['tool-fs', 'dev-loop-directory', 'dev-loop-lifecycle'],
     companions: ['fs-observation-policy'],
     note: 'tool-fs executes read/write/edit through ctx.fs; fs-sandbox fences mutations by the shared sandbox mode; fs-observation-policy contributes observed-state checks through the fs/* event gate.',
   },

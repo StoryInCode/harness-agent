@@ -30,6 +30,7 @@ export interface ProviderDirectoryEntry {
   readonly settingsPath: readonly string[]
   readonly active: boolean
   readonly declared?: boolean
+  readonly subscription?: boolean
   readonly error?: string
 }
 
@@ -52,6 +53,7 @@ export function joinProviderDirectory(
     settingsPath: [...entry.settingsPath],
     active: active.has(entry.provider),
     ...entry.declared === undefined ? {} : { declared: entry.declared },
+    ...entry.subscription === undefined ? {} : { subscription: entry.subscription },
     ...entry.error === undefined ? {} : { error: entry.error },
   }))
   for (const provider of registered) {

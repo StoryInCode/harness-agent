@@ -1,0 +1,22 @@
+# Authored native protocol fixture; neither this composition nor replay invokes agy.
+- id: llm-deepseek
+  disabled: true
+
+- insert:
+    - id: antigravity-authored-model
+      name: '../../../packages/subagent/subagent-antigravity/tests/fixtures/loader/authored-model.ts'
+
+    - id: subagent-antigravity
+      name: '@deepseek-ai/dsh-subagent-antigravity'
+      config:
+        command: !!js "process.cwd() + '/agy-fixture.mjs'"
+        model: fixture-native-model
+        timeoutMs: 30000
+
+    - id: tool-subagent-antigravity
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: antigravity
+        toolName: subagent_antigravity
+        backgroundMode: one-shot
+        maxDepth: provider-managed

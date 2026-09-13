@@ -35,6 +35,8 @@ Choose this adapter when the same composition serves several providers, when a r
 
 Each profile may set a `retryPolicy`; omission uses normal mode with five retries. `apiKeyEnv` is a credential reference resolved per request through the harness credential seam, so no secret enters the configuration file; a reference that resolves to nothing fails the request with `MISSING_CREDENTIAL`. Omitting it leaves the route configured-but-keyless, which for an installed catalog route defers to pi-ai's provider-native ambient discovery.
 
+A keyless route with no harness-stored record also reuses the login already owned by the vendor CLI: the `openai-codex` route reads the Codex CLI's `auth.json` (`$CODEX_HOME` or `~/.codex`), and the `anthropic` route reads Claude Code's credential store (`$CLAUDE_CONFIG_DIR`/`~/.claude/.credentials.json`, plus the macOS Keychain entry). pi-ai's own OAuth refresh then rotates that vendor-owned grant and the rotated pair is written back to the same vendor store — never into harness configuration. A harness sign-in for the same provider always wins over the vendor file. The `google-vertex` route uses Google Cloud billing, not an Antigravity subscription: before the first request it verifies Google Application Default Credentials and a configured project (falling back to the gcloud configuration and a `global` location) and fails with the matching remediation when either is missing.
+
 ```yaml
 - name: '@deepseek-ai/dsh-llm-pi-ai'
   config:

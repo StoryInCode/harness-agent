@@ -540,6 +540,48 @@ export interface Config {
 
 Source: [`packages/credentials/credentials-local/src/index.ts:64`](../packages/credentials/credentials-local/src/index.ts)
 
+<a id="deepseek-aidsh-dev-loop-directory"></a>
+
+## `@deepseek-ai/dsh-dev-loop-directory`
+
+Requires: `fs`
+
+```ts config-catalog
+/**
+ * Directory configuration; every field is deployment-varying and set from
+ * `cordis.yml`. All are optional so a row may set one and inherit the rest
+ * from the schema defaults.
+ */
+export interface Config {
+  /** Directory holding the set directories, relative to the filesystem backend's base. */
+  root?: string
+  /** Inclusive line ceiling enforced by `R-piece-size`. */
+  maxLines?: number
+  /** Accepted Harness primitives; a piece declaring anything else is rejected. */
+  primitives?: string[]
+}
+```
+
+Source: [`packages/dev-loop/directory/src/index.ts:66`](../packages/dev-loop/directory/src/index.ts)
+
+<a id="deepseek-aidsh-dev-loop-lifecycle"></a>
+
+## `@deepseek-ai/dsh-dev-loop-lifecycle`
+
+Requires: `devLoopDirectory` · `fs` · `subprocess`
+
+```ts config-catalog
+/** Deployment budgets, defaulted and validated by the lifecycle's Config schema. */
+export interface Config {
+  /** Positive integer termination grace in milliseconds, at most the Node timer limit. */
+  terminationGraceMs?: number
+  /** Positive integer in-memory byte cap for each collected command stream. */
+  outputMaxBytes?: number
+}
+```
+
+Source: [`packages/dev-loop/lifecycle/src/index.ts:53`](../packages/dev-loop/lifecycle/src/index.ts)
+
 <a id="deepseek-aidsh-e2b"></a>
 
 ## `@deepseek-ai/dsh-e2b`
@@ -2404,6 +2446,34 @@ export type PermissionPolicy = 'allow' | 'reject'
 ```
 
 Source: [`packages/subagent/subagent-acp/src/index.ts:27`](../packages/subagent/subagent-acp/src/index.ts)
+
+<a id="deepseek-aidsh-subagent-antigravity"></a>
+
+## `@deepseek-ai/dsh-subagent-antigravity`
+
+Requires: `subagents` · `subprocess`
+
+```ts config-catalog
+/** Deployment-selected executable, model, environment, and process bounds. */
+export interface Config {
+  /** Unique subagent registry name; defaults to `antigravity`. */
+  providerName?: string
+  /** Installed CLI executable, resolved by the subprocess provider; defaults to `agy`. */
+  command?: string
+  /** Native model slug; omission preserves native settings. */
+  model?: string
+  /** Explicit child environment layered after the subprocess provider's credential scrub. */
+  env?: Record<string, string>
+  /** Positive whole-run deadline in milliseconds; defaults to 300000. */
+  timeoutMs?: number
+  /** Retained UTF-8 byte cap per output stream; stdout overflow fails the run. Defaults to 1048576. */
+  maxOutputBytes?: number
+  /** Managed-range termination grace in milliseconds; defaults to 3000. */
+  disposeGraceMs?: number
+}
+```
+
+Source: [`packages/subagent/subagent-antigravity/src/index.ts:22`](../packages/subagent/subagent-antigravity/src/index.ts)
 
 <a id="deepseek-aidsh-subagent-claude-code"></a>
 

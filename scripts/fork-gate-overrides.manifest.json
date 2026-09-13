@@ -1,0 +1,11 @@
+{
+  "disabledGates": [
+    {
+      "id": "translation-pairing",
+      "reason": "This fork ships English-only documentation. Upstream requires every in-scope document to merge bilingually with a Chinese counterpart and an .i18n.yaml consistency record; maintaining that for fork-local packages is not work this fork takes on. The verify-translation-pairing script is untouched and still runnable by name for anyone who wants the report."
+    }
+  ],
+  "englishOnlySubsystemPages": {
+    "development-loop.md": "Fork-local development-loop documentation is maintained in English only; catalog ownership and English region freshness remain mandatory."
+  }
+}

@@ -342,6 +342,35 @@ describe('ModelsSection', () => {
     expect(screen.getByRole('button', { name: en.customAdd })).toBeTruthy()
   })
 
+  it('renders subscription-backed routes in their own titled group', async () => {
+    const scripted = scriptedFace()
+    const piAi = wireNamespaces().find(view => view.ns === 'llm-pi-ai')!
+    const namespaces = wireNamespaces().map((view) => {
+      if (view.ns !== 'llm-pi-ai') return view
+      const withCodex = {
+        providers: { ...(piAi.value as { providers: Record<string, JsonValue> }).providers, 'openai-codex': {} },
+      }
+      return { ...view, value: withCodex, user: withCodex }
+    })
+    scripted.face.settings.describe.mockResolvedValue(remoteOk({ writable: true, hasDocument: false, namespaces }))
+    scripted.face.llm.listConfigurableProviders.mockResolvedValue(remoteOk([
+      { provider: 'openai', displayName: 'openai', settingsNs: 'llm-pi-ai', settingsPath: ['providers', 'openai'] },
+      {
+        provider: 'openai-codex', displayName: 'openai-codex', settingsNs: 'llm-pi-ai',
+        settingsPath: ['providers', 'openai-codex'], subscription: true,
+      },
+    ]))
+    await mountFace(scripted)
+    const section = screen.getByRole('heading', { name: en.subscriptionTitle }).closest('section')
+    expect(section).toBeTruthy()
+    const editCodex = screen.getByRole('button', {
+      name: providerCopy(en.editProvider, { provider: 'openai-codex', displayName: 'openai-codex' }),
+    })
+    const editOpenai = screen.getByRole('button', { name: openaiCopy(en.editProvider) })
+    expect(section?.contains(editCodex)).toBe(true)
+    expect(section?.contains(editOpenai)).toBe(false)
+  })
+
   it('renders nothing before the slot injects its dependencies', () => {
     const uninjected = {} as ModelsSectionProps
     render(<ModelsSection {...uninjected} />)

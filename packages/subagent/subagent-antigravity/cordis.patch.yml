@@ -1,0 +1,4 @@
+# Optional Host provider; Agent Presets separately grant a delegation tool.
+- insert:
+    - id: subagent-antigravity
+      name: '@deepseek-ai/dsh-subagent-antigravity'

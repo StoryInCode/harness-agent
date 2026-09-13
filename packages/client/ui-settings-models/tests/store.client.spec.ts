@@ -16,6 +16,16 @@ it.each([false, true])('retains configuration diagnostics when the route is acti
   }])
 })
 
+it('carries the subscription marker into the joined row', () => {
+  expect(joinProviderDirectory([], [{
+    provider: 'openai-codex', displayName: 'openai-codex', settingsNs: 'llm-pi-ai', settingsPath: ['providers', 'openai-codex'],
+    subscription: true,
+  }])).toEqual([{
+    provider: 'openai-codex', displayName: 'openai-codex', settingsNs: 'llm-pi-ai', settingsPath: ['providers', 'openai-codex'],
+    active: false, subscription: true,
+  }])
+})
+
 let nextRpc = 0
 function ok<T>(value: T): RpcResponse<T> {
   return { rpcId: `r-${nextRpc++}` as never, result: { ok: true, value } }

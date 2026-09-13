@@ -1237,6 +1237,19 @@ describe('configurable-provider directory', () => {
       settingsNs: 'llm-pi-ai',
       settingsPath: ['providers', 'openai-codex'],
       declared: false,
+      subscription: true,
     })
+  })
+
+  it('marks subscription sign-in routes and leaves API-billed catalog routes unmarked', async () => {
+    const ctx = await harness({})
+    const directory = ctx.llm.listConfigurableProviders()
+    const entryOf = (provider: string) => directory.find(entry => entry.provider === provider)
+    for (const provider of ['openai-codex', 'anthropic']) {
+      expect(entryOf(provider)?.subscription).toBe(true)
+    }
+    for (const provider of ['google-vertex', 'openai', 'deepseek', 'openrouter', 'zai']) {
+      expect(entryOf(provider)?.subscription).toBeUndefined()
+    }
   })
 })

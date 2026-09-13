@@ -12,6 +12,8 @@ import { resolve } from 'node:path'
 import { performance } from 'node:perf_hooks'
 import { CLIENT_BUILD_PROFILE_SELECTOR } from './client-build-environment.ts'
 import { COVERAGE_EXEMPT_ENV, coverageExemptHeavySuites } from './coverage-exempt.ts'
+// FORK-LOCAL: gate policy owned by this fork; no upstream counterpart.
+import { applyForkGatePolicy, readForkGatePolicy } from './fork-gate-overrides.ts'
 import {
   COVERAGE_PARTITIONS_ENV,
   COVERAGE_TEST_TIMEOUT_ENV,
@@ -225,11 +227,26 @@ function pnpmExec(id: string, args: string[], options: Partial<Gate> = {}): Gate
 }
 
 /**
- * Construct the complete gate list for a named aggregate.
+ * Construct the complete gate list for a named aggregate, less any gate this
+ * fork disables in `scripts/fork-gate-overrides.manifest.json`.
+ *
+ * FORK-LOCAL: the `applyForkGatePolicy` wrapper is the only edit this fork
+ * makes to upstream gate wiring. Keep it to this one call so an upstream merge
+ * conflict here stays a two-line reapply.
+ *
  * @param selected - aggregate mode to construct.
  * @returns the aggregate's gate graph.
  */
 export function gatesForMode(selected: Mode): Gate[] {
+  return applyForkGatePolicy(gatesForModeUpstream(selected), readForkGatePolicy(root))
+}
+
+/**
+ * Construct the complete gate list for a named aggregate as upstream declares it.
+ * @param selected - aggregate mode to construct.
+ * @returns the aggregate's unfiltered gate graph.
+ */
+function gatesForModeUpstream(selected: Mode): Gate[] {
   switch (selected) {
     case 'ci-primary':
       return ciPrimaryGates()

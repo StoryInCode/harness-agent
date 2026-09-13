@@ -1,0 +1,24 @@
+# Load the public Bundle separately; this overlay grants the production tool.
+- id: headless-startup
+  disabled: true
+
+- id: headless-runner
+  disabled: true
+
+- id: subprocess
+  disabled: true
+
+- insert:
+    - id: subprocess-guard
+      name: './subprocess.ts'
+
+    - id: fixture
+      name: './fixture.ts'
+
+    - id: tool-subagent-antigravity
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: antigravity
+        toolName: subagent_antigravity
+        backgroundMode: one-shot
+        maxDepth: provider-managed

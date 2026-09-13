@@ -202,6 +202,9 @@
     { "path": "./packages/storage/storage-domain" },
     { "path": "./packages/feedback/message-feedback" },
     { "path": "./packages/workspace/workspace" },
+    // FORK-LOCAL: fork-owned dev-loop packages (see FORK.md).
+    { "path": "./packages/dev-loop/directory" },
+    { "path": "./packages/dev-loop/lifecycle" },
     { "path": "./packages/session/session-title" },
     { "path": "./packages/session/session-title-llm" },
     { "path": "./packages/session/session-title-first-prompt-llm" },
@@ -317,6 +320,7 @@
     { "path": "./packages/subagent/subagent-acp" },
     { "path": "./packages/subagent/subagent-claude-code" },
     { "path": "./packages/subagent/subagent-codex" },
+    { "path": "./packages/subagent/subagent-antigravity" },
     { "path": "./packages/subagent/subagent-dsh-sdk" },
     { "path": "./packages/jobs/jobs" },
     { "path": "./packages/jobs/jobs-local" },

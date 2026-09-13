@@ -3,7 +3,7 @@
  * Typert catalog projection. Every harness `ctx.<key>` service and event scope
  * maps to exactly one `docs/subsystems/` page through the curated tables below;
  * the generator injects each page's Cordis API reference between its GENERATED markers —
- * into both language sides of the pair, localizing paired document paths for
+ * into each policy-required language file, localizing paired document paths for
  * the Chinese side while retaining every other byte — and re-records a pair's
  * `.i18n.yaml` only when nothing outside the region changed. The
  * projection enforces event modes, JSDoc parameter/return completeness, and
@@ -30,6 +30,8 @@ import {
 import type { CordisCatalogPolicy } from '@deepseek-ai/dsh-typert-generator'
 import { renderCordisCoreApiPages } from './cordis-core-api.ts'
 import { contextKeyMap, contextMergeFiles, eventNameList } from './cordis-walk.ts'
+// FORK-LOCAL: explicit English-only owners retain all other catalog checks.
+import { readForkGatePolicy, resolveForkSubsystemPages } from './fork-gate-overrides.ts'
 import {
   blobHash,
   parsePairMeta,
@@ -73,6 +75,9 @@ export const SERVICE_PAGE: Record<string, string> = {
   settingsController: 'settings.md',
   directoryPicker: 'workspace.md',
   deepseekLlmApiExtensions: 'llm-streaming.md',
+  // FORK-LOCAL: development-loop services own this English subsystem page.
+  devLoopDirectory: 'development-loop.md',
+  devLoopLifecycle: 'development-loop.md',
   dynamicCordisRunner: 'extensions.md',
   e2b: 'subprocess.md',
   fileUploads: 'attachment.md',
@@ -202,6 +207,8 @@ export const EVENT_SCOPE_PAGE: Record<string, string> = {
   'domain': 'storage.md',
   'fs': 'filesystem.md',
   'goal': 'goal.md',
+  // FORK-LOCAL: piece lifecycle events share the development-loop owner.
+  'piece': 'development-loop.md',
   'llm': 'llm-streaming.md',
   'session': 'session.md',
   'settings': 'settings.md',
@@ -245,6 +252,13 @@ export const EVENT_WALK_EXEMPTIONS: Record<string, string> = {
  * appear on more than one page.
  */
 export const LINK_MAP: Readonly<Record<string, string>> = {
+  // FORK-LOCAL: public development-loop signature types have a documented owner.
+  PieceStatus: 'development-loop.md',
+  PieceRecord: 'development-loop.md',
+  SetScan: 'development-loop.md',
+  StateTransitionEvent: 'development-loop.md',
+  PieceCompletedEvent: 'development-loop.md',
+  PiecePreCompleteEvent: 'development-loop.md',
   Agent: 'core.md',
   AgentCancelCause: 'core.md',
   AgentFactory: 'core.md',
@@ -977,8 +991,8 @@ export function walkPartitionProblems(input: WalkPartitionInput, maps: WalkParti
 
 /**
  * Compute every generated artifact: the inherited-tier page, the model-facing
- * runtime API module, plus, per mapped subsystems page, the pair's two updated
- * documents with the injected region. Fail-loud partition checks live here: an
+ * runtime API module, plus each mapped subsystem's policy-required language
+ * files with the injected region. Fail-loud partition checks live here: an
  * unmapped service/event scope, a mapping whose page file does not exist, a
  * curated entry whose key/scope the projection no longer discovers, a declared
  * Context key or Events member the projection cannot see without a named walk
@@ -1019,22 +1033,23 @@ export function computeOutputs(): [string, string][] {
     [OUT_INHERITED, renderInheritedPage(CORDIS_CATALOG_POLICY)],
     [OUT_RUNTIME_API, projector.renderRuntimeApi(model)],
   ]
-  for (const page of pages) {
+  // FORK-LOCAL: named English-only pages change language requirements, not ownership or freshness.
+  for (const [page, sides] of resolveForkSubsystemPages(pages, readForkGatePolicy(root))) {
     const region = renderPageRegion(
       page,
       services.filter(s => SERVICE_PAGE[s.key] === page),
       events.filter(e => EVENT_SCOPE_PAGE[e.scope] === page),
       CORDIS_CATALOG_POLICY,
     )
-    for (const side of [page, page.replace(/\.md$/, '.zh.md')]) {
+    for (const side of sides) {
       const rel = `${SUBSYSTEMS_DIR}/${side}`
       const localizedRegion = localizePageRegion(region, rel)
       let current: string
       try {
         current = readFileSync(resolve(root, rel), 'utf8')
       } catch {
-        // Both pair sides must exist before a region can be injected; the
-        // pairing gate owns pair completeness, this generator names the miss.
+        // Every policy-required language file must exist before injection;
+        // English-only choices never excuse a missing English owning page.
         problems.push(`${rel}: mapped subsystems page does not exist.`)
         continue
       }

@@ -833,6 +833,76 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'devLoopDirectory',
+    summary: 'Reads and validates the piece corpus.',
+    description: 'Reads and validates the piece corpus.\n\nA set\'s pieces live in `<root>/<set>` until they complete, then move to `<root>/<set>/done` per `R-done-pieces-moved`; every read merges both so the directory stays the whole-set view regardless of completion state.',
+    methods: [
+      {
+        signature: 'readonly config: ResolvedConfig',
+        description: 'Validated configuration; schemastery applied the defaults before construction.',
+        parameters: [],
+      },
+      {
+        signature: 'validate(filePath: string, content: string): PieceRecord',
+        description: 'Validate one piece file\'s text without reading the filesystem.',
+        parameters: [{ name: 'filePath', description: 'path the content came from, reported in findings.' }, { name: 'content', description: 'complete file text.' }],
+        returns: 'the validated record, carrying any warnings.',
+      },
+      {
+        signature: 'async scanSet(setName: string, signal?: AbortSignal): Promise<SetScan>',
+        description: 'Read every piece of one set, pending and completed together.\n\nA file this parser rejects is reported in `rejected` rather than thrown, so one malformed piece never denies the caller the rest of its set. The defects that still throw belong to the request or the set as a whole rather than to one file\'s contents: an unmatched set name, and one id owned by two files.',
+        parameters: [{ name: 'setName', description: 'set directory name such as `00-dev-loop`.' }, { name: 'signal', description: 'aborts path resolution, directory listings and reads; cancellation after resolution prevents the next request.' }],
+        returns: 'the parsed records ordered by queue position then by id, beside every rejected file.',
+      },
+      {
+        signature: 'async listSets(signal?: AbortSignal): Promise<string[]>',
+        description: 'List the set directories under the configured root, in name order.\n\nOnly direct subdirectories of the root are sets: a file beside them is not one, a set\'s own `done/` subdirectory lives one level deeper and is part of its set, and no listing recurses. A root holding no set directory returns an empty list, which is the answer for an empty corpus; a configured root that does not exist is misconfiguration and rejects, as reading it as "no work" would idle every consumer silently.',
+        parameters: [{ name: 'signal', description: 'aborts root resolution and listing; cancellation after resolution prevents the listing.' }],
+        returns: 'every set directory name under the root, sorted by name.',
+      },
+      {
+        signature: 'async getQueueCandidates(setName?: string, signal?: AbortSignal): Promise<PieceRecord[]>',
+        description: 'Select the pieces available for dispatch: those declaring `todo` or `pending`. A `done` piece stays resolvable through getPiece but is never a candidate, and a `blocked` piece is excluded because it waits on a human decision rather than on a dispatch slot. Selection reads the valid pieces of every set it scans, so a malformed file elsewhere in the corpus withholds only itself.',
+        parameters: [{ name: 'setName', description: 'set to select from; omitted selects across every set. An unmatched name rejects with {@link SetNotFoundError}.' }, { name: 'signal', description: 'aborts path resolution, directory listings and reads; cancellation after resolution prevents the next request.' }],
+        returns: 'candidates ordered by queue position then id within one set, and by set before queue when selecting across every set, because queue numbers are set-local.',
+      },
+      {
+        signature: 'async getPiece(id: string, signal?: AbortSignal): Promise<PieceRecord>',
+        description: 'Read one piece by id, searching the set directory its id prefix names.\n\nA malformed sibling never decides this call: the parse failure surfaces only when the requested id owns the rejected file, which its filename declares.',
+        parameters: [{ name: 'id', description: 'dotted piece id such as `00.01`.' }, { name: 'signal', description: 'aborts path resolution, directory listings and reads; cancellation after resolution prevents the next request.' }],
+        returns: 'the validated record.',
+        throws: ['PieceParseError when the requested id\'s own file failed to parse.'],
+      },
+    ],
+  },
+  {
+    key: 'devLoopLifecycle',
+    summary: 'The guarded piece state machine.',
+    description: 'The guarded piece state machine.\n\nEvery status change passes through transition, which is the only writer, so the legality check cannot be bypassed by a caller reaching around the service.',
+    methods: [
+      {
+        signature: 'getStatus(pieceId: string): PieceStatus',
+        description: 'Read a piece\'s current status.',
+        parameters: [{ name: 'pieceId', description: 'dotted piece id such as `00.01`.' }],
+        returns: 'the in-memory status hydrated at mount and updated by this service; external edits are not refreshed.',
+        throws: ['PieceNotFoundError when the corpus declares no such id, and PieceParseError when its file was rejected by the scan.'],
+      },
+      {
+        signature: 'canTransition(from: PieceStatus, to: PieceStatus): boolean',
+        description: 'Whether an edge is legal, as a pure predicate callable before mutating, so a caller can pre-check without duplicating the transition table.',
+        parameters: [{ name: 'from', description: 'the status a piece currently holds.' }, { name: 'to', description: 'the status the caller intends.' }],
+        returns: 'whether the state machine permits that edge.',
+      },
+      {
+        signature: 'async transition(pieceId: string, expected: PieceStatus, to: PieceStatus, reason?: string, signal?: AbortSignal): Promise<void>',
+        description: 'Move a piece to a new status, committing any completing move first.\n\nThe claim on `expected` is taken synchronously, before the first `await`, so two callers that both observed the same status cannot both reach the move: the second one rejects while the first is still committing.',
+        parameters: [{ name: 'pieceId', description: 'dotted piece id such as `00.01`.' }, { name: 'expected', description: 'the status the caller observed; a mismatch rejects with {@link StalePieceStatusError}.' }, { name: 'to', description: 'the status to move to.' }, { name: 'reason', description: 'why the transition happened; recorded on the event.' }, { name: 'signal', description: 'optional caller cancellation, combined with lifecycle disposal.' }],
+        returns: 'after memory publication and synchronous announcement dispatch; no durable record is written.',
+        throws: ['Hook, filesystem, command or cancellation errors before publication leave memory unchanged. Recovery is awaited on a fresh lifetime; PieceRecoveryFailedError retains both failures. A synchronous announcement error propagates after commit without rollback; async listeners are not awaited.'],
+      },
+    ],
+  },
+  {
     key: 'directoryPicker',
     summary: 'Abstract directory-picking service.',
     description: 'Abstract directory-picking service. Subclass, implement `capability()`, and load the subclass as a plugin — it registers as `ctx.directoryPicker` (one implementation per context; loading a second throws, cordis\' standard duplicate-service behavior). The capability object must be stable for the service lifetime: consumers may capture it across calls.',
@@ -3339,6 +3409,38 @@ export const EVENT_API: readonly EventApiEntry[] = [
     parameters: [{ name: 'options', description: 'the full request. A LOOP-built request carries the process-local {@link markAgentLoopRequest} identity and arrives deep-frozen (mutation throws): its content is a pure function of the session log (the reconstructability Agent Note), so listeners read it, never rewrite it. Hand-built calls do not carry that marker; their messages already obey the immutable creation contract.' }],
   },
   {
+    name: 'piece/approved',
+    mode: 'emit',
+    signature: '\'piece/approved\'(event: StateTransitionEvent): void',
+    summary: 'A piece was approved at the junction and may enter the dispatch queue.',
+    description: 'A piece was approved at the junction and may enter the dispatch queue.',
+    parameters: [{ name: 'event', description: 'the recorded transition from `todo` to `pending`.' }],
+  },
+  {
+    name: 'piece/blocked',
+    mode: 'emit',
+    signature: '\'piece/blocked\'(event: StateTransitionEvent): void',
+    summary: 'A piece was blocked by a failed gate, a failed subagent, or a contradicted claim.',
+    description: 'A piece was blocked by a failed gate, a failed subagent, or a contradicted claim.',
+    parameters: [{ name: 'event', description: 'the transition, carrying the recorded reason.' }],
+  },
+  {
+    name: 'piece/completed',
+    mode: 'emit',
+    signature: '\'piece/completed\'(event: PieceCompletedEvent): void',
+    summary: 'A piece completed, published strictly after the move committed.',
+    description: 'A piece completed, published strictly after the move committed.',
+    parameters: [{ name: 'event', description: 'the transition, carrying the piece\'s new path under `done/`.' }],
+  },
+  {
+    name: 'piece/pre-complete',
+    mode: 'serial',
+    signature: '\'piece/pre-complete\'(event: PiecePreCompleteEvent): void | Promise<void>',
+    summary: 'Await completion policy before filesystem or Git work.',
+    description: 'Await completion policy before filesystem or Git work. Listeners return void or reject to veto; an empty listener set enforces no verification.',
+    parameters: [{ name: 'event', description: 'the claimed request and its cancellation lifetime.' }],
+  },
+  {
     name: 'session-telemetry/record',
     mode: 'waterfall',
     signature: '\'session-telemetry/record\'(record: SessionTelemetryRecord, next: () => SessionTelemetryRecord): SessionTelemetryRecord',
@@ -4516,7 +4618,7 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   },
   {
     name: 'LlmConfigurableProvider',
-    declaration: 'export interface LlmConfigurableProvider {\n    provider: string;\n    displayName: string;\n    settingsNs: string;\n    settingsPath: readonly string[];\n    declared?: boolean;\n    error?: string;\n}',
+    declaration: 'export interface LlmConfigurableProvider {\n    provider: string;\n    displayName: string;\n    settingsNs: string;\n    settingsPath: readonly string[];\n    declared?: boolean;\n    subscription?: boolean;\n    error?: string;\n}',
   },
   {
     name: 'LlmDiscoveredModel',
@@ -4753,6 +4855,46 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'PermissionSelect',
     declaration: 'export interface PermissionSelect {\n    options: PresetOption[];\n    currentValue: string;\n}',
+  },
+  {
+    name: 'PieceCompletedEvent',
+    declaration: 'export interface PieceCompletedEvent extends StateTransitionEvent {\n    readonly to: \'done\';\n    readonly newPath: string;\n}',
+  },
+  {
+    name: 'PieceFinding',
+    declaration: 'export interface PieceFinding {\n    readonly code: PieceFindingCode;\n    readonly severity: PieceFindingSeverity;\n    readonly message: string;\n}',
+  },
+  {
+    name: 'PieceFindingCode',
+    declaration: 'export type PieceFindingCode = \'PIECE_SIZE_EXCEEDED\' | \'MISSING_REQUIRED_SECTION\' | \'MISSING_RECOMMENDED_SECTION\' | \'INVALID_HARNESS_PRIMITIVE\' | \'INVALID_PIECE_STATUS\' | \'MALFORMED_PIECE_HEADER\';',
+  },
+  {
+    name: 'PieceFindingSeverity',
+    declaration: 'export type PieceFindingSeverity = \'blocker\' | \'warning\';',
+  },
+  {
+    name: 'PieceMetadata',
+    declaration: 'export interface PieceMetadata {\n    readonly id: string;\n    readonly title: string;\n    readonly set: string;\n    readonly queue: number;\n    readonly dependsOn: readonly string[];\n    readonly status: PieceStatus;\n    readonly primitive: string;\n    readonly pkg: string;\n}',
+  },
+  {
+    name: 'PiecePreCompleteEvent',
+    declaration: 'export interface PiecePreCompleteEvent {\n    readonly pieceId: string;\n    readonly from: \'pending\';\n    readonly to: \'done\';\n    readonly reason?: string;\n    readonly signal: AbortSignal;\n}',
+  },
+  {
+    name: 'PieceRecord',
+    declaration: 'export interface PieceRecord extends PieceMetadata {\n    readonly path: string;\n    readonly lineCount: number;\n    readonly summary: string;\n    readonly scenarios: readonly PieceScenario[];\n    readonly warnings: readonly PieceFinding[];\n}',
+  },
+  {
+    name: 'PieceRejection',
+    declaration: 'export interface PieceRejection {\n    readonly path: string;\n    readonly code: PieceFindingCode;\n    readonly findings: readonly PieceFinding[];\n}',
+  },
+  {
+    name: 'PieceScenario',
+    declaration: 'export interface PieceScenario {\n    readonly given: string;\n    readonly when: string;\n    readonly then: string;\n}',
+  },
+  {
+    name: 'PieceStatus',
+    declaration: 'export type PieceStatus = \'todo\' | \'pending\' | \'done\' | \'blocked\';',
   },
   {
     name: 'PostToolDecision',
@@ -5527,6 +5669,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export interface SessionWireHeader {\n    readonly version: number;\n    readonly id: SessionId;\n    readonly createdAt: number;\n    readonly cwd?: string;\n    readonly parentSession?: SessionId;\n    readonly isSeeded: boolean;\n    readonly origin?: \'subagent\';\n    readonly delegationDepth?: number;\n    readonly agentPreset?: string;\n}',
   },
   {
+    name: 'SetScan',
+    declaration: 'export interface SetScan {\n    readonly pieces: readonly PieceRecord[];\n    readonly rejected: readonly PieceRejection[];\n}',
+  },
+  {
     name: 'SettingsApplies',
     declaration: 'export type SettingsApplies = \'live\' | \'restart\';',
   },
@@ -5693,6 +5839,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'SpillSource',
     declaration: 'export type SpillSource = {\n    kind: \'tool\';\n    toolName: string;\n    callId: ToolCallId;\n    label: string;\n} | {\n    kind: \'session-reference\';\n    sessionId: SessionId;\n    label: string;\n};',
+  },
+  {
+    name: 'StateTransitionEvent',
+    declaration: 'export interface StateTransitionEvent {\n    readonly pieceId: string;\n    readonly from: PieceStatus;\n    readonly to: PieceStatus;\n    readonly reason?: string;\n    readonly timestamp: number;\n    readonly newPath?: string;\n}',
   },
   {
     name: 'StorageBackend',

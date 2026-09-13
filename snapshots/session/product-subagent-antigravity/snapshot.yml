@@ -1,0 +1,9 @@
+version: 1
+scenario: product-subagent-antigravity
+profile: headless
+composition: product-subagent-antigravity
+recording: authored
+platform: posix
+header:
+  class: product-subagent-antigravity
+  pin: true

@@ -252,6 +252,12 @@
       // session-log-export lives under session-query/, so the generated aliases map only its
       // bare name; the browser half needs this explicit subpath for source-mode dynamic imports.
       "@deepseek-ai/dsh-session-log-export/client": ["./packages/session-query/session-log-export/src/client"],
+      // FORK-LOCAL: fork-owned dev-loop packages (see FORK.md).
+      // dev-loop/ package directories drop the group prefix their npm names
+      // carry (directory -> dsh-dev-loop-directory), so gen-tsconfig-paths skips
+      // them and each needs a hand-written alias, like typert/ and sdk/ above.
+      "@deepseek-ai/dsh-dev-loop-directory": ["./packages/dev-loop/directory/src"],
+      "@deepseek-ai/dsh-dev-loop-lifecycle": ["./packages/dev-loop/lifecycle/src"],
       // BEGIN generated package aliases — pnpm run gen-tsconfig-paths
       "@deepseek-ai/dsh-acp": ["./packages/acp/acp/src"],
       "@deepseek-ai/dsh-acp-app": ["./packages/bundle/acp-app/src"],
@@ -396,6 +402,7 @@
       "@deepseek-ai/dsh-subagent": ["./packages/subagent/subagent/src"],
       "@deepseek-ai/dsh-subagent/invariant": ["./packages/subagent/subagent/src/invariant.ts"],
       "@deepseek-ai/dsh-subagent-acp": ["./packages/subagent/subagent-acp/src"],
+      "@deepseek-ai/dsh-subagent-antigravity": ["./packages/subagent/subagent-antigravity/src"],
       "@deepseek-ai/dsh-subagent-claude-code": ["./packages/subagent/subagent-claude-code/src"],
       "@deepseek-ai/dsh-subagent-codex": ["./packages/subagent/subagent-codex/src"],
       "@deepseek-ai/dsh-subagent-dsh-sdk": ["./packages/subagent/subagent-dsh-sdk/src"],

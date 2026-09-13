@@ -35,6 +35,8 @@ kind: "package-reference"
 
 每个 profile 都可以设置 `retryPolicy`；省略时使用 normal mode、最多重试五次。`apiKeyEnv` 是按请求经 harness 凭据 seam 解析的凭据引用，因此配置文件绝不包含密钥；解析为空的引用会让请求以 `MISSING_CREDENTIAL` 失败。省略它会让路由保持已配置但无密钥（configured-but-keyless）状态，对已安装目录路由而言即交由 pi-ai 提供方原生的环境发现。
 
+无密钥且没有 harness 已存凭据记录的路由还会复用厂商 CLI 已有的登录：`openai-codex` 路由读取 Codex CLI 的 `auth.json`（`$CODEX_HOME` 或 `~/.codex`），`anthropic` 路由读取 Claude Code 的凭据存储（`$CLAUDE_CONFIG_DIR`/`~/.claude/.credentials.json`，以及 macOS 钥匙串条目）。pi-ai 自身的 OAuth 刷新会轮换该厂商所有的凭据，并把轮换后的令牌对写回同一厂商存储——绝不写入 harness 配置。同一提供方的 harness 登录始终优先于厂商文件。`google-vertex` 路由使用 Google Cloud 计费，而非 Antigravity 订阅：首次请求前会校验 Google Application Default Credentials 与已配置的项目（回退到 gcloud 配置和 `global` location），任一缺失时以对应的补救指引失败。
+
 ```yaml
 - name: '@deepseek-ai/dsh-llm-pi-ai'
   config:

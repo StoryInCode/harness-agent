@@ -63,8 +63,9 @@ import type {} from '@deepseek-ai/dsh-fs'
 import type {} from '@deepseek-ai/dsh-settings'
 import { deepEqualJson } from '@deepseek-ai/dsh-util-values'
 import { PiAiAdapter } from './adapter.ts'
-import { authContextFrom, credentialStoreFrom } from './auth.ts'
-import { catalogProviderIds } from './catalog.ts'
+import { authContextFrom, credentialStoreFrom, recordKeyFor } from './auth.ts'
+import { assertGoogleAdcReady } from './external-auth.ts'
+import { catalogProvider, catalogProviderIds } from './catalog.ts'
 import { assertServiceable, Config, resolveProfiles } from './config.ts'
 import type { ResolvedPiAiProviderProfile } from './config.ts'
 import { discoverModels } from './discovery.ts'
@@ -123,6 +124,8 @@ function directoryEntries(
 ): LlmConfigurableProvider[] {
   const catalog = new Set(catalogProviderIds())
   const entries = new Map<string, LlmConfigurableProvider>()
+  const subscriptionRoute = (provider: string): boolean =>
+    catalogProvider(provider)?.auth.oauth?.isSubscription === true
   const declare = (provider: string, displayName: string, error?: string): void => {
     entries.set(provider, {
       provider,
@@ -133,6 +136,7 @@ function directoryEntries(
       // narrowing a shipped provider's models stores a profile too, and that
       // route is still one pi-ai knows.
       declared: !catalog.has(provider),
+      ...subscriptionRoute(provider) ? { subscription: true } : {},
       ...error === undefined ? {} : { error },
     })
   }
@@ -175,7 +179,23 @@ export function apply(ctx: Context, config: Config): void {
     // handing pi-ai `undefined` would let it pick up an unrelated ambient key
     // (OPENAI_API_KEY and friends), billing another tenant for a request the
     // deployment meant to authenticate differently.
-    if (ref === undefined) return undefined
+    if (ref === undefined) {
+      // The Vertex route is the ADC-backed Gemini path: pi-ai's own ambient
+      // resolution answers a missing Google setup with a generic "not
+      // configured", so pre-flight the two ADC facts and fail with the
+      // remediation instead. A stored Vertex credential carries its own
+      // project and answers for itself.
+      if (provider === 'google-vertex') {
+        const stored = await ctx.get('credentials')?.readRecord(recordKeyFor(provider))
+        if (stored === undefined) {
+          await assertGoogleAdcReady(
+            name => auth.authContext.env(name),
+            path => auth.authContext.fileExists(path),
+          )
+        }
+      }
+      return undefined
+    }
     const credentials = ctx.get('credentials')
     const hit = credentials !== undefined
       ? (await credentials.resolve(ref))?.value

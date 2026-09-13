@@ -1,0 +1,29 @@
+# Replay the recorded parent while the native subprocess protocol stays real.
+- id: llm-deepseek
+  disabled: true
+
+- insert:
+    - id: llm-replay
+      name: '@deepseek-ai/dsh-llm-replay'
+      config:
+        providers:
+          - id: deepseek-official
+            name: DeepSeek
+            models:
+              - id: deepseek-v4-flash
+              - id: deepseek-v4-pro
+
+    - id: subagent-antigravity
+      name: '@deepseek-ai/dsh-subagent-antigravity'
+      config:
+        command: !!js "process.cwd() + '/agy-fixture.mjs'"
+        model: fixture-native-model
+        timeoutMs: 30000
+
+    - id: tool-subagent-antigravity
+      name: '@deepseek-ai/dsh-tool-subagent'
+      config:
+        provider: antigravity
+        toolName: subagent_antigravity
+        backgroundMode: one-shot
+        maxDepth: provider-managed

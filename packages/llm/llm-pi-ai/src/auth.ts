@@ -19,6 +19,12 @@ import {
 import type { CredentialKey, CredentialProvider, CredentialRecord } from '@deepseek-ai/dsh-credentials'
 import { launchEnvironmentOf } from '@deepseek-ai/dsh-launch-environment'
 import { LlmError } from '@deepseek-ai/dsh-llm'
+import {
+  googleAdcEnv,
+  listExternalCredentials,
+  modifyExternalCredential,
+  readExternalCredential,
+} from './external-auth.ts'
 
 /**
  * The record scope every credential this adapter family stores is written
@@ -142,21 +148,33 @@ export function credentialStoreFrom(ctx: Context): CredentialStore {
   return {
     async read(providerId) {
       const credentials = ctx.get('credentials')
-      if (credentials === undefined) return undefined
       if (!isCredentialKeySegment(providerId)) return undefined
-      return toPiCredential(await credentials.readRecord(recordKeyFor(providerId)))
+      if (credentials !== undefined) {
+        const stored = toPiCredential(await credentials.readRecord(recordKeyFor(providerId)))
+        if (stored !== undefined) return stored
+      }
+      // No Harness-owned record: reuse a login already owned by the vendor CLI.
+      // This is intentionally a fallback so an explicit Harness sign-in always
+      // wins and existing credential semantics remain unchanged.
+      return readExternalCredential(providerId)
     },
     async list(): Promise<readonly CredentialInfo[]> {
       const stored = await ctx.get('credentials')?.listRecords() ?? []
       const mine: CredentialInfo[] = []
+      const providerIds = new Set<string>()
       for (const entry of stored) {
         // Records another plugin owns are not this collection's to report:
         // their payloads are written in a format pi-ai never agreed to.
         if (credentialKeyScope(entry.key) !== RECORD_SCOPE) continue
+        const providerId = credentialKeyId(entry.key)
+        providerIds.add(providerId)
         mine.push({
-          providerId: credentialKeyId(entry.key),
+          providerId,
           type: entry.kind === 'api-key' ? 'api_key' : 'oauth',
         })
+      }
+      for (const entry of await listExternalCredentials()) {
+        if (!providerIds.has(entry.providerId)) mine.push(entry)
       }
       return mine
     },
@@ -168,6 +186,18 @@ export function credentialStoreFrom(ctx: Context): CredentialStore {
           + ' credential',
           'UNSTORABLE_PROVIDER_ID',
         )
+      }
+      // Refresh an externally-owned OAuth grant back into the same vendor store
+      // (Codex auth.json / Claude Code credential store), rather than copying it
+      // into Harness. If no writable external credential exists, preserve the
+      // normal Harness record path below.
+      const credentials = ctx.get('credentials')
+      const existing = credentials === undefined
+        ? undefined
+        : await credentials.readRecord(recordKeyFor(providerId))
+      if (existing === undefined) {
+        const external = await modifyExternalCredential(providerId, mutate)
+        if (external.handled) return external.credential
       }
       const stored = await writableStore(ctx).modifyRecord(recordKeyFor(providerId), async (current) => {
         const next = await mutate(toPiCredential(current))
@@ -211,7 +241,16 @@ export function authContextFrom(ctx: Context): AuthContext {
         const hit = await credentials?.resolve(credentialRef(name))
         if (hit !== undefined) return hit.value
       }
-      return launchEnvironmentOf(ctx).get(name)?.value
+      const launch = launchEnvironmentOf(ctx)
+      const ambient = launch.get(name)?.value
+      if (ambient !== undefined) return ambient
+
+      // pi-ai's google-vertex provider already speaks ADC; give it the two
+      // provider-scoped values it additionally requires. This turns the common
+      // `gcloud auth application-default login` setup into a zero-key route.
+      const storedAdcPath = await ctx.get('credentials')?.resolve(credentialRef('GOOGLE_APPLICATION_CREDENTIALS'))
+      const adcPath = storedAdcPath?.value ?? launch.get('GOOGLE_APPLICATION_CREDENTIALS')?.value
+      return googleAdcEnv(name, adcPath)
     },
     async fileExists(path) {
       const expanded = path.startsWith('~/') || path === '~'

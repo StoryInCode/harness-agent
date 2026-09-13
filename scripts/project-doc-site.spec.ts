@@ -16,6 +16,9 @@ import {
   rawMarkdownFiles, rawMarkdownPageContent, rawMarkdownRoute, resolveRepositoryRef, rewriteMarkdown,
 } from './project-doc-site.ts'
 
+// FORK-LOCAL: navigation follows the same explicit language policy as its catalog owner.
+import { readForkGatePolicy, resolveForkSubsystemPages } from './fork-gate-overrides.ts'
+
 const roots: string[] = []
 const repositoryRoot = resolve(import.meta.dirname, '..')
 
@@ -419,18 +422,20 @@ describe('docsPages locale routes', () => {
     }
   })
 
-  it('indexes every subsystem page in both sides of the folder README', () => {
+  it('indexes every subsystem page in each policy-selected language of the folder README', () => {
     const pages = globSync(join(repositoryRoot, 'docs/subsystems/*.md'))
       .map(page => basename(page))
       .filter(page => !page.endsWith('.zh.md') && page !== 'README.md')
       .sort()
     expect(pages.length).toBeGreaterThan(0)
+    // FORK-LOCAL: preserve English rows and every non-exempt Chinese row.
+    const selected = resolveForkSubsystemPages(pages, readForkGatePolicy(repositoryRoot))
     for (const readme of ['README.md', 'README.zh.md']) {
       const rows = readFileSync(join(repositoryRoot, 'docs/subsystems', readme), 'utf8')
-      const missing = pages.filter((page) => {
+      const missing = [...selected].filter(([page, targets]) => {
         const target = readme.endsWith('.zh.md') ? page.replace(/\.md$/, '.zh.md') : page
-        return !rows.includes(`| [${page}](${target}) |`)
-      })
+        return targets.includes(target) && !rows.includes(`| [${page}](${target}) |`)
+      }).map(([page]) => page)
       expect(missing, `${readme} must carry one table row per subsystem page`).toEqual([])
     }
   })

@@ -26,6 +26,17 @@ afterEach(async () => {
 })
 
 describe('pi-ai credential store over harness records', () => {
+  beforeEach(async () => {
+    // The store's external fallback reads real vendor CLI credential files
+    // (~/.codex/auth.json, ~/.claude/.credentials.json). Point it at an empty
+    // throwaway home so these record-store tests neither observe nor touch
+    // machine state.
+    const home = await mkdtemp(join(tmpdir(), 'dsh-pi-auth-home-'))
+    dirs.push(home)
+    vi.stubEnv('CODEX_HOME', home)
+    vi.stubEnv('CLAUDE_CONFIG_DIR', home)
+  })
+
   it('reads nothing for a provider with no record', async () => {
     const store = credentialStoreFrom(await stored())
 

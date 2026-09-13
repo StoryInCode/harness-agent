@@ -2,8 +2,11 @@
  * Models settings section: the provider rows joined from the configurable
  * directory, settings namespaces, and credential states, with one editor
  * card at a time. Rows expose only confirmed API-key state through accessible
- * solid configured or missing dots. A whole-section provider without a
- * configured key renders as its open setup card instead of a row, but only in
+ * solid configured or missing dots. Subscription-backed routes (vendor CLI /
+ * ADC sign-ins the adapter marks `subscription`) read in their own titled
+ * group below the key-based list, without the key-missing postures. A
+ * whole-section provider without a configured key renders as its open setup
+ * card instead of a row, but only in
  * the first-run posture — no provider on the page can serve requests yet — and
  * only until the user closes that card; the add flow is a card carrying the
  * dormant-provider select. Each card kind owns its own open state, so closing
@@ -304,6 +307,10 @@ function Loaded({ injected, renderSlot }: { injected: ModelsSectionFace; renderS
   // one whose schema names the protocols one may speak; without it mounted
   // there is nothing to declare and the entry point stays disabled.
   const protocols = protocolChoices(state.namespaces.get('llm-pi-ai'), schema)
+  // Subscription-backed routes (vendor CLI / ADC sign-ins) read in their own
+  // group; key-based providers keep the plain list.
+  const subscriptionRows = configured.filter(row => row.entry.subscription === true)
+  const standardRows = configured.filter(row => row.entry.subscription !== true)
 
   return (
     <div className={styles['section']}>
@@ -318,7 +325,7 @@ function Loaded({ injected, renderSlot }: { injected: ModelsSectionFace; renderS
           </p>
         )}
       <ul className={styles['rows']}>
-        {configured.map((row) => {
+        {standardRows.map((row) => {
           const target = targetOf(row)
           const namespace = state.namespaces.get(target.settingsNs)
           /* v8 ignore next -- the join marks a row configured only when its namespace resolved */
@@ -548,6 +555,92 @@ function Loaded({ injected, renderSlot }: { injected: ModelsSectionFace; renderS
               </div>
             )}
       </div>
+      {subscriptionRows.length > 0 && (
+        <section className={styles['subscriptionGroup']}>
+          <h3 className={styles['groupTitle']}>{t('subscriptionTitle')}</h3>
+          <p className={styles['groupIntro']}>{t('subscriptionIntro')}</p>
+          <ul className={styles['rows']}>
+            {subscriptionRows.map((row) => {
+              const target = targetOf(row)
+              const namespace = state.namespaces.get(target.settingsNs)
+              if (namespace === undefined) return null
+              const error = row.entry.error === undefined
+                ? null
+                : <p role="alert" className={styles['error']}>{row.entry.error}</p>
+              const open = !adding && editing?.provider === row.entry.provider
+              const credentialConfigured = row.credential?.configured === true
+              return (
+                <li key={row.entry.provider} className={styles['rowCard']}>
+                  <div className={styles['rowHead']}>
+                    <span className={styles['rowIdentity']}>
+                      <span className={styles['rowName']}>{row.entry.displayName}</span>
+                      {credentialConfigured
+                        ? (
+                          <span
+                            className={`${styles['credentialDot']} ${styles['credentialDotConfigured']}`}
+                            role="img"
+                            aria-label={t('credentialConfigured')}
+                            title={t('credentialConfigured')}
+                          />
+                        )
+                        : null}
+                    </span>
+                    <span className={styles['rowActions']}>
+                      <button
+                        type="button"
+                        className={styles['secondaryButton']}
+                        aria-label={providerCopy(t('editProvider'), target)}
+                        onClick={() => {
+                          setSavedTarget(undefined)
+                          setDeclaring(false)
+                          setAdding(false)
+                          setEditing(open ? undefined : target)
+                        }}
+                      >
+                        {t('edit')}
+                      </button>
+                      {row.removable
+                        ? (
+                          <button
+                            type="button"
+                            className={styles['dangerButton']}
+                            aria-label={providerCopy(t('removeProvider'), target)}
+                            disabled={!state.writable}
+                            onClick={() => {
+                              setSavedTarget(undefined)
+                              setDeleteFailure(undefined)
+                              setDeleteTarget(target)
+                            }}
+                          >
+                            {t('remove')}
+                          </button>
+                        )
+                        : null}
+                    </span>
+                  </div>
+                  {error}
+                  {renderSlot(
+                    'settings.models.provider-card',
+                    { provider: row.entry, configured: row.configured, keyConfigured: keyConfiguredOf(row) },
+                    { entryKey: row.entry.settingsNs },
+                  )}
+                  {open
+                    ? renderProviderEditor({
+                      target,
+                      namespace,
+                      schema,
+                      operations,
+                      t,
+                      readOnly: !state.writable,
+                      onClose: (changed) => { closeEditor(changed, target) },
+                    })
+                    : null}
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      )}
       {renderSlot('settings.models.footer', {})}
       <Modal
         open={deleteTarget !== undefined}
