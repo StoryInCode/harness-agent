@@ -1,0 +1,7 @@
+packages/dev-loop/claims/src/evidence.ts: OK
+packages/dev-loop/claims/src/index.ts: OK
+packages/dev-loop/claims/src/inventory.ts: OK
+packages/dev-loop/claims/src/records.ts: OK
+packages/dev-loop/claims/src/research.ts: OK
+packages/dev-loop/claims/src/tool.ts: OK
+packages/dev-loop/claims/src/types.ts: OK

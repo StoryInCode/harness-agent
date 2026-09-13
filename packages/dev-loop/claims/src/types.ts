@@ -1,0 +1,113 @@
+/** Revision-bound evidence and complete Research JSON fields. @module dsh-dev-loop-claims/types */
+import type { Branded } from '@deepseek-ai/dsh-brand'
+import type { DelegationId } from '@deepseek-ai/dsh-dev-loop-roles'
+import type { ProvenanceObservation } from '@deepseek-ai/dsh-dev-loop-references'
+import type { SessionId } from '@deepseek-ai/dsh-session'
+
+/** Validated row-derived identity correlating explicit inventory with Research findings. */
+export type ClaimId = Branded<'DevLoopClaimId'>
+/** Validated UUID identifying one owner-produced verification report. */
+export type ClaimReportId = Branded<'DevLoopClaimReportId'>
+/** Evidence category used to select required identities and scope qualifications. */
+export type ClaimKind = 'repository' | 'dependency' | 'external' | 'negative' | 'measurement'
+/** Reported evidential support, not independently verified semantic truth. */
+export type ClaimStatus = 'supported' | 'contradicted' | 'unverified'
+/** Every numeric policy is a required positive safe integer; byte budgets cover complete UTF-8 values. */
+export interface Config {
+  /** Repository containing approved pieces and local evidence; local identities are resolved within this root. */
+  repositoryRoot: string
+  /** Maximum complete piece UTF-8 bytes read by Claims; does not bound Directory's independent buffering. */
+  maxPieceBytes: number
+  /** Maximum explicit inventory rows plus additional candidate claims; overflow never silently drops a premise. */
+  maxClaims: number
+  /** Maximum UTF-8 bytes of the complete flattened evidence-array JSON, including every citation and its metadata. */
+  maxEvidenceBytes: number
+  /** Maximum UTF-8 bytes of the complete retained report JSON, including References, inventory and limitations. */
+  maxReportBytes: number
+  /** Owner cancellation lifetime in milliseconds; expiry requests cancellation but still joins admitted cleanup and writes. */
+  verificationTimeoutMs: number
+}
+/** Bounded negative-search corpus, not a universal absence certificate. */
+export interface SearchCorpus {
+  contentManifest: Record<string, string>
+  versions: Record<string, string>
+  exportEntryPoints: string[]
+  includedDirectories: string[]
+  exclusions: string[]
+  resultCount: number
+}
+/** Reported measurement scope; claimed execution does not establish independent execution or current performance. */
+export interface ReportedMeasurement {
+  /** Nonempty exact command reported as producing the cited log. */
+  command: string
+  /** Nonempty recorded environment with nonempty keys and values; not inferred from the current host. */
+  environment: Record<string, string>
+  /** Nonnegative safe-integer Unix millisecond time of the reported measurement. */
+  recordedAt: number
+  /** Nonempty scoped reported result, preserved beside the log identity. */
+  result: string
+  /** Report author's execution assertion; not-executed cannot support a measurement-dependent decision. */
+  reportedExecution: 'executed' | 'not-executed'
+}
+/** Research-supplied locator and scoped observations; identity checks do not prove the author used the source. */
+export interface ClaimEvidence {
+  locator: string
+  symbol?: string
+  version?: string
+  digest?: string
+  query?: string
+  corpus?: SearchCorpus
+  /** Optional reported measurement metadata; supported measurement evidence also requires a local log locator and SHA-256. */
+  measurement?: ReportedMeasurement
+  resultSummary: string
+}
+/** Candidate premise identified by the full-source assessment but not necessarily resolved by this attempt. */
+export interface AdditionalClaim {
+  claim: string
+  kind: ClaimKind
+  loadBearing: boolean
+  decisionRestingOnClaim: string
+}
+/** Parsed only from the complete untrusted outcome JSON, never a caller truth setter. */
+export interface ResearchFinding extends AdditionalClaim {
+  claimId: ClaimId
+  status: ClaimStatus
+  evidence: ClaimEvidence[]
+  limitations: string[]
+}
+/** Complete strict outcome JSON requested in one Research assignment; incomplete coverage cannot authorize admission. */
+export interface ResearchReport {
+  inventoryCoverage: { complete: boolean; limitations: string[] }
+  findings: ResearchFinding[]
+  additionalClaims: AdditionalClaim[]
+}
+/** Exact decoded cell text in Resources-and-proof order, starting at one. */
+export interface InventoryClaim {
+  claimId: ClaimId
+  row: number
+  claim: string
+  citation: string
+  howEstablished: string
+  checkedAgainst: string
+}
+/** Finding linked to actual settled Research identity while retaining reported, rather than inspected, provenance. */
+export interface ClaimFinding extends ResearchFinding {
+  provenance: { kind: 'reported'; role: 'Research'; delegationId: DelegationId; subagentSessionId: SessionId; preset?: string }
+}
+/** Owner-produced terminal observation; admissibility is computed by requireAdmissible. */
+export interface ClaimVerificationReport {
+  reportId: ClaimReportId
+  pieceId: string
+  pieceSha256: string
+  inventoryDigest: string
+  checkedAt: number
+  referencesDigest: string
+  references: ProvenanceObservation
+  delegationIds: DelegationId[]
+  inventory: InventoryClaim[]
+  inventoryCoverage: ResearchReport['inventoryCoverage']
+  findings: ClaimFinding[]
+  additionalClaims: AdditionalClaim[]
+  limitations: string[]
+  state: 'completed' | 'failed' | 'aborted'
+}

@@ -1,0 +1,96 @@
+/** Scoped Loader consumer with a scripted model, real execution, and logged result projection. */
+import { writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
+import Include from '@deepseek-ai/cordis-plugin-include'
+import { ToolCallId } from '@deepseek-ai/dsh-llm'
+import { runFixtureTurn } from '@deepseek-ai/dsh-loader-smoke'
+import { expect, it } from 'vitest'
+import { textResponse, toolCallResponse } from '../../../core/agent-loop/tests/mock-adapter.ts'
+import * as tool from '../src/tool.ts'
+import { fixture, response, pieceId } from './harness.ts'
+import type { Fixture } from './harness.ts'
+
+async function mount(f: Fixture) {
+  const path = join(f.repo, 'claims-consumer.yml')
+  await writeFile(path, JSON.stringify([{ name: 'cordis:claims-tool' }]))
+  await f.handle.agent.ctx.plugin(Include, { path: pathToFileURL(path).href })
+  await f.ctx.loader.await()
+}
+
+it('exposes only pieceId, rejects pass/preset authority, and removes registration on disposal', async () => {
+  await fixture([], async (f) => {
+    await mount(f)
+    expect('default' in tool).toBe(false)
+    const tools = f.ctx.get('tools')!
+    expect(tools.schemas(f.handle.agent).map(row => row.name)).toContain('dev_loop_verify_claims')
+    expect(tools.schemas().map(row => row.name)).not.toContain('dev_loop_verify_claims')
+    for (const args of [{ pieceId, allPassed: true }, { pieceId, preset: 'arbitrary' }, { pieceId, findings: [] }, { pieceId: '../other' }]) {
+      const result = await tools.execute({ callId: ToolCallId('invalid'), name: 'dev_loop_verify_claims',
+        arguments: args, agent: f.handle.agent, signal: new AbortController().signal })
+      expect(result.isError).toBe(true)
+    }
+    expect(f.adapter.requests).toEqual([])
+    expect(await f.ctx.get('devLoopRoles')!.getDelegations(pieceId)).toEqual([])
+    await f.handle.dispose()
+    expect(tools.schemas().map(row => row.name)).not.toContain('dev_loop_verify_claims')
+  })
+})
+
+it('refuses an actual live caller disposed during extensible pre-execute policy', async () => {
+  await fixture([], async (f) => {
+    await mount(f)
+    f.ctx.on('tools/pre-execute', async (exec, next) => {
+      if (exec.name === 'dev_loop_verify_claims') await f.handle.dispose()
+      return next()
+    })
+    const result = await f.ctx.get('tools')!.execute({ name: 'dev_loop_verify_claims', callId: ToolCallId('disposed-caller'),
+      arguments: { pieceId }, agent: f.handle.agent, signal: new AbortController().signal })
+    expect(result.isError).toBe(true)
+    expect(result.content.filter(block => block.type === 'text').map(block => block.text).join(' '))
+      .toMatch(/live initiator|unavailable|unknown|disposed/i)
+    expect(await f.ctx.get('devLoopRoles')!.getDelegations(pieceId)).toEqual([])
+    expect(f.adapter.requests).toEqual([])
+  })
+})
+
+it('forwards tool cancellation to actual Research and joins Queue cleanup', async () => {
+  const controller = new AbortController()
+  await fixture([() => { controller.abort(new Error('cancel tool')); return response() }], async (f) => {
+    await mount(f)
+    await f.ctx.get('tools')!.execute({ callId: ToolCallId('cancel-claims'), name: 'dev_loop_verify_claims',
+      arguments: { pieceId }, agent: f.handle.agent, signal: controller.signal })
+    const history = await f.ctx.get('devLoopRoles')!.getDelegations(pieceId)
+    expect(history).toHaveLength(1)
+    expect(history[0]).toMatchObject({ state: 'settled', status: 'aborted', cleanup: 'quiescent' })
+    expect(f.ctx.get('devLoopQueue')!.getActiveWorkers()).toEqual([])
+    await expect(f.admit()).rejects.toThrow('CLAIM_VERIFICATION_OUTSTANDING')
+  })
+})
+
+it('logs reported findings and Resources-and-proof output exactly as the next model request sees it', async () => {
+  await fixture([toolCallResponse('verify-claims', 'dev_loop_verify_claims', { pieceId }), response(), textResponse('Evidence is reported, not verified inspection.')], async (f) => {
+    await mount(f)
+    const logged: { id: string; isError: boolean; text: string }[] = []
+    await runFixtureTurn(f.ctx, { task: 'Verify the piece claims before writing tests.', onEvent(_id, event) {
+      if (event.type !== 'tool/result') return
+      const block = event.data.message.content[0]
+      logged.push({ id: block.toolCallId, isError: block.isError ?? false,
+        text: block.content.filter(row => row.type === 'text').map(row => row.text).join('') })
+    } })
+    expect(logged).toHaveLength(1)
+    expect(logged[0]!.isError).toBe(false)
+    const report = await f.claims.getReport(pieceId)
+    expect(report).toBeDefined()
+    expect(logged[0]!.text).toContain(report!.reportId)
+    expect(logged[0]!.text).toMatch(/reported/i)
+    expect(logged[0]!.text).toContain('Resources and proof')
+    expect(report!.findings[0]!.provenance.kind).toBe('reported')
+    expect(f.adapter.requests).toHaveLength(3)
+    expect(f.adapter.requests[1]!.tools?.map(row => row.name)).toEqual(['read'])
+    const projected = f.adapter.requests[2]!.messages.flatMap(message => message.content)
+      .filter(block => block.type === 'tool-result').map(block => ({ id: block.toolCallId, isError: block.isError ?? false,
+        text: block.content.filter(row => row.type === 'text').map(row => row.text).join('') }))
+    expect(projected).toEqual(logged)
+  })
+})

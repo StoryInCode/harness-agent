@@ -1,0 +1,14 @@
+0d71f5c49fe7928bd3f35ebc74d501ae3cb7be2330607daf8e78af6e70a562ce  /home/sic/harness-agent/plans/pieces/00-dev-loop/00.13-claim-verification.md
+5b580f231a7cacb7041297188f194c3055ae29bb6c25554b952a37c204347180  packages/dev-loop/references/src/attribution.ts
+d8534fab843b3c4eb1b7ca4a065000beb57c260b7c947873e9d2ab80678b9aa7  packages/dev-loop/references/src/index.ts
+c6cbdb4e3f7390e8f992a8ef0f62328ea6e41bcab3104c5a648a989024e0484f  packages/dev-loop/references/src/parser.ts
+8393918e42b6c9edb7f572dce3c345818f6d79e19de253f771c72c6718240d55  packages/dev-loop/references/src/records.ts
+2f65a9278025d1a9062c4eb47ca64337dc0cfcc514442376e301a5f76bba3f05  packages/dev-loop/references/src/sources.ts
+ef27dcc75119178522c87f9176f0c1aa1e199451547ab4a7baaf3b918bd73de2  packages/dev-loop/references/src/types.ts
+658153be7d1a57d9ae50afc8d4ba841460e3de2524113a29e0ad46d0e1d21585  packages/dev-loop/references/package.json
+34955a93bc303fb347f8c6ad8ab3effcb7bfdeefb1942a93bf137196b4b28ebd  packages/dev-loop/roles/src/config.ts
+e2bcae03ba19017e359dd6291a3aff0ce6ee7417311104dcb3071f73e46e9908  packages/dev-loop/roles/src/index.ts
+5b62a00a191151d120631f44f50779e5082a41175ac0f6610b0d023b9611f732  packages/dev-loop/roles/src/records.ts
+70fe51fb126c43b9ee813aa94106338e2b9a980ed7b749bf8cca588e3250d850  packages/dev-loop/roles/src/tool.ts
+6af584cd5a94500cf6564d5b73449a4ed0b75007b8f112f7e23e2de1a5723fd4  packages/dev-loop/roles/src/types.ts
+f7c6075dde04333de47ec734117dd82c1037fba5e9e24cf0ea7d1370d0edd26d  packages/dev-loop/roles/package.json

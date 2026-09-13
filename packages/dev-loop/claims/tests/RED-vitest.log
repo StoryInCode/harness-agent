@@ -1,0 +1,1001 @@
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+
+ RUN  v4.1.8 /home/sic/harness-agent/.worktrees/claims-tests
+
+ ❯ |thread-safe| packages/dev-loop/claims/tests/model-tools.spec.ts (2 tests | 2 failed) 135ms
+   × exposes only pieceId, rejects pass/preset authority, and removes registration on disposal 73ms
+   × logs reported findings and Resources-and-proof output exactly as the next model request sees it 61ms
+ ❯ |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts (37 tests | 35 failed) 221ms
+   ✓ freezes a complete strict Research JSON object independent of the production parser 4ms
+   × rejects invalid configured maxPieceBytes=0 before publishing service 3ms
+   × rejects invalid configured maxPieceBytes=-1 before publishing service 0ms
+   × rejects invalid configured maxPieceBytes=1.5 before publishing service 0ms
+   × rejects invalid configured maxPieceBytes=9007199254740992 before publishing service 0ms
+   × rejects invalid configured maxPieceBytes=Infinity before publishing service 0ms
+   × rejects invalid configured maxPieceBytes=NaN before publishing service 0ms
+   × rejects invalid configured maxClaims=0 before publishing service 0ms
+   × rejects invalid configured maxClaims=-1 before publishing service 0ms
+   × rejects invalid configured maxClaims=1.5 before publishing service 0ms
+   × rejects invalid configured maxClaims=9007199254740992 before publishing service 0ms
+   × rejects invalid configured maxClaims=Infinity before publishing service 0ms
+   × rejects invalid configured maxClaims=NaN before publishing service 0ms
+   × rejects invalid configured maxEvidenceBytes=0 before publishing service 0ms
+   × rejects invalid configured maxEvidenceBytes=-1 before publishing service 0ms
+   × rejects invalid configured maxEvidenceBytes=1.5 before publishing service 0ms
+   × rejects invalid configured maxEvidenceBytes=9007199254740992 before publishing service 0ms
+   × rejects invalid configured maxEvidenceBytes=Infinity before publishing service 0ms
+   × rejects invalid configured maxEvidenceBytes=NaN before publishing service 0ms
+   × rejects invalid configured maxReportBytes=0 before publishing service 0ms
+   × rejects invalid configured maxReportBytes=-1 before publishing service 0ms
+   × rejects invalid configured maxReportBytes=1.5 before publishing service 0ms
+   × rejects invalid configured maxReportBytes=9007199254740992 before publishing service 0ms
+   × rejects invalid configured maxReportBytes=Infinity before publishing service 0ms
+   × rejects invalid configured maxReportBytes=NaN before publishing service 0ms
+   × rejects invalid configured verificationTimeoutMs=0 before publishing service 0ms
+   × rejects invalid configured verificationTimeoutMs=-1 before publishing service 0ms
+   × rejects invalid configured verificationTimeoutMs=1.5 before publishing service 0ms
+   × rejects invalid configured verificationTimeoutMs=9007199254740992 before publishing service 0ms
+   × rejects invalid configured verificationTimeoutMs=Infinity before publishing service 0ms
+   × rejects invalid configured verificationTimeoutMs=NaN before publishing service 0ms
+   × rejects piece overflow before Research without pretending Directory buffering is bounded 63ms
+   ✓ rejects more proof rows than maxClaims before starting Research 29ms
+   × counts omitted candidates against maxClaims instead of silently dropping them 28ms
+   × rejects multibyte complete evidence overflow instead of clipping a citation 27ms
+   × accepts the exact complete evidence byte limit 26ms
+   × never returns or retains an oversized terminal report wrapper 35ms
+ ❯ |thread-safe| packages/dev-loop/claims/tests/claims.spec.ts (11 tests | 11 failed) 382ms
+   × maps actual proof rows, sends one full-source Research assignment, and preserves reported identity 59ms
+   × runs the same Loader chain with actual References instead of the isolated observation fixture 35ms
+   × keeps duplicate text rows distinct and escaped-pipe cell text exact 40ms
+   × contradicted load-bearing findings prevent actual Test Writer dispatch 42ms
+   × unverified load-bearing findings prevent actual Test Writer dispatch 36ms
+   × discloses non-load-bearing context without converting uncertainty into proved facts 30ms
+   × rejects stale source identity rather than reusing admission 26ms
+   × rejects stale evidence identity rather than reusing admission 27ms
+   × rejects stale caller digest identity rather than reusing admission 28ms
+   × refuses contradicted References identity even when the model says supported 27ms
+   × has no caller proof/pass setter and never admits an unchecked piece 31ms
+ ❯ |thread-safe| packages/dev-loop/claims/tests/durability.spec.ts (9 tests | 8 failed) 406ms
+   × commits intent before the model and the complete terminal report before verify returns 63ms
+   × reopens the exact report and detaches nested values returned by verify, getReport and admission 52ms
+   × blocks absent report admission after reopen without dispatching Research 78ms
+   × reopens an incomplete durable intent as unresolved and never retries Research automatically 42ms
+   × rejects malformed authoritative attempts records on reopen 51ms
+   × rejects malformed authoritative reports records on reopen 39ms
+   ✓ rejects an initial backend write failure before Roles intent, Queue admission or model execution 29ms
+   × rejects terminal write failure without publishing a report and reopens the prior unresolved intent 26ms
+   × excludes overlapping same-piece verification before another intent and releases admission after joined cleanup 26ms
+ ❯ |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts (15 tests | 15 failed) 497ms
+   × cannot support load-bearing premise with evidence 65ms
+   × cannot support load-bearing premise with digest 47ms
+   × cannot support load-bearing premise with mutable external 42ms
+   × cannot support load-bearing premise with unexecuted measurement 36ms
+   × retains immutable external version as reported evidence without making network requests 28ms
+   × retains complete negative-search corpus without upgrading it to universal absence 30ms
+   × rejects negative-search report missing explicit contentManifest 27ms
+   × rejects negative-search report missing explicit versions 25ms
+   × rejects negative-search report missing explicit exportEntryPoints 26ms
+   × rejects negative-search report missing explicit includedDirectories 27ms
+   × rejects negative-search report missing explicit exclusions 34ms
+   × rejects negative-search report missing explicit resultCount 25ms
+   × invalidates dependency evidence when exact package.json bytes drift 29ms
+   × invalidates dependency evidence when exact pnpm-lock.yaml bytes drift 30ms
+   × invalidates dependency evidence when exact entry.ts bytes drift 25ms
+ ❯ |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts (38 tests | 38 failed) 1097ms
+   × retains a failed non-admissible observation for markdown fence 67ms
+   × retains a failed non-admissible observation for prefix prose 31ms
+   × retains a failed non-admissible observation for two objects 32ms
+   × retains a failed non-admissible observation for array root 28ms
+   × retains a failed non-admissible observation for null root 29ms
+   × retains a failed non-admissible observation for unknown root field 28ms
+   × retains a failed non-admissible observation for missing coverage 27ms
+   × retains a failed non-admissible observation for missing additionalClaims 31ms
+   × retains a failed non-admissible observation for unknown coverage field 27ms
+   × retains a failed non-admissible observation for missing findings 25ms
+   × retains a failed non-admissible observation for empty explicit findings 25ms
+   × retains a failed non-admissible observation for duplicate claim id 29ms
+   × retains a failed non-admissible observation for unknown claim id 29ms
+   × retains a failed non-admissible observation for invalid claim id 27ms
+   × retains a failed non-admissible observation for rewritten explicit claim 27ms
+   × retains a failed non-admissible observation for unknown kind 26ms
+   × retains a failed non-admissible observation for unknown status 27ms
+   × retains a failed non-admissible observation for unknown finding field 28ms
+   × retains a failed non-admissible observation for missing loadBearing 27ms
+   × retains a failed non-admissible observation for missing decision 39ms
+   × retains a failed non-admissible observation for missing limitations 25ms
+   × retains a failed non-admissible observation for unknown evidence field 26ms
+   × retains a failed non-admissible observation for invalid digest 30ms
+   × retains a failed non-admissible observation for wrong evidence type 26ms
+   × retains a failed non-admissible observation for missing evidence locator 27ms
+   × retains a failed non-admissible observation for missing evidence result 26ms
+   × retains a failed non-admissible observation for unknown additional field 27ms
+   × cannot authorize handoff with incomplete assessment 28ms
+   × cannot authorize handoff with omitted load-bearing claim 25ms
+   × cannot authorize handoff with undermining limitation 31ms
+   × rejects malformed proof structure without empty success: "No table was supplied." 29ms
+   × rejects malformed proof structure without empty success: "| Claim | Citation |\n|---|---|\n| x | y |" 25ms
+   × rejects malformed proof structure without empty success: "| Claim | Citation | How established | Checked against |\n|---|---|---|---|" 26ms
+   × rejects malformed proof structure without empty success: "| Claim | Citation | How established | Checked against |\n|---|---|---|---|\n| tracked.txt contains retained evidence | `tracked.txt` | UNVERIFIED |" 27ms
+   × rejects malformed proof structure without empty success: "```markdown\n| Claim | Citation | How established | Checked against |\n|---|---|---|---|\n| tracked.txt contains retained evidence | `tracked.txt` | UNVERIFIED | fixture source |\n```" 26ms
+   × explicit no-load-bearing declaration needs an explained complete full-source assessment 30ms
+   × empty parser plus unexplained model assessment cannot establish no load-bearing claims 27ms
+   × JSON-looking partial provider output remains failed evidence after actual cleanup 27ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 109 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxPieceBytes=0 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxPieceBytes=-1 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxPieceBytes=1.5 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxPieceBytes=9007199254740992 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxPieceBytes=Infinity before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxPieceBytes=NaN before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxClaims=0 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxClaims=-1 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxClaims=1.5 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxClaims=9007199254740992 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxClaims=Infinity before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxClaims=NaN before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxEvidenceBytes=0 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxEvidenceBytes=-1 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxEvidenceBytes=1.5 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxEvidenceBytes=9007199254740992 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxEvidenceBytes=Infinity before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxEvidenceBytes=NaN before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxReportBytes=0 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxReportBytes=-1 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxReportBytes=1.5 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxReportBytes=9007199254740992 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxReportBytes=Infinity before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured maxReportBytes=NaN before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured verificationTimeoutMs=0 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured verificationTimeoutMs=-1 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured verificationTimeoutMs=1.5 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured verificationTimeoutMs=9007199254740992 before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured verificationTimeoutMs=Infinity before publishing service
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects invalid configured verificationTimeoutMs=NaN before publishing service
+AssertionError: expected [Function] to throw an error
+ ❯ packages/dev-loop/claims/tests/bounds.spec.ts:16:110
+     14|     it(`rejects invalid configured ${field}=${value} before publishing…
+     15|       expect(() => Claims.Config({ repositoryRoot: '.', maxPieceBytes:…
+     16|         maxEvidenceBytes: 32_768, maxReportBytes: 131_072, verificatio…
+       |                                                                                                              ^
+     17|     })
+     18|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/109]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects piece overflow before Research without pretending Directory buffering is bounded
+AssertionError: expected [Function] to throw error matching /piece|byte|large|limit/i but got 'Missing Claims behavior: inventory, R…'
+
+- Expected:
+/piece|byte|large|limit/i
+
++ Received:
+"Missing Claims behavior: inventory, Research, durable evidence"
+
+ ❯ config.maxPieceBytes packages/dev-loop/claims/tests/bounds.spec.ts:23:28
+     21| it('rejects piece overflow before Research without pretending Director…
+     22|   await fixture([], async f => {
+     23|     await expect(f.verify()).rejects.toThrow(/piece|byte|large|limit/i)
+       |                            ^
+     24|     expect(f.adapter.requests).toEqual([])
+     25|   }, { config: { maxPieceBytes: 100 }, proof: proof([['界'.repeat(100),…
+ ❯ maxBriefBytes packages/dev-loop/claims/tests/harness.ts:79:13
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/claims/tests/harness.ts:46:3
+ ❯ packages/dev-loop/claims/tests/bounds.spec.ts:22:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/109]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > counts omitted candidates against maxClaims instead of silently dropping them
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > rejects multibyte complete evidence overflow instead of clipping a citation
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > accepts the exact complete evidence byte limit
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/claims.spec.ts > maps actual proof rows, sends one full-source Research assignment, and preserves reported identity
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/claims.spec.ts > runs the same Loader chain with actual References instead of the isolated observation fixture
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/claims.spec.ts > keeps duplicate text rows distinct and escaped-pipe cell text exact
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/claims.spec.ts > contradicted load-bearing findings prevent actual Test Writer dispatch
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/claims.spec.ts > unverified load-bearing findings prevent actual Test Writer dispatch
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/claims.spec.ts > discloses non-load-bearing context without converting uncertainty into proved facts
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/claims.spec.ts > rejects stale source identity rather than reusing admission
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/claims.spec.ts > rejects stale evidence identity rather than reusing admission
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/claims.spec.ts > rejects stale caller digest identity rather than reusing admission
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/claims.spec.ts > refuses contradicted References identity even when the model says supported
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/durability.spec.ts > commits intent before the model and the complete terminal report before verify returns
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/durability.spec.ts > reopens the exact report and detaches nested values returned by verify, getReport and admission
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/durability.spec.ts > reopens an incomplete durable intent as unresolved and never retries Research automatically
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > cannot support load-bearing premise with evidence
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > cannot support load-bearing premise with digest
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > cannot support load-bearing premise with mutable external
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > cannot support load-bearing premise with unexecuted measurement
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > retains immutable external version as reported evidence without making network requests
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > retains complete negative-search corpus without upgrading it to universal absence
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > rejects negative-search report missing explicit contentManifest
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > rejects negative-search report missing explicit versions
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > rejects negative-search report missing explicit exportEntryPoints
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > rejects negative-search report missing explicit includedDirectories
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > rejects negative-search report missing explicit exclusions
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > rejects negative-search report missing explicit resultCount
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > invalidates dependency evidence when exact package.json bytes drift
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > invalidates dependency evidence when exact pnpm-lock.yaml bytes drift
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/evidence.spec.ts > invalidates dependency evidence when exact entry.ts bytes drift
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for markdown fence
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for prefix prose
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for two objects
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for array root
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for null root
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for unknown root field
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for missing coverage
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for missing additionalClaims
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for unknown coverage field
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for missing findings
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for empty explicit findings
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for duplicate claim id
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for unknown claim id
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for invalid claim id
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for rewritten explicit claim
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for unknown kind
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for unknown status
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for unknown finding field
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for missing loadBearing
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for missing decision
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for missing limitations
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for unknown evidence field
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for invalid digest
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for wrong evidence type
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for missing evidence locator
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for missing evidence result
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > retains a failed non-admissible observation for unknown additional field
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > cannot authorize handoff with incomplete assessment
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > cannot authorize handoff with omitted load-bearing claim
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > cannot authorize handoff with undermining limitation
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > explicit no-load-bearing declaration needs an explained complete full-source assessment
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > empty parser plus unexplained model assessment cannot establish no load-bearing claims
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > JSON-looking partial provider output remains failed evidence after actual cleanup
+Error: Missing Claims behavior: inventory, Research, durable evidence
+ ❯ Proxy.verifyPieceClaims packages/dev-loop/claims/src/index.ts:25:27
+     23|   verifyPieceClaims(pieceId: string, signal: AbortSignal): Promise<Cla…
+     24|     void pieceId; void signal
+     25|     return Promise.reject(new Error('Missing Claims behavior: inventor…
+       |                           ^
+     26|   }
+     27|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/claims/tests/harness.ts:77:108
+ ❯ packages/core/agent/src/index.ts:633:66
+ ❯ Proxy.runWithInitiator packages/core/agent/src/index.ts:633:35
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ Proxy.withInitiator packages/core/agent/src/index.ts:325:17
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/109]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/bounds.spec.ts > never returns or retains an oversized terminal report wrapper
+AssertionError: expected 'Error: Missing Claims behavior: inven…' to match /report|byte|limit|large/i
+
+- Expected:
+/report|byte|limit|large/i
+
++ Received:
+"Error: Missing Claims behavior: inventory, Research, durable evidence"
+
+ ❯ config.maxReportBytes packages/dev-loop/claims/tests/bounds.spec.ts:71:33
+     69|       expect(Buffer.byteLength(JSON.stringify(result.report))).toBeLes…
+     70|       expect(result.report.state).toBe('failed')
+     71|     } else expect(result.error).toMatch(/report|byte|limit|large/i)
+       |                                 ^
+     72|     const retained = await f.claims.getReport(pieceId)
+     73|     if (retained) expect(Buffer.byteLength(JSON.stringify(retained))).…
+ ❯ maxBriefBytes packages/dev-loop/claims/tests/harness.ts:79:7
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/claims/tests/harness.ts:46:3
+ ❯ packages/dev-loop/claims/tests/bounds.spec.ts:66:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/109]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/claims.spec.ts > has no caller proof/pass setter and never admits an unchecked piece
+AssertionError: expected [Function] to throw error including 'CLAIM_VERIFICATION_OUTSTANDING' but got 'Missing Claims behavior: current fail…'
+
+Expected: "CLAIM_VERIFICATION_OUTSTANDING"
+Received: "Missing Claims behavior: current fail-closed admission"
+
+ ❯ packages/dev-loop/claims/tests/claims.spec.ts:110:78
+    108|   await fixture([], async f => {
+    109|     for (const method of ['recordProofTable', 'recordProof', 'setAllPa…
+    110|     await expect(f.claims.requireAdmissible(pieceId, sha(f.source), si…
+       |                                                                              ^
+    111|     expect(f.adapter.requests).toEqual([])
+    112|   })
+ ❯ maxBriefBytes packages/dev-loop/claims/tests/harness.ts:79:13
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/claims/tests/harness.ts:46:3
+ ❯ packages/dev-loop/claims/tests/claims.spec.ts:108:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/109]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/durability.spec.ts > blocks absent report admission after reopen without dispatching Research
+AssertionError: expected [Function] to throw error including 'CLAIM_VERIFICATION_OUTSTANDING' but got 'Missing Claims behavior: current fail…'
+
+Expected: "CLAIM_VERIFICATION_OUTSTANDING"
+Received: "Missing Claims behavior: current fail-closed admission"
+
+ ❯ packages/dev-loop/claims/tests/durability.spec.ts:70:76
+     68|     const claims = await f.mountClaims(reopened)
+     69|     expect(await claims.getReport(pieceId)).toBeUndefined()
+     70|     await expect(claims.requireAdmissible(pieceId, sha(f.source), sign…
+       |                                                                            ^
+     71|     expect(await reopened.get('devLoopRoles')!.getDelegations(pieceId)…
+     72|     expect(reopened.get('devLoopQueue')!.getActiveWorkers()).toEqual([…
+ ❯ maxBriefBytes packages/dev-loop/claims/tests/harness.ts:79:7
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/claims/tests/harness.ts:46:3
+ ❯ packages/dev-loop/claims/tests/durability.spec.ts:65:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/109]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/durability.spec.ts > rejects malformed authoritative attempts records on reopen
+AssertionError: promise resolved "DevLoopClaims{ …(2), …(1) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ DevLoopClaims {
++   "ctx": Context {
++     "baseUrl": "file:///tmp/dsh-roles-68dAT6/",
++     "events": EventsService {
++       "_hooks": {
++         "agent/disposed": [],
++         "internal/config": [],
++         "internal/listener": [
++           {
++             "callback": [Function anonymous],
++             "ctx": [Circular],
++             "prepend": undefined,
++           },
++         ],
++         "internal/plugin": [],
++         "internal/status": [],
++         "internal/update": [
++           {
++             "callback": [Function anonymous],
++             "ctx": [Circular],
++             "global": true,
++             "prepend": true,
++           },
++         ],
++         "loader/entry-init": [],
++         "loader/partial-dispose": [],
++         "loader/patch-context": [],
++         "piece/approved": [],
++         "piece/blocked": [],
++         "piece/completed": [],
++         "session/created": [],
++         "session/event": [],
++       },
++       "ctx": [Circular],
++     },
++     "fiber": Fiber {
++       "_config": {},
++       "_disposables": DisposableList {
++         "map": Map {},
++         "sn": 32,
++         "weak": WeakMap {},
++       },
++       "_error": undefined,
++       "_hooks": {},
++       "_runner": {
++         "collect": [Function collect],
++         "epoch": "",
++         "execute": [Function execute],
++         "getOuterStack": [Function anonymous],
++       },
++       "_store": {},
++       "config": {},
++       "context": [Circular],
++       "ctx": [Circular],
++       "dispose": [Function anonymous],
++       "inertia": undefined,
++       "inject": {},
++       "parent": [Circular],
++       "runtime": null,
++       "state": 2,
++       "store": {},
++       "uid": 0,
++     },
++     "logger": [Function logger],
++     "reflect": ReflectService {
++       "ctx": [Circular],
++       "props": {
++         "accessor": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "agentLoop": {
++           "type": "service",
++         },
++         "agents": {
++           "type": "service",
++         },
++         "bail": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "devLoopClaims": {
++           "type": "service",
++         },
++         "devLoopDirectory": {
++           "type": "service",
++         },
++         "devLoopLifecycle": {
++           "type": "service",
++         },
++         "devLoopQueue": {
++           "type": "service",
++         },
++         "devLoopReferences": {
++           "type": "service",
++         },
++         "devLoopRoles": {
++           "type": "service",
++         },
++         "devLoopWorktree": {
++           "type": "service",
++         },
++         "effect": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "emit": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "fs": {
++           "type": "service",
++         },
++         "get": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "inject": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "invariants": {
++           "type": "service",
++         },
++         "llm": {
++           "type": "service",
++         },
++         "loader": {
++           "type": "service",
++         },
++         "mixin": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "on": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "once": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "parallel": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "plugin": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "provide": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "runtime": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "serial": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "sessionProjections": {
++           "type": "service",
++         },
++         "sessions": {
++           "type": "service",
++         },
++         "set": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "storage": {
++           "type": "service",
++         },
++         "storage.backend.json": {
++           "type": "service",
++         },
++         "storageDomain": {
++           "type": "service",
++         },
++         "subagents": {
++           "type": "service",
++         },
++         "subprocess": {
++           "type": "service",
++         },
++         "systemPrompt": {
++           "type": "service",
++         },
++         "testInvariantReady": {
++           "type": "service",
++         },
++         "tools": {
++           "type": "service",
++         },
++         "waterfall": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++       },
++       "store": {},
++     },
++     "registry": RegistryService {
++       "_counter": 36,
++       "_internal": Map {},
++       "ctx": [Circular],
++     },
++     "root": [Circular],
++     Symbol(cordis.isolate): {
++       "agentLoop": Symbol(agentLoop),
++       "agents": Symbol(agents),
++       "devLoopClaims": Symbol(devLoopClaims),
++       "devLoopDirectory": Symbol(devLoopDirectory),
++       "devLoopLifecycle": Symbol(devLoopLifecycle),
++       "devLoopQueue": Symbol(devLoopQueue),
++       "devLoopReferences": Symbol(devLoopReferences),
++       "devLoopRoles": Symbol(devLoopRoles),
++       "devLoopWorktree": Symbol(devLoopWorktree),
++       "fs": Symbol(fs),
++       "invariants": Symbol(invariants),
++       "llm": Symbol(llm),
++       "loader": Symbol(loader),
++       "sessionProjections": Symbol(sessionProjections),
++       "sessions": Symbol(sessions),
++       "storage": Symbol(storage),
++       "storage.backend.json": Symbol(storage.backend.json),
++       "storageDomain": Symbol(storageDomain),
++       "subagents": Symbol(subagents),
++       "subprocess": Symbol(subprocess),
++       "systemPrompt": Symbol(systemPrompt),
++       "testInvariantReady": Symbol(testInvariantReady),
++       "tools": Symbol(tools),
++     },
++     Symbol(cordis.intercept): {},
++   },
++   "name": "devLoopClaims",
+  }
+
+ ❯ packages/dev-loop/claims/tests/durability.spec.ts:105:41
+    103|       tables: { attempts: {}, reports: {}, [table]: { invalid: { piece…
+    104|     const reopened = await f.mount()
+    105|     await expect(f.mountClaims(reopened)).rejects.toThrow(/invalid|rec…
+       |                                         ^
+    106|     expect(f.adapter.requests).toEqual([])
+    107|   })
+ ❯ maxBriefBytes packages/dev-loop/claims/tests/harness.ts:79:7
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/claims/tests/harness.ts:46:3
+ ❯ packages/dev-loop/claims/tests/durability.spec.ts:99:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/109]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/durability.spec.ts > rejects malformed authoritative reports records on reopen
+AssertionError: promise resolved "DevLoopClaims{ …(2), …(1) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ DevLoopClaims {
++   "ctx": Context {
++     "baseUrl": "file:///tmp/dsh-roles-3Op24R/",
++     "events": EventsService {
++       "_hooks": {
++         "agent/disposed": [],
++         "internal/config": [],
++         "internal/listener": [
++           {
++             "callback": [Function anonymous],
++             "ctx": [Circular],
++             "prepend": undefined,
++           },
++         ],
++         "internal/plugin": [],
++         "internal/status": [],
++         "internal/update": [
++           {
++             "callback": [Function anonymous],
++             "ctx": [Circular],
++             "global": true,
++             "prepend": true,
++           },
++         ],
++         "loader/entry-init": [],
++         "loader/partial-dispose": [],
++         "loader/patch-context": [],
++         "piece/approved": [],
++         "piece/blocked": [],
++         "piece/completed": [],
++         "session/created": [],
++         "session/event": [],
++       },
++       "ctx": [Circular],
++     },
++     "fiber": Fiber {
++       "_config": {},
++       "_disposables": DisposableList {
++         "map": Map {},
++         "sn": 32,
++         "weak": WeakMap {},
++       },
++       "_error": undefined,
++       "_hooks": {},
++       "_runner": {
++         "collect": [Function collect],
++         "epoch": "",
++         "execute": [Function execute],
++         "getOuterStack": [Function anonymous],
++       },
++       "_store": {},
++       "config": {},
++       "context": [Circular],
++       "ctx": [Circular],
++       "dispose": [Function anonymous],
++       "inertia": undefined,
++       "inject": {},
++       "parent": [Circular],
++       "runtime": null,
++       "state": 2,
++       "store": {},
++       "uid": 0,
++     },
++     "logger": [Function logger],
++     "reflect": ReflectService {
++       "ctx": [Circular],
++       "props": {
++         "accessor": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "agentLoop": {
++           "type": "service",
++         },
++         "agents": {
++           "type": "service",
++         },
++         "bail": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "devLoopClaims": {
++           "type": "service",
++         },
++         "devLoopDirectory": {
++           "type": "service",
++         },
++         "devLoopLifecycle": {
++           "type": "service",
++         },
++         "devLoopQueue": {
++           "type": "service",
++         },
++         "devLoopReferences": {
++           "type": "service",
++         },
++         "devLoopRoles": {
++           "type": "service",
++         },
++         "devLoopWorktree": {
++           "type": "service",
++         },
++         "effect": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "emit": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "fs": {
++           "type": "service",
++         },
++         "get": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "inject": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "invariants": {
++           "type": "service",
++         },
++         "llm": {
++           "type": "service",
++         },
++         "loader": {
++           "type": "service",
++         },
++         "mixin": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "on": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "once": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "parallel": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "plugin": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "provide": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "runtime": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "serial": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "sessionProjections": {
++           "type": "service",
++         },
++         "sessions": {
++           "type": "service",
++         },
++         "set": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++         "storage": {
++           "type": "service",
++         },
++         "storage.backend.json": {
++           "type": "service",
++         },
++         "storageDomain": {
++           "type": "service",
++         },
++         "subagents": {
++           "type": "service",
++         },
++         "subprocess": {
++           "type": "service",
++         },
++         "systemPrompt": {
++           "type": "service",
++         },
++         "testInvariantReady": {
++           "type": "service",
++         },
++         "tools": {
++           "type": "service",
++         },
++         "waterfall": {
++           "get": [Function get],
++           "set": [Function set],
++           "type": "accessor",
++         },
++       },
++       "store": {},
++     },
++     "registry": RegistryService {
++       "_counter": 36,
++       "_internal": Map {},
++       "ctx": [Circular],
++     },
++     "root": [Circular],
++     Symbol(cordis.isolate): {
++       "agentLoop": Symbol(agentLoop),
++       "agents": Symbol(agents),
++       "devLoopClaims": Symbol(devLoopClaims),
++       "devLoopDirectory": Symbol(devLoopDirectory),
++       "devLoopLifecycle": Symbol(devLoopLifecycle),
++       "devLoopQueue": Symbol(devLoopQueue),
++       "devLoopReferences": Symbol(devLoopReferences),
++       "devLoopRoles": Symbol(devLoopRoles),
++       "devLoopWorktree": Symbol(devLoopWorktree),
++       "fs": Symbol(fs),
++       "invariants": Symbol(invariants),
++       "llm": Symbol(llm),
++       "loader": Symbol(loader),
++       "sessionProjections": Symbol(sessionProjections),
++       "sessions": Symbol(sessions),
++       "storage": Symbol(storage),
++       "storage.backend.json": Symbol(storage.backend.json),
++       "storageDomain": Symbol(storageDomain),
++       "subagents": Symbol(subagents),
++       "subprocess": Symbol(subprocess),
++       "systemPrompt": Symbol(systemPrompt),
++       "testInvariantReady": Symbol(testInvariantReady),
++       "tools": Symbol(tools),
++     },
++     Symbol(cordis.intercept): {},
++   },
++   "name": "devLoopClaims",
+  }
+
+ ❯ packages/dev-loop/claims/tests/durability.spec.ts:105:41
+    103|       tables: { attempts: {}, reports: {}, [table]: { invalid: { piece…
+    104|     const reopened = await f.mount()
+    105|     await expect(f.mountClaims(reopened)).rejects.toThrow(/invalid|rec…
+       |                                         ^
+    106|     expect(f.adapter.requests).toEqual([])
+    107|   })
+ ❯ maxBriefBytes packages/dev-loop/claims/tests/harness.ts:79:7
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/claims/tests/harness.ts:46:3
+ ❯ packages/dev-loop/claims/tests/durability.spec.ts:99:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/109]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/durability.spec.ts > rejects terminal write failure without publishing a report and reopens the prior unresolved intent
+AssertionError: terminal failure must occur after actual Research execution: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ packages/dev-loop/claims/tests/durability.spec.ts:128:95
+    126|     failTerminal = () => { renameSync(file, saved); mkdirSync(file) }
+    127|     await expect(f.verify()).rejects.toThrow()
+    128|     expect(f.adapter.requests, 'terminal failure must occur after actu…
+       |                                                                                               ^
+    129|     expect(await f.claims.getReport(pieceId)).toBeUndefined()
+    130|     expect(Object.values(decode(await readFile(saved, 'utf8')).tables.…
+ ❯ maxBriefBytes packages/dev-loop/claims/tests/harness.ts:79:7
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/claims/tests/harness.ts:46:3
+ ❯ packages/dev-loop/claims/tests/durability.spec.ts:123:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/109]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/durability.spec.ts > excludes overlapping same-piece verification before another intent and releases admission after joined cleanup
+AssertionError: first verification must reach the model barrier before settling: expected 'settled' to be 'model-entered' // Object.is equality
+
+Expected: "model-entered"
+Received: "settled"
+
+ ❯ packages/dev-loop/claims/tests/durability.spec.ts:166:76
+    164|     try {
+    165|       expect(await Promise.race([entered.promise.then(() => 'model-ent…
+    166|         'first verification must reach the model barrier before settli…
+       |                                                                            ^
+    167|       const before = await readFile(filename(f.data), 'utf8')
+    168|       await expect(f.verify()).rejects.toThrow()
+ ❯ maxBriefBytes packages/dev-loop/claims/tests/harness.ts:79:7
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/claims/tests/harness.ts:46:3
+ ❯ packages/dev-loop/claims/tests/durability.spec.ts:147:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/109]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/model-tools.spec.ts > exposes only pieceId, rejects pass/preset authority, and removes registration on disposal
+AssertionError: expected [ 'read', 'write', 'edit', …(2) ] to include 'dev_loop_verify_claims'
+ ❯ packages/dev-loop/claims/tests/model-tools.spec.ts:26:64
+     24|     expect('default' in tool).toBe(false)
+     25|     const tools = f.ctx.get('tools')!
+     26|     expect(tools.schemas(f.handle.agent).map(row => row.name)).toConta…
+       |                                                                ^
+     27|     expect(tools.schemas().map(row => row.name)).not.toContain('dev_lo…
+     28|     for (const args of [{ pieceId, allPassed: true }, { pieceId, prese…
+ ❯ maxBriefBytes packages/dev-loop/claims/tests/harness.ts:79:7
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/claims/tests/harness.ts:46:3
+ ❯ packages/dev-loop/claims/tests/model-tools.spec.ts:22:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/109]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/model-tools.spec.ts > logs reported findings and Resources-and-proof output exactly as the next model request sees it
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ packages/dev-loop/claims/tests/model-tools.spec.ts:51:32
+     49|     } })
+     50|     expect(logged).toHaveLength(1)
+     51|     expect(logged[0]!.isError).toBe(false)
+       |                                ^
+     52|     const report = await f.claims.getReport(pieceId)
+     53|     expect(report).toBeDefined()
+ ❯ maxBriefBytes packages/dev-loop/claims/tests/harness.ts:79:7
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/claims/tests/harness.ts:46:3
+ ❯ packages/dev-loop/claims/tests/model-tools.spec.ts:41:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/109]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > rejects malformed proof structure without empty success: "No table was supplied."
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > rejects malformed proof structure without empty success: "| Claim | Citation |\n|---|---|\n| x | y |"
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > rejects malformed proof structure without empty success: "| Claim | Citation | How established | Checked against |\n|---|---|---|---|"
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > rejects malformed proof structure without empty success: "| Claim | Citation | How established | Checked against |\n|---|---|---|---|\n| tracked.txt contains retained evidence | `tracked.txt` | UNVERIFIED |"
+ FAIL  |thread-safe| packages/dev-loop/claims/tests/research-json.spec.ts > rejects malformed proof structure without empty success: "```markdown\n| Claim | Citation | How established | Checked against |\n|---|---|---|---|\n| tracked.txt contains retained evidence | `tracked.txt` | UNVERIFIED | fixture source |\n```"
+AssertionError: expected [Function] to throw error including 'CLAIM_VERIFICATION_OUTSTANDING' but got 'Missing Claims behavior: current fail…'
+
+Expected: "CLAIM_VERIFICATION_OUTSTANDING"
+Received: "Missing Claims behavior: current fail-closed admission"
+
+ ❯ proof packages/dev-loop/claims/tests/research-json.spec.ts:70:29
+     68|       await expect(f.verify()).rejects.toThrow(/proof|inventory|claim/…
+     69|       expect(f.adapter.requests).toEqual([])
+     70|       await expect(f.admit()).rejects.toThrow('CLAIM_VERIFICATION_OUTS…
+       |                             ^
+     71|     }, { proof: body })
+     72|   })
+ ❯ maxBriefBytes packages/dev-loop/claims/tests/harness.ts:79:7
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/claims/tests/harness.ts:46:3
+ ❯ packages/dev-loop/claims/tests/research-json.spec.ts:67:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/109]⎯
+
+
+ Test Files  6 failed (6)
+      Tests  109 failed | 3 passed (112)
+   Start at  09:18:00
+   Duration  2.51s (transform 5.85s, setup 777ms, import 7.17s, tests 2.74s, environment 0ms)

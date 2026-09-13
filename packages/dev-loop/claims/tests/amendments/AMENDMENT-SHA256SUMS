@@ -1,0 +1,11 @@
+36c4741b6555679d0adebec2625971121d04d507f08ee60cb756bd9687bcfcb8  packages/dev-loop/claims/src/types.ts
+b6e622b2cc689f702baa73553e5dec78786cddc3a5b09a810533b0683119ba0a  packages/dev-loop/claims/tests/concurrency.spec.ts
+a1c07fbff8ccaddd885966143043ec22285baea2b5e2f8a3bd1366e9f51ebab5  packages/dev-loop/claims/tests/supplemental-durable.spec.ts
+d66914baf6175eb4fe0f1af0a3ddd3b6f43e49dfcff203c86508a91386ffcc7d  packages/dev-loop/claims/tests/supplemental-evidence.spec.ts
+59dd3df2c2dfa2e00ac9e0c8fed2996ff0f9f7f30732e633ba8a6dff880b4da2  packages/dev-loop/claims/tests/supplemental-lifetime.spec.ts
+588df19a117c56291bf04151e34d07c33bb4376e93ba975dc48e8bb3aad909e6  packages/dev-loop/claims/tests/supplemental-measurement.spec.ts
+be7657dc9ee8ba33cba176a741e053d2164b4698fe5d3b7f45ac75e78667795f  packages/dev-loop/claims/tests/supplemental-preset.spec.ts
+9813dd3d3215d37b9deb23104a47ca727710f8693cdeb1b972957aec4e2d6da4  packages/dev-loop/claims/tests/supplemental-research-schema.ts
+c409a539f4183bb4343165c4f949771f6d8423daae6e32dbbcf1cd8cd6e87f5c  packages/dev-loop/claims/tests/supplemental-source-bytes.spec.ts
+43683bb57448813841ad6a389510043cca72b243ee2519990e8a0f7f92e4f643  packages/dev-loop/claims/tests/amendments/concurrency-before-commit.txt
+aecc1e79e7e5e9ef9eafb9006ebfcbac3004437885d54632d72a23a3216c491f  packages/dev-loop/claims/tests/amendments/types-doc-only.txt

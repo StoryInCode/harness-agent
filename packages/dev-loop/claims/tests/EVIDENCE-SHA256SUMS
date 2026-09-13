@@ -1,0 +1,8 @@
+1feb8fac718319c91efeabca452eede66fcdc8396b6b6b1ae518cf1258d67620  packages/dev-loop/claims/tests/RED.md
+8cc7f2ff7fab297caf848575da0b987e4d4d4bff7a712408bf3dac20a0f0d8fc  packages/dev-loop/claims/tests/RED-vitest-final.log
+4b5b28a4efedd92b81b63d0f5d92643ba1ca4fcc21bbd584405ca597578c689c  packages/dev-loop/claims/tests/RED-vitest-before-bounds.log
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  packages/dev-loop/claims/tests/RED-typescript-final.log
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  packages/dev-loop/claims/tests/RED-build.log
+aef6e9f74164f4b8317dea45f1c4290ca0fb07f5ce012ae777013b1816ad0579  packages/dev-loop/claims/tests/RED-oxlint.log
+cbb2d89a685066660b34f79ae4bf29b0853029f8c516b89f95c24cc32c3cf6cc  packages/dev-loop/claims/tests/SHA256SUMS
+9c6985d021a632bd8a734d106250c2b6ca7a4ecab4fd68ba679e65774c5bc31f  packages/dev-loop/claims/tests/DEPENDENCIES-SHA256SUMS
