@@ -36,7 +36,7 @@ The proposed behavior is specified in [piece 00.02](../../../../plans/pieces/00-
 
 ## Acceptance criteria
 
-Regression tests must demonstrate RED against the baseline without import failures or timeouts, then pass after a source-only implementation. Observe hook rejection before mutation, guarded edits under concurrent changes, exact failing argv, ordinary compensation and recovery conflicts, a todo-to-pending-to-done chain, and held subprocess/recovery work during caller cancellation and fiber teardown. A separate Reviewer must examine a frozen implementation, not only its test output.
+Regression tests must demonstrate RED against the baseline without import failures or timeouts, then pass after a source-only implementation. Observe hook rejection before mutation, guarded edits under concurrent changes, exact failing argv, ordinary compensation and recovery conflicts, a todo-to-pending-to-done chain, and held subprocess/recovery work during caller cancellation and fiber teardown. The Implementer must pass the frozen tests, then the parent transfers the implementation and reruns tests on master before completion and a milestone commit.
 
 ## Risks
 

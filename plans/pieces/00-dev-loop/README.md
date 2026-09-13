@@ -1,6 +1,6 @@
 # Set 00 — The Development Loop
 
-The development loop is the execution engine that all future DeepSeek Harness work runs through. Specifications arrive sized for one-at-a-time ingestion as discrete lego pieces (at most 280 lines). For each piece, the orchestrator presents the feature summary, mechanism, Given/When/Then behaviour, teaching section, and references to the user. At every junction, the user can question, request changes, or accept the piece. On approval, the piece enters a prioritized dispatch queue with an absolute concurrency ceiling of at most 6 subagents. Each subagent executes within its own isolated Git worktree, bounded by sandbox fencing. The loop delegates strictly by role (Research, Test Writer, Implementer, Utility), enforces read-only guards on research agents, verifies evidence and reference provenance, and requires four verification gates before declaring any piece done.
+The development loop is the execution engine that all future DeepSeek Harness work runs through. Specifications arrive sized for one-at-a-time ingestion as discrete lego pieces (at most 280 lines). For each piece, the orchestrator presents the feature summary, mechanism, Given/When/Then behaviour, teaching section, and references to the user. At every junction, the user can question, request changes, or accept the piece. After approval, a role consumer submits executable work to the prioritized queue. Its configurable `maxConcurrency` defaults to 4 and bounds queue-owned one-shot delegations; it is not a process-wide subagent count. Each subagent executes within its own isolated Git worktree, bounded by sandbox fencing. The loop delegates strictly by role (Research, Test Writer, Implementer, Utility), enforces read-only guards on research agents, verifies evidence and reference provenance, and requires four verification gates before declaring any piece done.
 
 ## Set Index
 
@@ -10,7 +10,7 @@ The development loop is the execution engine that all future DeepSeek Harness wo
 |---|---|---|---|---|---|
 | `00.01` | [Piece Directory and Specification Parser](done/00.01-piece-directory.md) | `@deepseek-ai/dsh-dev-loop-directory` | none | 1 | done |
 | `00.02` | [Piece Lifecycle State Machine](done/00.02-piece-lifecycle.md) | `@deepseek-ai/dsh-dev-loop-lifecycle` | `00.01` | 2 | done |
-| `00.03` | Approval Junction and User Clarification | `@deepseek-ai/dsh-dev-loop-approval` | `00.01`, `00.02` | 3 | todo |
+| `00.03` | [Approval Junction and User Clarification](done/00.03-approval-junction.md) | `@deepseek-ai/dsh-dev-loop-approval` | `00.01`, `00.02` | 3 | done |
 | `00.04` | Dev Loop Dispatch Queue and Concurrency Guard | `@deepseek-ai/dsh-dev-loop-queue` | `00.02`, `00.03` | 4 | todo |
 | `00.05` | Per-Piece Git Worktree Allocation | `@deepseek-ai/dsh-dev-loop-worktree` | `00.04` | 5 | todo |
 | `00.06` | Role Delegation Dispatcher and Record | `@deepseek-ai/dsh-dev-loop-roles` | `00.04`, `00.05` | 6 | todo |

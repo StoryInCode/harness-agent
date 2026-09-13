@@ -272,8 +272,9 @@ A piece that is complete does not stay in the plan set. It moves to a `done/` fo
 remaining plan is always the remaining work and progress is visible by looking at the tree.
 
 - Each set directory has a sibling `done/` subdirectory: `<set>/done/`.
-- A piece moves there when it reaches `done` status — implemented, verified, and reviewed —
-  and only then. Moving it is part of completing it, not a later tidy-up.
+- A piece moves there after implementation passes the frozen tests, transfer to master, and
+  successful post-transfer tests. No separate Reviewer stage is required. Move it and update
+  the index promptly, then commit the completed milestone; do not push without authorization.
 - The move preserves the filename and its id, so references from other pieces stay resolvable.
   A piece referring to a completed dependency looks in `<set>/done/` for it.
 - The set README records the move: the index shows each piece as pending or done and where it
@@ -378,10 +379,9 @@ looking.
 - **Merge work back to the mainline, then remove the worktree.** A worktree is a scratch space
   with a lifetime, not a place work accumulates. Between units of work, `git worktree list`
   should show only the main checkout, with no detached worker worktrees remaining.
-- **A reviewer reviews a frozen tree.** Do not edit a worktree while a review of it is running:
-  the reviewer ends up judging code that no longer exists, and cannot tell a live edit from
-  sabotage. Give the reviewer its own worktree at the reviewed commit, or stop editing until it
-  reports.
+- **Implement against frozen tests.** The Test Writer hands off tests and behavioral RED proof.
+  The Implementer changes production code, not the handed-off tests. A necessary test correction
+  returns to the Test Writer and establishes a new recorded baseline before implementation.
 
 ```axiom
 id: R-no-feature-branches

@@ -8,6 +8,7 @@ Discover development-loop piece specifications, inspect validation results, and 
 
 - [Directory values](#directory-values)
 - [Lifecycle state](#lifecycle-state)
+- [Human decisions](#human-decisions)
 - [Completion and events](#completion-and-events)
 - [Failure and cancellation](#failure-and-cancellation)
 - [Cordis API](#cordis-surface)
@@ -36,6 +37,10 @@ A scan combines a set directory and its `done/` child. Malformed files remain vi
 The lifecycle service hydrates valid records once during mounting. `getStatus` reads committed memory, not a fresh directory scan; external edits do not refresh it. Rejected files retain their parse errors instead of acquiring a status.
 
 `LEGAL_TRANSITIONS` permits `todo → pending`, `pending → done`, `pending → blocked`, and `blocked → todo`. `done` has no outgoing edge. `transition` requires the expected status and claims the piece before asynchronous work; stale or competing claims reject. Readers continue to see committed status while completion is in flight. Non-completing transitions change memory only, so logical `pending` can coexist with a disk header declaring `todo`.
+
+## Human decisions
+
+The [approval result declarations](../../packages/dev-loop/approval/src/types.ts) define `ApprovalDecision` as `accept`, `question`, or `change`, and `PresentPieceResult` as the requested `pieceId`, explicit `decision`, and optional trimmed `feedback`. The [approval package](../../packages/dev-loop/approval/README.md) owns presentation, exact-choice validation, live-root calling requirements, and source-version checks. Only acceptance attempts `todo → pending`; it creates no durable authorization and does not restrict direct callers of the lifecycle service.
 
 ## Completion and events
 

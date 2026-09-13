@@ -7,7 +7,7 @@ kind: "package-group"
 
 ## Summary
 
-Read development-loop piece specifications and change their status through guarded operations. The directory package discovers and validates files; the lifecycle package manages in-memory transitions and Git promotion of completed pieces. These services do not provide a complete autonomous loop, human approval enforcement, or durable transition records.
+Read development-loop piece specifications and change their status through guarded operations. The directory package discovers and validates files; the lifecycle package manages in-memory transitions and Git promotion of completed pieces. The approval tool requests an explicit human decision before moving a current todo piece to pending. These packages do not provide a complete autonomous loop or durable transition records.
 
 ## Table of Contents
 
@@ -24,6 +24,7 @@ Choose the service by the operation it owns.
 
 | Package | Role |
 |---|---|
+| [`approval`](approval/README.md) | Present current source for Accept, Question, or Change; reject stale acceptance. |
 | [`directory`](directory/README.md) | Discover and validate piece specifications through the filesystem service. |
 | [`lifecycle`](lifecycle/README.md) | Guard status changes and promote tracked piece files into `done/`. |
 

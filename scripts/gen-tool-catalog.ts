@@ -28,6 +28,10 @@ import LocalFileSystem from '@deepseek-ai/dsh-fs-local'
 import { AttachmentStore } from '@deepseek-ai/dsh-attachment'
 import type { ImageAttachmentLimits, ImageAttachmentRef, SaveImageAttachment, StoredImageAttachment } from '@deepseek-ai/dsh-attachment'
 import UserQuestionService from '@deepseek-ai/dsh-user-questions'
+// FORK-LOCAL: harvest the opt-in development-loop tool through its real providers.
+import DevLoopDirectory from '@deepseek-ai/dsh-dev-loop-directory'
+import DevLoopLifecycle from '@deepseek-ai/dsh-dev-loop-lifecycle'
+import * as DevLoopApproval from '@deepseek-ai/dsh-dev-loop-approval'
 import PlanModeController from '@deepseek-ai/dsh-plan-mode'
 import WebRuntime from '@deepseek-ai/dsh-web'
 import * as WebSearchExa from '@deepseek-ai/dsh-web-search-exa'
@@ -188,6 +192,23 @@ export interface ToolPackage {
  * guard proves it is exhaustive against the on-disk glob.
  */
 const TOOL_PACKAGES: ToolPackage[] = [
+  // FORK-LOCAL: this consumer is outside the upstream tool-* discovery pattern.
+  {
+    pkg: '@deepseek-ai/dsh-dev-loop-approval',
+    dir: 'approval',
+    source: 'packages/dev-loop/approval/src/index.ts',
+    requires: ['ctx.tools', 'ctx.userQuestions', 'ctx.devLoopDirectory', 'ctx.devLoopLifecycle', 'ctx.fs'],
+    writes: ['tool/call', 'piece/approved after explicit acceptance', 'tool/result'],
+    async mount(ctx) {
+      await ctx.plugin(LocalFileSystem, { cwd: root })
+      await ctx.plugin(LocalSubprocessRuntime)
+      await ctx.plugin(UserQuestionService)
+      await ctx.plugin(DevLoopDirectory, { root: 'plans/pieces' })
+      await ctx.plugin(DevLoopLifecycle)
+      await ctx.plugin(DevLoopApproval)
+    },
+    note: 'The opt-in consumer presents current source to a live root caller. Accept changes lifecycle memory to pending; it does not dispatch work or persist an approval grant.',
+  },
   {
     pkg: '@deepseek-ai/dsh-tool-ask-user',
     dir: 'tool-ask-user',

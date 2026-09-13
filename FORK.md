@@ -30,6 +30,7 @@ Never delete an upstream gate script, test, or manifest to silence it. Deletion 
 | `scripts/fork-gate-overrides.spec.ts` | Private-fixture policy validation, dependency-pruning, and selective language requirements. |
 | `scripts/fork-gate-overrides.manifest.json` | Disabled gates and English-only subsystem basenames, each with a reason. |
 | `docs/subsystems/development-loop.md` | Canonical English reference for development-loop shared types and generated Cordis API. |
+| `scripts/dev-loop-tool-catalog.spec.ts` | Regression proving the opt-in approval tool is harvested despite its non-`tool-*` package name. |
 | `scripts/fork-diff.ts` | Divergence inventory against `upstream/master`; `--strict` fails on an unmarked edit to an upstream-owned file. |
 | `scripts/check-pieces.ts` | The `plans/AGENTS.md` axiom checkers, validating through the same parser the development loop uses at runtime, so an axiom and its runtime cannot drift. |
 | `scripts/check-pieces.spec.ts` | Detection-boundary tests for those checkers, per the `scripts/AGENTS.md` rule that a source-ownership gate tests every form that moves its boundary. |
@@ -41,6 +42,7 @@ Never delete an upstream gate script, test, or manifest to silence it. Deletion 
 
 | File | Edit | Why it could not be fork-owned |
 |---|---|---|
+| `scripts/gen-tool-catalog.ts` | Explicit approval-tool boot entry with actual local filesystem, lifecycle, and question providers. | The runtime schema catalog has a closed boot manifest and its discovery glob does not include `dev-loop/approval`; the regression pins inclusion without weakening the existing completeness checks. |
 | `scripts/run-gates.ts` | Import `fork-gate-overrides.ts`, and wrap the aggregate construction: `gatesForMode()` now returns `applyForkGatePolicy(gatesForModeUpstream(selected), …)`. | `gatesForMode` is the only funnel every aggregate passes through, and upstream exposes no gate-filtering hook. Two lines plus a renamed inner function; a conflict here is a two-line reapply. |
 | `scripts/gen-cordis-catalog.ts` | Development-loop service/event/type owners and the fork-local language selector. | Ownership maps and language expansion have no external registration point. All partition, English-page, marker, type-link and freshness checks remain active. |
 | `docs/subsystems/README.md` | Development-loop navigation row. | The upstream subsystem index owns discovery of the new reference page. |

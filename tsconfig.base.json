@@ -256,6 +256,7 @@
       // dev-loop/ package directories drop the group prefix their npm names
       // carry (directory -> dsh-dev-loop-directory), so gen-tsconfig-paths skips
       // them and each needs a hand-written alias, like typert/ and sdk/ above.
+      "@deepseek-ai/dsh-dev-loop-approval": ["./packages/dev-loop/approval/src"],
       "@deepseek-ai/dsh-dev-loop-directory": ["./packages/dev-loop/directory/src"],
       "@deepseek-ai/dsh-dev-loop-lifecycle": ["./packages/dev-loop/lifecycle/src"],
       // BEGIN generated package aliases — pnpm run gen-tsconfig-paths

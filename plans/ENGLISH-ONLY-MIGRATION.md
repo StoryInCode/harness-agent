@@ -96,4 +96,4 @@ PDF CMaps, fonts, and wasm are runtime data, not ordinary locale copy. Their lic
 
 **Decision authority:** routine English copy and broken-link fixes can proceed within their owners. Archive/released-fixture policies and website route changes need explicit migration designs and independent review. Do not infer legal permission to delete notices from a text-search result.
 
-No migration tests have run and no Chinese removal is claimed. The immediate next implementation step is a small policy/gate specification with Test Writer → RED → Implementer → Reviewer, not a bulk delete.
+No migration tests have run and no Chinese removal is claimed. The immediate next implementation step is a small policy/gate specification with Test Writer → RED → Implementer GREEN → transfer to master → post-transfer tests → milestone commit, not a bulk delete.
