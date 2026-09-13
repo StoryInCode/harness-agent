@@ -13,8 +13,8 @@ The development loop is the execution engine that all future DeepSeek Harness wo
 | `00.03` | [Approval Junction and User Clarification](done/00.03-approval-junction.md) | `@deepseek-ai/dsh-dev-loop-approval` | `00.01`, `00.02` | 3 | done |
 | `00.04` | [Dev Loop Dispatch Queue and Concurrency Guard](done/00.04-concurrency-queue.md) | `@deepseek-ai/dsh-dev-loop-queue` | `00.01`, `00.02`, `00.03` | 4 | done |
 | `00.05` | [Per-Piece Detached Git Worktree Allocation](done/00.05-worktree-assignment.md) | `@deepseek-ai/dsh-dev-loop-worktree` | `00.04` | 5 | done |
-| `00.06` | Role Delegation Dispatcher and Record | `@deepseek-ai/dsh-dev-loop-roles` | `00.04`, `00.05` | 6 | todo |
-| `00.07` | Research Subagent Read-Only Guard | `@deepseek-ai/dsh-dev-loop-research-guard` | `00.06` | 7 | todo |
+| `00.06` | [Role Delegation Dispatcher and Record](done/00.06-role-delegation.md) | `@deepseek-ai/dsh-dev-loop-roles` | `00.04`, `00.05` | 6 | done |
+| `00.07` | [Research Capability Policy and Acceptance](done/00.07-research-guard.md) | `@deepseek-ai/dsh-dev-loop-roles` (shared owner) | `00.06` | 7 | done |
 | `00.08` | References Provenance Store and Verification | `@deepseek-ai/dsh-dev-loop-references` | `00.01`, `00.06` | 8 | todo |
 | `00.09` | BDD Scenario Extractor and Test Handoff | `@deepseek-ai/dsh-dev-loop-test-handoff` | `00.01`, `00.06`, `00.13` | 9 | todo |
 | `00.10` | Multi-Gate Verification Enforcer | `@deepseek-ai/dsh-dev-loop-gates` | `00.02`, `00.09` | 10 | todo |
