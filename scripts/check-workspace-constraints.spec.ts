@@ -1,10 +1,12 @@
 /** Experimental-package publication and dependency constraints. */
 
 import { describe, expect, it } from 'vitest'
+import rolesManifest from '../packages/dev-loop/roles/package.json' with { type: 'json' }
 import {
   checkDshFamilyVersion,
   checkExperimentalDependencyIsolation,
   checkExperimentalManifest,
+  checkWorkspaceManifest,
   expectedDshPackageFiles,
   type WorkspaceManifest,
 } from './check-workspace-constraints.ts'
@@ -132,6 +134,28 @@ describe('dsh family version coherence', () => {
 })
 
 describe('package payload constraints', () => {
+  const rolesFiles = ['lib/index.js', 'lib/tool.js', 'lib/records-*.js', 'lib/types/**/*.d.ts']
+
+  it('ships the Roles service, scoped tool and their shared records chunk', () => {
+    expect(checkWorkspaceManifest({
+      dir: 'packages/dev-loop/roles',
+      manifest: { ...rolesManifest, files: rolesFiles },
+    })).toEqual([])
+  })
+
+  it.each<[string, string[]]>([
+    ['missing tool', rolesFiles.filter(file => file !== 'lib/tool.js')],
+    ['missing records chunk', rolesFiles.filter(file => file !== 'lib/records-*.js')],
+    ['unbounded runtime glob', ['lib/*.js', 'lib/types/**/*.d.ts']],
+  ])('rejects a Roles payload with %s', (_label, files) => {
+    expect(checkWorkspaceManifest({
+      dir: 'packages/dev-loop/roles',
+      manifest: { ...rolesManifest, files },
+    })).toEqual([
+      `packages/dev-loop/roles/package.json: @deepseek-ai/dsh-dev-loop-roles: package.json files must be ${JSON.stringify(rolesFiles)}`,
+    ])
+  })
+
   it('includes a declared profile patch without a package-name allowlist', () => {
     expect(expectedDshPackageFiles({
       name: '@deepseek-ai/dsh-private-profile',

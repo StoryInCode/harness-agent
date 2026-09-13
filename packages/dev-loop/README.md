@@ -30,6 +30,7 @@ Choose the service by the operation it owns.
 | [`directory`](directory/README.md) | Discover and validate piece specifications through the filesystem service. |
 | [`lifecycle`](lifecycle/README.md) | Guard status changes and promote tracked piece files into `done/`. |
 | [`queue`](queue/README.md) | Admit consumer-owned one-shot delegations and bound startup through complete cleanup. |
+| [`references`](references/README.md) | Check bounded local sources and retain report attribution without claiming verified inspection. |
 | [`roles`](roles/README.md) | Delegate specialist assignments and retain bounded, attributed history. |
 | [`worktree`](worktree/README.md) | Retain detached piece checkouts across roles and conservatively retire clean owned trees. |
 

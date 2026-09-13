@@ -260,6 +260,7 @@
       "@deepseek-ai/dsh-dev-loop-directory": ["./packages/dev-loop/directory/src"],
       "@deepseek-ai/dsh-dev-loop-lifecycle": ["./packages/dev-loop/lifecycle/src"],
       "@deepseek-ai/dsh-dev-loop-queue": ["./packages/dev-loop/queue/src"],
+      "@deepseek-ai/dsh-dev-loop-references": ["./packages/dev-loop/references/src"],
       "@deepseek-ai/dsh-dev-loop-roles": ["./packages/dev-loop/roles/src"],
       "@deepseek-ai/dsh-dev-loop-roles/tool": ["./packages/dev-loop/roles/src/tool.ts"],
       "@deepseek-ai/dsh-dev-loop-worktree": ["./packages/dev-loop/worktree/src"],

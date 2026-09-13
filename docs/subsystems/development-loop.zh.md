@@ -14,6 +14,7 @@
 - [分派请求](#dispatch-requests)
 - [Worktree 分配](#worktree-assignments)
 - [角色委派记录](#role-delegation-records)
+- [引用观察](#reference-observations)
 - [完成与事件](#completion-and-events)
 - [失败与取消](#failure-and-cancellation)
 - [Cordis API](#cordis-surface)
@@ -66,6 +67,13 @@
 [Roles 声明](../../packages/dev-loop/roles/src/types.ts)定义封闭的 `DevLoopRole` 联合、有界 `DelegationBrief`、可选 `VerificationAssignment`、Host `RoleConfig` 与 `Config`，以及作用域 `ToolConfig`。`DelegationRecord` 通过 `state` 区分未解决的 `RequestedDelegation` 意图与 `SettledDelegation` 观察。带品牌的 `DelegationId` 在整个生命周期标识同一持久化行；子级身份、worktree 分配和实际预设都是可选观察，不是推断的权限。
 
 已结算记录将完成状态与 `cleanup` 分开：不确定清理强制为 `failed`，而 `reported` 来源绝不证明独立验证。[Roles 包](../../packages/dev-loop/roles/README.zh.md)拥有持久化顺序、清理证据、字节限制和策略限制。其历史在服务重启后仍然存在，但既不协调恢复未解决请求，也不恢复 Worktree 的进程本地分配映射。
+
+<a id="reference-observations"></a>
+## 引用观察
+
+[References 声明](../../packages/dev-loop/references/src/types.ts)将 `ProvenanceObservation` 定义为对精确解码后任务块文本的最新持久化检查，由 `pieceSha256` 和 `checkedAt` 标识。`ReferenceEntry` 区分本地来源解析、报告归属和查阅状态；`LinkedDelegation` 从 Roles 复制实际终态报告身份。结构有效性和关联报告绝不证明来源使用或声明真实性：查阅状态始终显式为 `unverified`。
+
+[References 包](../../packages/dev-loop/references/README.zh.md)拥有接受的定位符、仓库范围限制、字节限制和归属检查。观察不会在来源编辑后刷新，不强制生命周期策略，也不增加模型可见上下文。
 
 <a id="completion-and-events"></a>
 ## 完成与事件
@@ -253,6 +261,31 @@ getQueuedEntries(): QueueEntry[]
 ```
 
 Source: [`packages/dev-loop/queue/src/index.ts`](../../packages/dev-loop/queue/src/index.ts)
+
+<a id="ctxdevloopreferences--devloopreferences"></a>
+
+### `ctx.devLoopReferences` — `DevLoopReferences`
+
+Resolves sources and retains report identity without claiming verified inspection.
+
+```ts cordis-catalog
+/**
+ * Check the current piece and publish only after durable storage succeeds.
+ * @param pieceId - canonical piece id in the configured repository.
+ * @param signal - stops new checks, not an already-admitted domain write.
+ * @returns a detached observation of structural checks and unverified inspection.
+ */
+verifyReferences(pieceId: string, signal: AbortSignal): Promise<ProvenanceObservation>
+
+/**
+ * Read the last durable observation without reinterpreting changed piece contents.
+ * @param pieceId - canonical piece id.
+ * @returns detached latest observation or undefined when never checked.
+ */
+getProvenance(pieceId: string): Promise<ProvenanceObservation | undefined>
+```
+
+Source: [`packages/dev-loop/references/src/index.ts`](../../packages/dev-loop/references/src/index.ts)
 
 <a id="ctxdevlooproles--devlooproles"></a>
 

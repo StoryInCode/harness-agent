@@ -934,6 +934,25 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'devLoopReferences',
+    summary: 'Resolves sources and retains report identity without claiming verified inspection.',
+    description: 'Resolves sources and retains report identity without claiming verified inspection.',
+    methods: [
+      {
+        signature: 'verifyReferences(pieceId: string, signal: AbortSignal): Promise<ProvenanceObservation>',
+        description: 'Check the current piece and publish only after durable storage succeeds.',
+        parameters: [{ name: 'pieceId', description: 'canonical piece id in the configured repository.' }, { name: 'signal', description: 'stops new checks, not an already-admitted domain write.' }],
+        returns: 'a detached observation of structural checks and unverified inspection.',
+      },
+      {
+        signature: 'getProvenance(pieceId: string): Promise<ProvenanceObservation | undefined>',
+        description: 'Read the last durable observation without reinterpreting changed piece contents.',
+        parameters: [{ name: 'pieceId', description: 'canonical piece id.' }],
+        returns: 'detached latest observation or undefined when never checked.',
+      },
+    ],
+  },
+  {
     key: 'devLoopRoles',
     summary: 'Coordinates role policy, retained assignments, Queue leases and durable observations.',
     description: 'Coordinates role policy, retained assignments, Queue leases and durable observations.',
@@ -4702,6 +4721,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export interface KvUnitDescriptor {\n    readonly name: string;\n    readonly version: number;\n    readonly tables: readonly string[];\n    readonly hasGlobal: boolean;\n    readonly layout?: \'single\' | \'per-record\';\n    readonly compatibleVersions?: readonly number[];\n}',
   },
   {
+    name: 'LinkedDelegation',
+    declaration: 'export interface LinkedDelegation {\n    delegationId: DelegationId;\n    pieceId: string;\n    subagentSessionId: SessionId;\n    role: DevLoopRole;\n    preset?: string;\n    status: \'completed\' | \'aborted\' | \'failed\';\n    limitations: readonly string[];\n}',
+  },
+  {
     name: 'LlmAdapter',
     declaration: 'export abstract class LlmAdapter {\n    providerInfo(provider: string): LlmProviderInfo;\n    providerRetryPolicy(_provider: string): ResolvedRetryPolicy | undefined;\n    imageRequestPricing(_provider: string, _model: string): LlmImageRequestPricing | undefined;\n    listModels(_provider: string): Promise<readonly LlmModelInfo[]>;\n    resolveModel(provider: string, model: string, _signal?: AbortSignal): Promise<LlmResolvedModelInfo>;\n    async prepareCall(provider: string, model: string, signal?: AbortSignal): Promise<PreparedAdapterCall>;\n    abstract stream(options: GenerateOptions): AsyncIterable<StreamChunk>;\n}',
   },
@@ -5090,6 +5113,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export type PromptSectionOrderName = keyof typeof SECTION_ORDERS;',
   },
   {
+    name: 'ProvenanceObservation',
+    declaration: 'export interface ProvenanceObservation {\n    pieceId: string;\n    pieceSha256: string;\n    checkedAt: number;\n    explicitEmpty: boolean;\n    structuralStatus: \'valid\' | \'invalid\';\n    inspectionStatus: \'unverified\';\n    entries: readonly ReferenceEntry[];\n    errors: readonly ReferenceError[];\n    limitations: readonly string[];\n}',
+  },
+  {
     name: 'ProviderRequestId',
     declaration: 'export type ProviderRequestId = Branded<\'ProviderRequestId\'>;',
   },
@@ -5136,6 +5163,18 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'RedactedSecret',
     declaration: 'export interface RedactedSecret {\n    path: string[];\n    set: boolean;\n}',
+  },
+  {
+    name: 'ReferenceEntry',
+    declaration: 'export interface ReferenceEntry {\n    row: number;\n    source: string;\n    sourceText: string;\n    attribution: string;\n    rolePreset?: string;\n    question?: string;\n    inspection?: string;\n    usage?: string;\n    explanatoryColumns: Readonly<Record<string, string>>;\n    sourceStatus: \'resolved\' | \'missing\' | \'invalid\' | \'not-checked\';\n    attributionStatus: \'linked-report\' | \'unverified\' | \'contradicted\';\n    inspectionStatus: \'unverified\';\n    contentSha256?: string;\n    lineRange?: {\n        start: number;\n        end: number;\n    };\n    fragment?: string;\n    delegation?: LinkedDelegation;\n    limitations: readonly string[];\n}',
+  },
+  {
+    name: 'ReferenceError',
+    declaration: 'export interface ReferenceError {\n    code: ReferenceErrorCode;\n    message: string;\n    entryIndex?: number;\n}',
+  },
+  {
+    name: 'ReferenceErrorCode',
+    declaration: 'export type ReferenceErrorCode = \'MISSING_REFERENCES\' | \'MALFORMED_REFERENCES\' | \'INVALID_COLUMNS\' | \'INVALID_LOCATOR\' | \'ABSOLUTE_PATH\' | \'OUTSIDE_ROOT\' | \'SOURCE_MISSING\' | \'SOURCE_NOT_FILE\' | \'INVALID_RANGE\' | \'PIECE_TOO_LARGE\' | \'SOURCE_TOO_LARGE\' | \'TOO_MANY_REFERENCES\' | \'INVALID_DELEGATION_ID\';',
   },
   {
     name: 'RemoteError',

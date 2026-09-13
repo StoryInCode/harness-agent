@@ -59,6 +59,7 @@ const SENTENCE_MODEL_EXPERIENCE: Readonly<Record<string, SentenceContract>> = {
   'packages/util/deque': { kind: 'none', reason: 'In-process collection primitive; registers nothing model-facing.' },
   // FORK-LOCAL: fork-owned package (see FORK.md).
   'packages/dev-loop/directory': { kind: 'none', reason: 'Host-side directory over plan specification files; registers no tool, prompt, or session event.' },
+  'packages/dev-loop/references': { kind: 'none', reason: 'Host-side source checks and durable report attribution; registers no tool, prompt, or session event.' },
   'packages/dev-loop/lifecycle': { kind: 'none', reason: 'Host-side state machine over piece status; registers no tool, prompt, or session event.' },
   'packages/dev-loop/queue': { kind: 'none', reason: 'Host-side admission and one-shot lease scheduler; registers no tool, prompt, or session event. Dispatching consumers own model-visible work.' },
   'packages/dev-loop/worktree': { kind: 'none', reason: 'Host-side Git allocation and retained assignment service; registers no tool, prompt, or session event. Child workspace selection belongs to its caller.' },

@@ -12,9 +12,11 @@ flowchart LR
   pkg_dev_loop_lifecycle["dev-loop-lifecycle"]
   pkg_dev_loop_approval["dev-loop-approval"]
   pkg_dev_loop_queue["dev-loop-queue"]
+  pkg_dev_loop_references["dev-loop-references"]
   svc_devLoopLifecycle["ctx.devLoopLifecycle<br/>Guarded piece transitions"]
   svc_devLoopQueue["ctx.devLoopQueue<br/>Bounded piece dispatch"]
   pkg_dev_loop_roles["dev-loop-roles"]
+  svc_devLoopReferences["ctx.devLoopReferences<br/>Reference source and report observations"]
   svc_devLoopRoles["ctx.devLoopRoles<br/>Durable specialist delegation"]
   pkg_dev_loop_worktree["dev-loop-worktree"]
   svc_devLoopWorktree["ctx.devLoopWorktree<br/>Retained piece worktrees"]
@@ -270,6 +272,7 @@ flowchart LR
   pkg_dev_loop_directory --> svc_devLoopDirectory
   pkg_dev_loop_lifecycle --> svc_devLoopLifecycle
   pkg_dev_loop_queue --> svc_devLoopQueue
+  pkg_dev_loop_references --> svc_devLoopReferences
   pkg_dev_loop_roles --> svc_devLoopRoles
   pkg_dev_loop_worktree --> svc_devLoopWorktree
   pkg_e2b --> svc_e2b
@@ -388,9 +391,11 @@ flowchart LR
   svc_devLoopDirectory --> pkg_dev_loop_approval
   svc_devLoopDirectory --> pkg_dev_loop_lifecycle
   svc_devLoopDirectory --> pkg_dev_loop_queue
+  svc_devLoopDirectory --> pkg_dev_loop_references
   svc_devLoopLifecycle --> pkg_dev_loop_approval
   svc_devLoopLifecycle --> pkg_dev_loop_queue
   svc_devLoopQueue --> pkg_dev_loop_roles
+  svc_devLoopRoles --> pkg_dev_loop_references
   svc_devLoopRoles --> pkg_dev_loop_roles
   svc_devLoopWorktree --> pkg_dev_loop_roles
   svc_directoryPicker --> pkg_api_workspace_controller
@@ -402,6 +407,7 @@ flowchart LR
   svc_fs --> pkg_dev_loop_approval
   svc_fs --> pkg_dev_loop_directory
   svc_fs --> pkg_dev_loop_lifecycle
+  svc_fs --> pkg_dev_loop_references
   svc_fs --> pkg_dev_loop_worktree
   svc_fs --> pkg_tool_fs
   svc_invariants --> pkg_agent
@@ -456,6 +462,7 @@ flowchart LR
   svc_skills --> pkg_tool_skill
   svc_spillStore --> pkg_spill_policy
   svc_storage --> pkg_storage_domain
+  svc_storageDomain --> pkg_dev_loop_references
   svc_storageDomain --> pkg_workspace
   svc_subagentModelSelection --> pkg_tool_subagent
   svc_subagents --> pkg_tool_ralph
@@ -507,10 +514,11 @@ flowchart LR
 
 | ctx key | Role | Owner | Implementations | Direct consumers | Companion plugins | Note |
 | --- | --- | --- | --- | --- | --- | --- |
-| `ctx.devLoopDirectory` | `core` | [`dev-loop-directory`](../packages/dev-loop/directory) | - | [`dev-loop-lifecycle`](../packages/dev-loop/lifecycle), [`dev-loop-approval`](../packages/dev-loop/approval), [`dev-loop-queue`](../packages/dev-loop/queue) | - | Reads the configured corpus through ctx.fs and returns validated records and independent file rejections. |
+| `ctx.devLoopDirectory` | `core` | [`dev-loop-directory`](../packages/dev-loop/directory) | - | [`dev-loop-lifecycle`](../packages/dev-loop/lifecycle), [`dev-loop-approval`](../packages/dev-loop/approval), [`dev-loop-queue`](../packages/dev-loop/queue), [`dev-loop-references`](../packages/dev-loop/references) | - | Reads the configured corpus through ctx.fs and returns validated records and independent file rejections. |
 | `ctx.devLoopLifecycle` | `core` | [`dev-loop-lifecycle`](../packages/dev-loop/lifecycle) | - | [`dev-loop-approval`](../packages/dev-loop/approval), [`dev-loop-queue`](../packages/dev-loop/queue) | - | Owns process-local status, transition claims, and compensating Git promotion through filesystem and subprocess services. |
 | `ctx.devLoopQueue` | `core` | [`dev-loop-queue`](../packages/dev-loop/queue) | - | [`dev-loop-roles`](../packages/dev-loop/roles) | - | Admits consumer-owned one-shot callbacks and retains capacity through startup, result settlement, and cleanup. |
-| `ctx.devLoopRoles` | `core` | [`dev-loop-roles`](../packages/dev-loop/roles) | - | [`dev-loop-roles`](../packages/dev-loop/roles) | - | Records bounded assignments before Queue admission and attributed observations after cleanup; scoped tools expose delegation and complete history. |
+| `ctx.devLoopReferences` | `core` | [`dev-loop-references`](../packages/dev-loop/references) | - | - | - | Checks bounded local source locators and retains durable, explicitly unverified report attribution. |
+| `ctx.devLoopRoles` | `core` | [`dev-loop-roles`](../packages/dev-loop/roles) | - | [`dev-loop-roles`](../packages/dev-loop/roles), [`dev-loop-references`](../packages/dev-loop/references) | - | Records bounded assignments before Queue admission and attributed observations after cleanup; scoped tools expose delegation and complete history. |
 | `ctx.devLoopWorktree` | `core` | [`dev-loop-worktree`](../packages/dev-loop/worktree) | - | [`dev-loop-roles`](../packages/dev-loop/roles) | - | Allocates detached Git checkouts and retains assignments across roles; only explicitly retires clean unchanged owned trees. |
 | `ctx.attachments` | `seam` | [`attachment`](../packages/attachment/attachment) | [`attachment-local`](../packages/attachment/attachment-local) | [`api-session-controller`](../packages/api/session-controller), [`tool-fs`](../packages/fs/tool-fs), [`llm-pi-ai`](../packages/llm/llm-pi-ai), [`llm-deepseek`](../packages/llm/llm-deepseek) | - | The host commits accepted images before session events; provider adapters resolve authorized durable references into provider-native content. |
 | `ctx.fileUploads` | `core` | [`client-file-upload`](../packages/client/file-upload) | - | [`api-session-controller`](../packages/api/session-controller) | - | Owns streaming intake, durable storage, and staged receipt lifetime; the Session controller binds receipts to accepted submissions. |
@@ -537,7 +545,7 @@ flowchart LR
 | `ctx.authorization` | `seam` | [`authorization`](../packages/credentials/authorization) | - | [`llm-pi-ai`](../packages/llm/llm-pi-ai) | - | Flows are registered by the plugin that knows how to obtain one credential and keyed by the record they write; the seam owns the conversation and the one-attempt-per-key lifecycle, never the protocol. |
 | `ctx.sessionTelemetry` | `seam` | [`session-telemetry`](../packages/session/session-telemetry) | [`session-telemetry-otel`](../packages/session/session-telemetry-otel) | - | - | The seam captures, redacts, and hands session records to one backend; nothing else consumes the service — its output leaves the process. |
 | `ctx.storage` | `seam` | [`storage`](../packages/storage/storage) | [`storage-json`](../packages/storage/storage-json), [`storage-sqlite`](../packages/storage/storage-sqlite) | [`storage-domain`](../packages/storage/storage-domain) | - | Backends register side by side under names; data forms (domain first) mount on the hub and translate typed operations into opaque KV-unit primitives. |
-| `ctx.storageDomain` | `core` | [`storage-domain`](../packages/storage/storage-domain) | - | [`workspace`](../packages/workspace/workspace) | - | Waits for every configured backend, then publishes the domain form as one lifecycle-bound service for typed durable state. |
+| `ctx.storageDomain` | `core` | [`storage-domain`](../packages/storage/storage-domain) | - | [`workspace`](../packages/workspace/workspace), [`dev-loop-references`](../packages/dev-loop/references) | - | Waits for every configured backend, then publishes the domain form as one lifecycle-bound service for typed durable state. |
 | `ctx.messageFeedback` | `core` | [`message-feedback`](../packages/feedback/message-feedback) | - | - | - | Owns per-assistant-message feedback in the canonical Session log, target validation, per-item compare-and-set, and the Host unary Remote contract. Feedback stays outside model history; log export follows the consumer policy. |
 | `ctx.sessionFeedback` | `core` | [`command-feedback`](../packages/feedback/command-feedback) | - | - | - | Records one Session-level remark with its category as a log-only feedback/record event on a live Session through the Host unary Remote contract; the /feedback command shares the same producer. |
 | `ctx.workspaceRegistry` | `core` | [`workspace`](../packages/workspace/workspace) | - | [`api-workspace-controller`](../packages/api/workspace-controller), [`api-session-controller`](../packages/api/session-controller) | - | Owns WorkspaceId-branded records over the domain facility; stable sessionIds accounts drive Host RPC and GUI projections. |
@@ -568,7 +576,7 @@ flowchart LR
 | `ctx.approval` | `seam` | [`user-approval`](../packages/interaction/user-approval) | - | [`tools`](../packages/core/tools), [`tool-bash`](../packages/shell/tool-bash), [`acp`](../packages/acp/acp) | - | One-shot permission decisions dispatched over the `approval/request` waterfall; answerers are listeners (the ACP bridge for its own agents), absence fails closed to `unavailable`. |
 | `ctx.permissionPresets` | `core` | [`permission-presets`](../packages/interaction/permission-presets) | - | - | - | User-facing preset table (`workspace-write`/`danger-full-access`) bundling the sandbox-mode and approval-policy knobs; a switch writes one `permission/preset` event through to both knob events. |
 | `ctx.codeRuntime` | `seam` | [`code-runtime`](../packages/code-runtime/code-runtime) | [`code-runtime-worker-thread`](../packages/code-runtime/code-runtime-worker-thread), [`experimental-code-runtime-python`](../packages/experimental/code-runtime-python) | [`tools`](../packages/core/tools) | - | Runs one model-written program against host-provided async bindings; backends differ by substrate and language (the tool registry consumes it for PTC mode). |
-| `ctx.fs` | `seam` | [`fs`](../packages/fs/fs) | [`fs-local`](../packages/fs/fs-local), [`fs-sandbox`](../packages/fs/fs-sandbox), [`fs-e2b`](../packages/e2b/fs-e2b) | [`tool-fs`](../packages/fs/tool-fs), [`dev-loop-directory`](../packages/dev-loop/directory), [`dev-loop-lifecycle`](../packages/dev-loop/lifecycle), [`dev-loop-approval`](../packages/dev-loop/approval), [`dev-loop-worktree`](../packages/dev-loop/worktree) | [`fs-observation-policy`](../packages/fs/fs-observation-policy) | tool-fs executes read/write/edit through ctx.fs; fs-sandbox fences mutations by the shared sandbox mode; fs-observation-policy contributes observed-state checks through the fs/* event gate. |
+| `ctx.fs` | `seam` | [`fs`](../packages/fs/fs) | [`fs-local`](../packages/fs/fs-local), [`fs-sandbox`](../packages/fs/fs-sandbox), [`fs-e2b`](../packages/e2b/fs-e2b) | [`tool-fs`](../packages/fs/tool-fs), [`dev-loop-directory`](../packages/dev-loop/directory), [`dev-loop-lifecycle`](../packages/dev-loop/lifecycle), [`dev-loop-approval`](../packages/dev-loop/approval), [`dev-loop-worktree`](../packages/dev-loop/worktree), [`dev-loop-references`](../packages/dev-loop/references) | [`fs-observation-policy`](../packages/fs/fs-observation-policy) | tool-fs executes read/write/edit through ctx.fs; fs-sandbox fences mutations by the shared sandbox mode; fs-observation-policy contributes observed-state checks through the fs/* event gate. |
 | `ctx.compaction` | `seam` | [`compaction`](../packages/compaction/compaction) | [`compaction-basic`](../packages/compaction/compaction-basic) | [`compaction-basic`](../packages/compaction/compaction-basic) | - | The basic backend consumes post-step pressure and request-error recovery events; there is no model-facing compact tool. |
 | `ctx.subagents` | `seam` | [`subagent`](../packages/subagent/subagent) | [`subagent-spawn-in-process`](../packages/subagent/subagent-spawn-in-process), [`subagent-fork-in-process`](../packages/subagent/subagent-fork-in-process), [`subagent-acp`](../packages/subagent/subagent-acp), [`subagent-codex`](../packages/subagent/subagent-codex), [`subagent-claude-code`](../packages/subagent/subagent-claude-code), [`subagent-dsh-sdk`](../packages/subagent/subagent-dsh-sdk) | [`tool-subagent`](../packages/subagent/tool-subagent), [`tool-subagent-control`](../packages/subagent/tool-subagent-control), [`tool-ralph`](../packages/workflow/tool-ralph) | - | Providers implement transports; the service also owns optional Activation-based continuation orchestration, tool-subagent selects one-shot or continuable delegation, tool-subagent-control delivers follow-ups, and tool-ralph requires one fresh structured-output route. |
 | `ctx.agentTeams` | `core` | [`experimental-agent-team`](../packages/experimental/agent-team) | - | [`experimental-tool-agent-team`](../packages/experimental/tool-agent-team), [`experimental-client-ui-agent-team`](../packages/experimental/client-ui-agent-team) | - | Owns the implicit-root roster, durable peer mailbox, shared task DAG, continuable-child lifecycle, and generated Team Remote methods; tool-agent-team contributes model controls and client-ui-agent-team mounts the browser contribution. |

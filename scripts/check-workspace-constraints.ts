@@ -150,6 +150,8 @@ function workspaceManifests(): WorkspaceManifest[] {
 }
 
 const packageFileExtras: Readonly<Record<string, readonly string[]>> = {
+  // The Roles service and scoped tool import the same tsdown-generated records chunk.
+  '@deepseek-ai/dsh-dev-loop-roles': ['lib/tool.js', 'lib/records-*.js'],
   // Statically linked client libraries keep their stylesheets next to the emitted
   // JavaScript, which imports them by relative path: the compile shell runs
   // them through its own CSS pipeline, so the sheets are published artifacts.

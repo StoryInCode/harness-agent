@@ -14,6 +14,7 @@ Discover piece specifications, request guarded status changes, and delegate spec
 - [Dispatch requests](#dispatch-requests)
 - [Worktree assignments](#worktree-assignments)
 - [Role delegation records](#role-delegation-records)
+- [Reference observations](#reference-observations)
 - [Completion and events](#completion-and-events)
 - [Failure and cancellation](#failure-and-cancellation)
 - [Cordis API](#cordis-surface)
@@ -66,6 +67,13 @@ The [worktree declarations](../../packages/dev-loop/worktree/src/types.ts) defin
 The [Roles declarations](../../packages/dev-loop/roles/src/types.ts) define the closed `DevLoopRole` union, bounded `DelegationBrief`, optional `VerificationAssignment`, Host `RoleConfig` and `Config`, and scoped `ToolConfig`. `DelegationRecord` discriminates unresolved `RequestedDelegation` intent from `SettledDelegation` observations by `state`. The branded `DelegationId` identifies the same durable row throughout that lifecycle; child identity, worktree assignment, and actual preset are optional observations, not inferred authority.
 
 A settled record separates completion status from `cleanup`: uncertain cleanup forces `failed`, while `reported` provenance never establishes independent verification. The [Roles package](../../packages/dev-loop/roles/README.md) owns persistence ordering, cleanup evidence, byte limits, and policy limitations. Its history survives service restart, but neither reconciles unresolved requests nor restores Worktree's process-local assignment map.
+
+<a id="reference-observations"></a>
+## Reference observations
+
+The [References declarations](../../packages/dev-loop/references/src/types.ts) define `ProvenanceObservation` as the latest durable check of exact decoded piece text, identified by `pieceSha256` and `checkedAt`. `ReferenceEntry` separates local-source resolution, report attribution, and inspection status; `LinkedDelegation` copies actual terminal report identity from Roles. Structural validity and linked reports never establish source usage or claim truth: inspection remains explicitly `unverified`.
+
+The [References package](../../packages/dev-loop/references/README.md) owns accepted locators, repository containment, byte limits, and attribution checks. Observations do not refresh after source edits, enforce lifecycle policy, or add model-visible context.
 
 <a id="completion-and-events"></a>
 ## Completion and events
@@ -253,6 +261,31 @@ getQueuedEntries(): QueueEntry[]
 ```
 
 Source: [`packages/dev-loop/queue/src/index.ts`](../../packages/dev-loop/queue/src/index.ts)
+
+<a id="ctxdevloopreferences--devloopreferences"></a>
+
+### `ctx.devLoopReferences` — `DevLoopReferences`
+
+Resolves sources and retains report identity without claiming verified inspection.
+
+```ts cordis-catalog
+/**
+ * Check the current piece and publish only after durable storage succeeds.
+ * @param pieceId - canonical piece id in the configured repository.
+ * @param signal - stops new checks, not an already-admitted domain write.
+ * @returns a detached observation of structural checks and unverified inspection.
+ */
+verifyReferences(pieceId: string, signal: AbortSignal): Promise<ProvenanceObservation>
+
+/**
+ * Read the last durable observation without reinterpreting changed piece contents.
+ * @param pieceId - canonical piece id.
+ * @returns detached latest observation or undefined when never checked.
+ */
+getProvenance(pieceId: string): Promise<ProvenanceObservation | undefined>
+```
+
+Source: [`packages/dev-loop/references/src/index.ts`](../../packages/dev-loop/references/src/index.ts)
 
 <a id="ctxdevlooproles--devlooproles"></a>
 

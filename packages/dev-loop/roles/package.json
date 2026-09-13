@@ -14,7 +14,7 @@
     "./src/*": "./src/*",
     "./package.json": "./package.json"
   },
-  "files": ["lib/*.js", "lib/types/**/*.d.ts"],
+  "files": ["lib/index.js", "lib/tool.js", "lib/records-*.js", "lib/types/**/*.d.ts"],
   "dependencies": { "@deepseek-ai/schemastery": "workspace:^", "zod": "^4.0.0" },
   "peerDependencies": {
     "@deepseek-ai/cordis": "workspace:^",

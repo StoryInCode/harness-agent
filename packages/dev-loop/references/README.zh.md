@@ -108,14 +108,15 @@ References 拥有 `dev_loop_references` 单布局存储域，使用 Zod 验证�
 <a id="model-experience"></a>
 ## 模型体验
 
-无，因为本 Host 服务不注册模型工具、提示词贡献或 Session 事件。它不增加模型输入 token。
+无，因为本 Host 服务不注册模型工具、提示词贡献或 Session 事件，也不增加模型输入 token。
 
 #### KV Cache 影响
 
 这里的内容不进入模型请求，因此本包不影响 provider 的 KV Cache 复用。
 
-<a id="known-limitations-and-deferred-work"></a>
 ## 已知限制与延后工作
+
+<a id="known-limitations-and-deferred-work"></a>
 
 观察结果描述有界检查，而不是实际查阅的真伪判定器。
 

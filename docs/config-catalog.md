@@ -598,6 +598,33 @@ export interface Config {
 
 Source: [`packages/dev-loop/queue/src/types.ts:7`](../packages/dev-loop/queue/src/types.ts)
 
+<a id="deepseek-aidsh-dev-loop-references"></a>
+
+## `@deepseek-ai/dsh-dev-loop-references`
+
+Requires: `devLoopDirectory` · `devLoopRoles` · `fs` · `storageDomain`
+
+```ts config-catalog
+/** Required host policy; byte limits measure UTF-8 encoded decoded text or complete JSON. */
+export interface Config {
+  /** Explicit repository root for inline-code paths and canonical local-source containment. */
+  repositoryRoot: string
+  /** Positive safe-integer UTF-8 byte limit on this owner's decoded piece read; overflow rejects without an observation or digest. */
+  maxPieceBytes: number
+  /** Positive safe-integer UTF-8 byte limit on decoded source text; overflow retains an invalid entry without a content fingerprint. */
+  maxSourceBytes: number
+  /**
+   * Positive safe-integer UTF-8 byte limit on complete observation JSON;
+   * must fit minimum error envelopes and rejects overflow before persistence.
+   */
+  maxObservationBytes: number
+  /** Positive safe-integer maximum number of source locators, including multiple locators in one row. */
+  maxReferences: number
+}
+```
+
+Source: [`packages/dev-loop/references/src/types.ts:6`](../packages/dev-loop/references/src/types.ts)
+
 <a id="deepseek-aidsh-dev-loop-roles"></a>
 
 ## `@deepseek-ai/dsh-dev-loop-roles`

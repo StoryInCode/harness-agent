@@ -14,9 +14,11 @@ flowchart LR
   pkg_dev_loop_lifecycle["dev-loop-lifecycle"]
   pkg_dev_loop_approval["dev-loop-approval"]
   pkg_dev_loop_queue["dev-loop-queue"]
+  pkg_dev_loop_references["dev-loop-references"]
   svc_devLoopLifecycle["ctx.devLoopLifecycle<br/>Guarded piece transitions"]
   svc_devLoopQueue["ctx.devLoopQueue<br/>Bounded piece dispatch"]
   pkg_dev_loop_roles["dev-loop-roles"]
+  svc_devLoopReferences["ctx.devLoopReferences<br/>Reference source and report observations"]
   svc_devLoopRoles["ctx.devLoopRoles<br/>Durable specialist delegation"]
   pkg_dev_loop_worktree["dev-loop-worktree"]
   svc_devLoopWorktree["ctx.devLoopWorktree<br/>Retained piece worktrees"]
@@ -272,6 +274,7 @@ flowchart LR
   pkg_dev_loop_directory --> svc_devLoopDirectory
   pkg_dev_loop_lifecycle --> svc_devLoopLifecycle
   pkg_dev_loop_queue --> svc_devLoopQueue
+  pkg_dev_loop_references --> svc_devLoopReferences
   pkg_dev_loop_roles --> svc_devLoopRoles
   pkg_dev_loop_worktree --> svc_devLoopWorktree
   pkg_e2b --> svc_e2b
@@ -390,9 +393,11 @@ flowchart LR
   svc_devLoopDirectory --> pkg_dev_loop_approval
   svc_devLoopDirectory --> pkg_dev_loop_lifecycle
   svc_devLoopDirectory --> pkg_dev_loop_queue
+  svc_devLoopDirectory --> pkg_dev_loop_references
   svc_devLoopLifecycle --> pkg_dev_loop_approval
   svc_devLoopLifecycle --> pkg_dev_loop_queue
   svc_devLoopQueue --> pkg_dev_loop_roles
+  svc_devLoopRoles --> pkg_dev_loop_references
   svc_devLoopRoles --> pkg_dev_loop_roles
   svc_devLoopWorktree --> pkg_dev_loop_roles
   svc_directoryPicker --> pkg_api_workspace_controller
@@ -404,6 +409,7 @@ flowchart LR
   svc_fs --> pkg_dev_loop_approval
   svc_fs --> pkg_dev_loop_directory
   svc_fs --> pkg_dev_loop_lifecycle
+  svc_fs --> pkg_dev_loop_references
   svc_fs --> pkg_dev_loop_worktree
   svc_fs --> pkg_tool_fs
   svc_invariants --> pkg_agent
@@ -458,6 +464,7 @@ flowchart LR
   svc_skills --> pkg_tool_skill
   svc_spillStore --> pkg_spill_policy
   svc_storage --> pkg_storage_domain
+  svc_storageDomain --> pkg_dev_loop_references
   svc_storageDomain --> pkg_workspace
   svc_subagentModelSelection --> pkg_tool_subagent
   svc_subagents --> pkg_tool_ralph
@@ -509,10 +516,11 @@ flowchart LR
 
 | ctx 键 | 角色 | 所属包 | 实现 | 直接消费方 | 配套插件 | 说明 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `ctx.devLoopDirectory` | `core` | [`dev-loop-directory`](../packages/dev-loop/directory) | - | [`dev-loop-lifecycle`](../packages/dev-loop/lifecycle), [`dev-loop-approval`](../packages/dev-loop/approval), [`dev-loop-queue`](../packages/dev-loop/queue) | - | Reads the configured corpus through ctx.fs and returns validated records and independent file rejections. |
+| `ctx.devLoopDirectory` | `core` | [`dev-loop-directory`](../packages/dev-loop/directory) | - | [`dev-loop-lifecycle`](../packages/dev-loop/lifecycle), [`dev-loop-approval`](../packages/dev-loop/approval), [`dev-loop-queue`](../packages/dev-loop/queue), [`dev-loop-references`](../packages/dev-loop/references) | - | Reads the configured corpus through ctx.fs and returns validated records and independent file rejections. |
 | `ctx.devLoopLifecycle` | `core` | [`dev-loop-lifecycle`](../packages/dev-loop/lifecycle) | - | [`dev-loop-approval`](../packages/dev-loop/approval), [`dev-loop-queue`](../packages/dev-loop/queue) | - | Owns process-local status, transition claims, and compensating Git promotion through filesystem and subprocess services. |
 | `ctx.devLoopQueue` | `core` | [`dev-loop-queue`](../packages/dev-loop/queue) | - | [`dev-loop-roles`](../packages/dev-loop/roles) | - | Admits consumer-owned one-shot callbacks and retains capacity through startup, result settlement, and cleanup. |
-| `ctx.devLoopRoles` | `core` | [`dev-loop-roles`](../packages/dev-loop/roles) | - | [`dev-loop-roles`](../packages/dev-loop/roles) | - | 在 Queue 准入前记录有界任务，在清理后记录明确归属的观察；作用域工具公开委派和完整历史。 |
+| `ctx.devLoopReferences` | `core` | [`dev-loop-references`](../packages/dev-loop/references) | - | - | - | 检查有界本地来源定位符，并保留持久化、显式未经验证的报告归属。 |
+| `ctx.devLoopRoles` | `core` | [`dev-loop-roles`](../packages/dev-loop/roles) | - | [`dev-loop-roles`](../packages/dev-loop/roles), [`dev-loop-references`](../packages/dev-loop/references) | - | 在 Queue 准入前记录有界任务，在清理后记录明确归属的观察；作用域工具公开委派和完整历史。 |
 | `ctx.devLoopWorktree` | `core` | [`dev-loop-worktree`](../packages/dev-loop/worktree) | - | [`dev-loop-roles`](../packages/dev-loop/roles) | - | Allocates detached Git checkouts and retains assignments across roles; only explicitly retires clean unchanged owned trees. |
 | `ctx.attachments` | `seam` | [`attachment`](../packages/attachment/attachment) | [`attachment-local`](../packages/attachment/attachment-local) | [`api-session-controller`](../packages/api/session-controller), [`tool-fs`](../packages/fs/tool-fs), [`llm-pi-ai`](../packages/llm/llm-pi-ai), [`llm-deepseek`](../packages/llm/llm-deepseek) | - | 宿主会在会话事件之前提交已接受的图片；提供方适配器将已授权的持久引用解析为提供方原生内容。 |
 | `ctx.fileUploads` | `core` | [`client-file-upload`](../packages/client/file-upload) | - | [`api-session-controller`](../packages/api/session-controller) | - | 负责流式接收、持久存储和暂存回执生命周期；Session Controller 将回执绑定到已接受的提交。 |
@@ -539,7 +547,7 @@ flowchart LR
 | `ctx.authorization` | `seam` | [`authorization`](../packages/credentials/authorization) | - | [`llm-pi-ai`](../packages/llm/llm-pi-ai) | - | flow 由知道如何取得某份凭据的插件注册，并以其写入的记录为键；seam 拥有这段对话与"每个键同时只跑一次尝试"的生命周期，而非协议本身。 |
 | `ctx.sessionTelemetry` | `seam` | [`session-telemetry`](../packages/session/session-telemetry) | [`session-telemetry-otel`](../packages/session/session-telemetry-otel) | - | - | 该 seam 捕获会话记录、进行脱敏并交给一个后端；没有其他组件消费该服务，其输出会离开当前进程。 |
 | `ctx.storage` | `seam` | [`storage`](../packages/storage/storage) | [`storage-json`](../packages/storage/storage-json), [`storage-sqlite`](../packages/storage/storage-sqlite) | [`storage-domain`](../packages/storage/storage-domain) | - | 各后端以不同名称并列注册；数据形态（领域优先）挂载到枢纽上，并将类型化操作转换为不透明的 KV 单元原语。 |
-| `ctx.storageDomain` | `core` | [`storage-domain`](../packages/storage/storage-domain) | - | [`workspace`](../packages/workspace/workspace) | - | 等待所有已配置后端就绪，然后将领域形态发布为一个受生命周期约束的服务，用于类型化持久状态。 |
+| `ctx.storageDomain` | `core` | [`storage-domain`](../packages/storage/storage-domain) | - | [`workspace`](../packages/workspace/workspace), [`dev-loop-references`](../packages/dev-loop/references) | - | 等待所有已配置后端就绪，然后将领域形态发布为一个受生命周期约束的服务，用于类型化持久状态。 |
 | `ctx.messageFeedback` | `core` | [`message-feedback`](../packages/feedback/message-feedback) | - | - | - | 拥有权威 Session 日志中的逐 assistant 消息反馈、目标校验、逐条目 compare-and-set 及 Host 一元 Remote 契约。反馈不进入模型历史；日志导出遵循消费方策略。 |
 | `ctx.sessionFeedback` | `core` | [`command-feedback`](../packages/feedback/command-feedback) | - | - | - | 通过 Host 一元 Remote 契约在 live Session 上把一条带分类的 Session 级评价记录为仅写日志的 feedback/record 事件；/feedback 命令共用同一个生产方。 |
 | `ctx.workspaceRegistry` | `core` | [`workspace`](../packages/workspace/workspace) | - | [`api-workspace-controller`](../packages/api/workspace-controller), [`api-session-controller`](../packages/api/session-controller) | - | 通过领域设施拥有带 WorkspaceId 品牌类型的记录；稳定的 sessionIds 账户驱动 Host RPC 与 GUI 投影。 |
@@ -570,7 +578,7 @@ flowchart LR
 | `ctx.approval` | `seam` | [`user-approval`](../packages/interaction/user-approval) | - | [`tools`](../packages/core/tools), [`tool-bash`](../packages/shell/tool-bash), [`acp`](../packages/acp/acp) | - | 一次性权限决策通过 `approval/request` waterfall（瀑布式事件）分派；回答方是监听器（即 ACP 为自身 agent 提供的桥接），没有回答方时以 `unavailable` 关闭失败。 |
 | `ctx.permissionPresets` | `core` | [`permission-presets`](../packages/interaction/permission-presets) | - | - | - | 面向用户的预设表（`workspace-write`／`danger-full-access`），将沙箱模式与审批策略选项组合在一起；一次切换会写入一个 `permission/preset` 事件，并贯通到两个选项事件。 |
 | `ctx.codeRuntime` | `seam` | [`code-runtime`](../packages/code-runtime/code-runtime) | [`code-runtime-worker-thread`](../packages/code-runtime/code-runtime-worker-thread), [`experimental-code-runtime-python`](../packages/experimental/code-runtime-python) | [`tools`](../packages/core/tools) | - | 使用 Host 提供的异步绑定运行一段由模型编写的程序；各后端采用不同的基础环境和语言（工具注册表在 PTC mode 下消费该服务）。 |
-| `ctx.fs` | `seam` | [`fs`](../packages/fs/fs) | [`fs-local`](../packages/fs/fs-local), [`fs-sandbox`](../packages/fs/fs-sandbox), [`fs-e2b`](../packages/e2b/fs-e2b) | [`tool-fs`](../packages/fs/tool-fs), [`dev-loop-directory`](../packages/dev-loop/directory), [`dev-loop-lifecycle`](../packages/dev-loop/lifecycle), [`dev-loop-approval`](../packages/dev-loop/approval), [`dev-loop-worktree`](../packages/dev-loop/worktree) | [`fs-observation-policy`](../packages/fs/fs-observation-policy) | tool-fs 通过 ctx.fs 执行读取／写入／编辑；fs-sandbox 按共享沙箱模式限制变更；fs-observation-policy 通过 fs/* 事件门禁贡献基于观测状态的检查。 |
+| `ctx.fs` | `seam` | [`fs`](../packages/fs/fs) | [`fs-local`](../packages/fs/fs-local), [`fs-sandbox`](../packages/fs/fs-sandbox), [`fs-e2b`](../packages/e2b/fs-e2b) | [`tool-fs`](../packages/fs/tool-fs), [`dev-loop-directory`](../packages/dev-loop/directory), [`dev-loop-lifecycle`](../packages/dev-loop/lifecycle), [`dev-loop-approval`](../packages/dev-loop/approval), [`dev-loop-worktree`](../packages/dev-loop/worktree), [`dev-loop-references`](../packages/dev-loop/references) | [`fs-observation-policy`](../packages/fs/fs-observation-policy) | tool-fs 通过 ctx.fs 执行读取／写入／编辑；fs-sandbox 按共享沙箱模式限制变更；fs-observation-policy 通过 fs/* 事件门禁贡献基于观测状态的检查。 |
 | `ctx.compaction` | `seam` | [`compaction`](../packages/compaction/compaction) | [`compaction-basic`](../packages/compaction/compaction-basic) | [`compaction-basic`](../packages/compaction/compaction-basic) | - | 基础后端消费步骤后的压力事件和请求错误恢复事件；不存在面向模型的压缩工具。 |
 | `ctx.subagents` | `seam` | [`subagent`](../packages/subagent/subagent) | [`subagent-spawn-in-process`](../packages/subagent/subagent-spawn-in-process), [`subagent-fork-in-process`](../packages/subagent/subagent-fork-in-process), [`subagent-acp`](../packages/subagent/subagent-acp), [`subagent-codex`](../packages/subagent/subagent-codex), [`subagent-claude-code`](../packages/subagent/subagent-claude-code), [`subagent-dsh-sdk`](../packages/subagent/subagent-dsh-sdk) | [`tool-subagent`](../packages/subagent/tool-subagent), [`tool-subagent-control`](../packages/subagent/tool-subagent-control), [`tool-ralph`](../packages/workflow/tool-ralph) | - | 提供方实现传输；该服务还负责可选的、基于 Activation 的延续编排，tool-subagent 选择一次性或可延续委派，tool-subagent-control 传递后续消息，而 tool-ralph 要求一条全新的结构化输出路由。 |
 | `ctx.agentTeams` | `core` | [`experimental-agent-team`](../packages/experimental/agent-team) | - | [`experimental-tool-agent-team`](../packages/experimental/tool-agent-team), [`experimental-client-ui-agent-team`](../packages/experimental/client-ui-agent-team) | - | 负责隐式 Root roster、持久 peer mailbox、共享任务 DAG、continuable child 生命周期与生成式 Team Remote method；tool-agent-team 提供模型控制工具，client-ui-agent-team 挂载浏览器 contribution。 |

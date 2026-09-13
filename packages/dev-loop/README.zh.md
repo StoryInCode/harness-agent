@@ -30,6 +30,7 @@ kind: "package-group"
 | [`directory`](directory/README.zh.md) | 通过文件系统服务发现并验证任务块规格。 |
 | [`lifecycle`](lifecycle/README.zh.md) | 保护状态变更，并将已跟踪任务块文件移入 `done/`。 |
 | [`queue`](queue/README.zh.md) | 准入 Consumer 拥有的一次性委派，并限制从启动到完整清理的工作。 |
+| [`references`](references/README.zh.md) | 检查有界本地来源并保留报告归属，不声称已验证查阅。 |
 | [`roles`](roles/README.zh.md) | 委派专业任务，并保留有界、明确归属的历史。 |
 | [`worktree`](worktree/README.zh.md) | 跨角色保留任务块的分离检出，并保守退役干净的自有目录树。 |
 

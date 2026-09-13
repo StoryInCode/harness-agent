@@ -1,0 +1,11 @@
+References MAIN integration metadata amendment
+
+The integration coordinator authorized release metadata normalization in package.json: publishConfig.access is public, repository identifies the canonical package directory, and files lists lib/index.js plus lib/types/**/*.d.ts. Versions, dependencies, exports, source, tests and DTO declarations are unchanged.
+
+INTEGRATION-METADATA-SHA256SUMS records the amended package.json. It supersedes only the package.json entry (658153be7d1a57d9ae50afc8d4ba841460e3de2524113a29e0ad46d0e1d21585) in IMPLEMENTATION-SHA256SUMS. The original manifest remains immutable; every source and tsconfig entry still matches. The DTO remains ef27dcc75119178522c87f9176f0c1aa1e199451547ab4a7baaf3b918bd73de2, as recorded by the separate DTO-DOC-REFLOW amendment.
+
+The same integration normalizes Roles publication files to lib/index.js, lib/tool.js, lib/records-*.js and lib/types/**/*.d.ts. Both published JavaScript entries import the generated records chunk. The Roles package.json predecessor hash is b8212fdc54a7392c38d3de555a5be66f8efcebc269b2b101a7695b02409b20e3; the integration checksum records its amended hash. The package-specific payload constraint requires those artifacts and rejects missing tools, missing chunks and an unrestricted JavaScript glob. Its four new script checks fail before the constraint update and pass afterward; all 16 script checks then pass.
+
+Actual pnpm tarballs include References index and declarations, and Roles index, tool, imported records chunk and declarations. Unpacked ESM imports and public API checks pass using each package's declared dependency installation. NodeNext validates all 285 workspace declaration APIs. Both package publint runs exit 0 with the retained source-export warning: ./src/* is not included in published files.
+
+The paired References README joins the Model Experience facts into one sentence and places the next section's explicit anchor inside that section. The model-experience and limitations checks and named translation pair pass. No package behavior or frozen test evidence changes.

@@ -104,7 +104,7 @@ const SERVICE_ROLES: ServiceRole[] = [
     pkg: 'dev-loop-directory',
     title: 'Piece discovery and validation',
     mode: 'core',
-    consumers: ['dev-loop-lifecycle', 'dev-loop-approval', 'dev-loop-queue'],
+    consumers: ['dev-loop-lifecycle', 'dev-loop-approval', 'dev-loop-queue', 'dev-loop-references'],
     note: 'Reads the configured corpus through ctx.fs and returns validated records and independent file rejections.',
   },
   {
@@ -124,11 +124,18 @@ const SERVICE_ROLES: ServiceRole[] = [
     note: 'Admits consumer-owned one-shot callbacks and retains capacity through startup, result settlement, and cleanup.',
   },
   {
+    key: 'devLoopReferences',
+    pkg: 'dev-loop-references',
+    title: 'Reference source and report observations',
+    mode: 'core',
+    note: 'Checks bounded local source locators and retains durable, explicitly unverified report attribution.',
+  },
+  {
     key: 'devLoopRoles',
     pkg: 'dev-loop-roles',
     title: 'Durable specialist delegation',
     mode: 'core',
-    consumers: ['dev-loop-roles'],
+    consumers: ['dev-loop-roles', 'dev-loop-references'],
     note: 'Records bounded assignments before Queue admission and attributed observations after cleanup; scoped tools expose delegation and complete history.',
   },
   {
@@ -344,7 +351,7 @@ const SERVICE_ROLES: ServiceRole[] = [
     pkg: 'storage-domain',
     title: 'Domain data facility',
     mode: 'core',
-    consumers: ['workspace'],
+    consumers: ['workspace', 'dev-loop-references'],
     note: 'Waits for every configured backend, then publishes the domain form as one lifecycle-bound service for typed durable state.',
   },
   {
@@ -598,7 +605,7 @@ const SERVICE_ROLES: ServiceRole[] = [
     mode: 'seam',
     implementations: ['fs-local', 'fs-sandbox', 'fs-e2b'],
     // FORK-LOCAL: directory and lifecycle consume the filesystem service directly.
-    consumers: ['tool-fs', 'dev-loop-directory', 'dev-loop-lifecycle', 'dev-loop-approval', 'dev-loop-worktree'],
+    consumers: ['tool-fs', 'dev-loop-directory', 'dev-loop-lifecycle', 'dev-loop-approval', 'dev-loop-worktree', 'dev-loop-references'],
     companions: ['fs-observation-policy'],
     note: 'tool-fs executes read/write/edit through ctx.fs; fs-sandbox fences mutations by the shared sandbox mode; fs-observation-policy contributes observed-state checks through the fs/* event gate.',
   },

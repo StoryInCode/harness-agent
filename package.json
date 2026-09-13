@@ -188,6 +188,7 @@
     "@deepseek-ai/dsh-dev-loop-directory": "workspace:^",
     "@deepseek-ai/dsh-dev-loop-lifecycle": "workspace:^",
     "@deepseek-ai/dsh-dev-loop-queue": "workspace:^",
+    "@deepseek-ai/dsh-dev-loop-references": "workspace:^",
     "@deepseek-ai/dsh-dev-loop-roles": "workspace:^",
     "@deepseek-ai/dsh-dev-loop-worktree": "workspace:^",
     "@deepseek-ai/dsh-subagent-antigravity": "workspace:^",

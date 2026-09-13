@@ -108,14 +108,15 @@ No runtime invariant companion is published: retained observations have one auth
 <a id="model-experience"></a>
 ## Model Experience
 
-None, as this Host service registers no model tool, prompt contribution or Session event. It adds no model-input tokens.
+None, as this Host service registers no model tool, prompt contribution or Session event and adds no model-input tokens.
 
 #### KV Cache effect
 
 Nothing here enters model requests, so this package does not affect provider KV Cache reuse.
 
-<a id="known-limitations-and-deferred-work"></a>
 ## Known Limitations and Deferred Work
+
+<a id="known-limitations-and-deferred-work"></a>
 
 The observation describes a bounded check, not an inspection oracle.
 
