@@ -47,12 +47,25 @@ class GatedAdapter extends LlmAdapter {
 const testToolSignal = new AbortController().signal
 
 const roots: string[] = []
-afterEach(() => {
+const contexts: Context[] = []
+const releaseGates: (() => void)[] = []
+
+async function disposeContexts() {
+  vi.restoreAllMocks()
+  for (const release of releaseGates.splice(0)) release()
+  const results = await Promise.allSettled(contexts.splice(0).map(ctx => ctx.fiber.dispose()))
+  const failures = results.filter(result => result.status === 'rejected').map((result): unknown => result.reason)
+  if (failures.length) throw new AggregateError(failures, 'list-agents fixture disposal failed')
+}
+
+afterEach(async () => {
+  await disposeContexts()
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true })
 })
 
 async function setupWith(adapter: MockAdapter | GatedAdapter) {
   const ctx = new Context()
+  contexts.push(ctx)
   await mountAgentLoopTestDependencies(ctx)
   const root = mkdtempSync(join(tmpdir(), 'dsh-tool-list-agents-'))
   roots.push(root)
@@ -101,6 +114,34 @@ async function waitNoActivation(ctx: Context, childId: SessionId): Promise<void>
 }
 
 describe('dsh-tool-subagent-control/list-agents', () => {
+  it.each([false, true])('releases the parent write lock before temp cleanup (setup fails: %s)', async (failSetup) => {
+    const create = vi.spyOn(AgentLoop.prototype, 'create')
+    create.mockImplementationOnce(async function (this: AgentLoop, ...args) {
+      create.mockRestore()
+      const parent = await this.create(...args)
+      await this.ctx.sessions.flush(parent.session)
+      if (failSetup) throw new Error('fixture setup failed after parent acquisition')
+      return parent
+    })
+    if (failSetup) {
+      await expect(setup([])).rejects.toThrow('fixture setup failed after parent acquisition')
+    } else {
+      await setup([])
+    }
+    const root = roots.at(-1)!
+    await disposeContexts()
+
+    const verify = new Context()
+    contexts.push(verify)
+    await verify.plugin(JsonlSessionPersistence, { root })
+    const writer = await verify.sessionPersistence.open(SessionId('parent'), 'write')
+    try {
+      expect(writer.header.id).toBe('parent')
+    } finally {
+      await writer.close()
+    }
+  })
+
   it('registers list_agents once, globally, with only the optional scope parameter', async () => {
     const { ctx } = await setup([])
     const schemas = ctx.tools.schemas().filter(schema => schema.name === 'list_agents')
@@ -210,8 +251,11 @@ describe('dsh-tool-subagent-control/list-agents', () => {
       parent,
       signal: new AbortController().signal,
     })
-    await oneShot.result
-    await oneShot.dispose()
+    try {
+      await oneShot.result
+    } finally {
+      await oneShot.dispose()
+    }
     const started = await ctx.subagents.startContinuable({
       provider: 'spawn',
       label: 'summarize the doc',
@@ -247,6 +291,7 @@ describe('dsh-tool-subagent-control/list-agents', () => {
 
   it('unregisters with its plugin fiber (HMR safety)', async () => {
     const ctx = new Context()
+    contexts.push(ctx)
     await mountAgentLoopTestDependencies(ctx)
     await ctx.plugin(AgentLoop, { agents: [] })
     await ctx.plugin(SubagentRuntime)
@@ -266,6 +311,7 @@ describe('dsh-tool-subagent-control/list-agents', () => {
   it('walks the complete descendant tree in pre-order with parent and depth annotations', async () => {
     const releaseChild = Promise.withResolvers<undefined>()
     const releaseGrandchild = Promise.withResolvers<undefined>()
+    releaseGates.push(() => { releaseChild.resolve(undefined) }, () => { releaseGrandchild.resolve(undefined) })
     const adapter = new GatedAdapter([
       { chunks: textResponse('child'), gate: releaseChild.promise },
       { chunks: textResponse('grandchild'), gate: releaseGrandchild.promise },

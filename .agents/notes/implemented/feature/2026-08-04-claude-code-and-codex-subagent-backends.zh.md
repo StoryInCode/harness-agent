@@ -6,7 +6,7 @@ Status: implemented
 
 ## 问题
 
-命名的 [`ctx.subagents`](2026-06-21-subagent-capability-seam.zh.md) 注册表让父 agent（智能体）无需了解子 agent 的运行方式即可委派工作，但 harness 需要通往真实 Codex 与 Claude Code 产品的第一方路径。每条路径都必须向产品交付一项自包含任务，让它在父会话的工作区中执行，返回最终回答或明确的失败或取消结果，并且不留下任何受管的产品进程。
+命名的 [`ctx.subagents`](2026-06-21-subagent-capability-seam.zh.md) 注册表让父 agent（智能体）无需了解子 agent 的运行方式即可委派工作，但 harness 需要通往真实 Codex 与 Claude Code 产品的第一方路径。每条路径都必须向产品交付一项自包含任务，let it work in the explicit request workspace or otherwise the parent Session's workspace，返回最终回答或明确的失败或取消结果，并且不留下任何受管的产品进程。
 
 产品集成不得成为任务文本、cwd、取消、结果结算或进程树的第二责任方。因此，所需证据要区分三个事实：无密钥真实产品测试证明官方集成、原生身份验证形态、确定性答案与资源清理；Loader 组合测试证明公开包和文档所示的工具配置无需启动产品即可加载；带密钥 e2e 证明生产提供方与真实产品能够从真实 DeepSeek 服务取得唯一答案。直接发起模型 HTTP 请求或使用产品替身无法取代上述任一产品运行层级；手工挂载插件无法取代 Loader 层级。
 
@@ -14,7 +14,7 @@ Status: implemented
 
 harness 交付两个同级的一次性提供方包，其默认注册名称分别为 `codex` 与 `claude-code`。本说明负责它们的产品协议、结果映射和进程生命周期；[命名实例决策](../../archived/feature/2026-08-18-product-subagent-named-instances.md)负责 Profile 选择的提供方身份、可选实例模型与静态工具绑定；[生产安装排除决策](../../archived/simplification/2026-08-12-production-dsh-excludes-product-subagent-providers.md)负责各自独立的可选 Bundle 与 host plane（宿主平面）放置；[tool-subagent README](../../../../packages/subagent/tool-subagent/README.zh.md) 负责模型可见的调度选择；[非交互权限决策](2026-08-15-product-subagent-noninteractive-permissions.zh.md)负责各产品提供方的 Profile 模式选择与安全权限决定；[最小诊断决策](../../archived/simplification/2026-08-21-product-subagent-minimal-diagnostics.md)负责粗粒度产品行动类别。两个包都接受多个命名实例。加载任一提供方都不会启动产品进程，而且每个工具只接受独立文本任务；产品与实例选择仍属于部署配置。
 
-这两个提供方都报告 `inheritsParentContext: false`，不声明任何可选的启动能力，并传递父会话 cwd，但不会复制父级对话。文档所示的工具使用 `backgroundMode: 'one-shot'` 与 `maxDepth: 'provider-managed'`：消费方默认在前台收集结果，也可把同一次运行放入通用 Job 运行时，而递归策略仍由进程外产品负责。每次调用都会创建一个全新的产品进程和一次不可续接的产品对话。`ctx.subagents` 负责具名请求解析与成对生命周期事件；`dsh-tool-subagent` 负责模型可见的调度以及前台与 Job 适配；`ctx.jobs` 和 `dsh-tool-jobs` 负责 Job id、状态、输出、控制、通知与父级 owner 取消；各产品提供方负责原生结果映射，`dsh-subprocess` 则负责凭证清洗、进程树终止以及整棵进程树的退出观测。
+这两个提供方都报告 `inheritsParentContext: false`，不声明任何可选的启动能力，and pass explicit request cwd or otherwise parent Session cwd without copying the parent conversation. 文档所示的工具使用 `backgroundMode: 'one-shot'` 与 `maxDepth: 'provider-managed'`：消费方默认在前台收集结果，也可把同一次运行放入通用 Job 运行时，而递归策略仍由进程外产品负责。每次调用都会创建一个全新的产品进程和一次不可续接的产品对话。`ctx.subagents` 负责具名请求解析与成对生命周期事件；`dsh-tool-subagent` 负责模型可见的调度以及前台与 Job 适配；`ctx.jobs` 和 `dsh-tool-jobs` 负责 Job id、状态、输出、控制、通知与父级 owner 取消；各产品提供方负责原生结果映射，`dsh-subprocess` 则负责凭证清洗、进程树终止以及整棵进程树的退出观测。
 
 ```text
 configured tool -> dsh-tool-subagent -> ctx.subagents -> product provider -> product process
@@ -36,7 +36,7 @@ configured tool -> dsh-tool-subagent -> ctx.subagents -> product provider -> pro
 
 `@deepseek-ai/dsh-subagent-codex` 注册由 Profile 选择、默认值为 `codex` 的提供方名称，解析锁定的 `@openai/codex@0.153.4` 包所声明的 `codex` bin，并使用当前 Node 可执行文件加 `app-server --stdio` 启动该 wrapper。Wrapper 会选择私有原生平台载荷；提供方既不解析也不回退宿主 `codex`。其公开配置包含非空的 `providerName`、可选的非空 `model`、显式的 `env` 覆盖项、须为正有限值且不得大于仓库共享 `MAX_TIMER_DELAY_MS` 的 `disposeGraceMs`，以及默认使用 `never` 的三值原生 `permissionMode`。每个命名实例会为自己的运行保留这些已解析值。显式模型会原样传给每个临时 `thread/start`；省略时仍以 Codex 原生设置为权威。安装、登录、`CODEX_HOME`、模型发现或 fallback、基础 URL 和产品会话设置仍由 Codex 原生机制或部署环境负责；所选模式只拥有非交互权限决策中描述的线程 approval／reviewer／sandbox 字段。
 
-发布前，提供方会验证非空的纯文本任务，在父级工作区中启动受管的 app-server，完成 `initialize` → `initialized` 握手，把可选模型与已解析模式映射为官方 `thread/start` 字段，并创建一个 `ephemeral: true` 线程。固定 app-server argv 不包含模型、模式或任务文本。已发布的运行只拥有一次 `turn/start`；其线程 ID 与轮次 ID 保持私有，绝不会持久化到父会话。
+发布前，提供方会验证非空的纯文本任务，starts the managed app-server in the explicit request workspace or otherwise the parent workspace，完成 `initialize` → `initialized` 握手，把可选模型与已解析模式映射为官方 `thread/start` 字段，并创建一个 `ephemeral: true` 线程。固定 app-server argv 不包含模型、模式或任务文本。已发布的运行只拥有一次 `turn/start`；其线程 ID 与轮次 ID 保持私有，绝不会持久化到父会话。
 
 `turn/completed` 是权威的远端终止事实。以最后一条带有 `phase: "final_answer"` 的 `agentMessage` 为准，且选中的消息必须包含非空白文本。若产品没有发出明确的最终阶段，则以最后一条 `phase: null` 的消息作为兼容性回退，该消息也必须包含非空白文本；过程说明绝不会取代上述任一答案。[最小诊断决策](../../archived/simplification/2026-08-21-product-subagent-minimal-diagnostics.md)负责 Codex 行动类别、HTTP status、生命周期阶段、进程结果与终止原因保持。本地取消仍是 `aborted` 且不附带失败诊断。
 
@@ -50,7 +50,7 @@ Codex 0.153.4 使用 Responses 协议，而 DeepSeek 的公开 OpenAI 兼容端�
 
 `@deepseek-ai/dsh-subagent-claude-code` 注册由 Profile 选择、默认值为 `claude-code` 的提供方名称，并调用 `@anthropic-ai/claude-agent-sdk@0.3.263`。提供方会省略 `pathToClaudeCodeExecutable`，因此 SDK 会从自己的 optional dependency 闭包中，按操作系统、CPU 与 Linux libc 选择携带 Claude Code 2.1.263 的匹配平台包。提供方既不会解析也不会回退宿主 `claude`；省略 optional dependency、不受支持的平台，以及缺失或损坏的平台载荷，都会在第一次委派的 SDK 启动边界失败。提供方使用官方 `query()` 入口点，并把 SDK 的 `spawnClaudeCodeProcess` 给出的原生 `claude` 或 `claude.exe` 命令、参数、cwd、环境和转发的信号交给 `dsh-subprocess`；其私有 `SpawnedProcess` 适配器只公开 SDK 所需的流、事件、终止和退出事实。
 
-公开配置包含非空的 `providerName`、可选的非空 `model`、显式的 `env` 覆盖项、须为正有限值且不得大于仓库共享 `MAX_TIMER_DELAY_MS` 的 `disposeGraceMs`，以及默认使用 `dontAsk` 的五值原生 `permissionMode`。每个命名实例会为自己的运行保留这些已解析值。显式模型会原样传入 `Options.model`；省略时不设置该字段，由原生设置选择模型。每次运行都会创建自己的 `AbortController`，设置 `persistSession: false`、禁用 `AskUserQuestion`，并把已解析模式传给 SDK；只有 `bypassPermissions` 会取得 SDK 的显式危险确认。提供方故意省略 `settingSources`，因此 SDK 会相对于父会话 cwd 读取宿主机常规的用户、项目和本地 Claude 设置。它既不复制也不过滤这些设置，也不会创建或修改登录状态。其余权限提示会被拒绝，MCP elicitation 会被拒绝，阻塞对话会快速失败，而不会等待本提供方不负责的用户界面。
+公开配置包含非空的 `providerName`、可选的非空 `model`、显式的 `env` 覆盖项、须为正有限值且不得大于仓库共享 `MAX_TIMER_DELAY_MS` 的 `disposeGraceMs`，以及默认使用 `dontAsk` 的五值原生 `permissionMode`。每个命名实例会为自己的运行保留这些已解析值。显式模型会原样传入 `Options.model`；省略时不设置该字段，由原生设置选择模型。每次运行都会创建自己的 `AbortController`，设置 `persistSession: false`、禁用 `AskUserQuestion`，并把已解析模式传给 SDK；只有 `bypassPermissions` 会取得 SDK 的显式危险确认。提供方故意省略 `settingSources`，因此 SDK 会relative to explicit request cwd or otherwise parent Session cwd 读取宿主机常规的用户、项目和本地 Claude 设置。它既不复制也不过滤这些设置，也不会创建或修改登录状态。其余权限提示会被拒绝，MCP elicitation 会被拒绝，阻塞对话会快速失败，而不会等待本提供方不负责的用户界面。
 
 只有在 SDK `Query` 与受管的活动 CLI 句柄都已存在后，提供方才会发布运行。它会消费完整的 SDK 流；只有 `result` 消息具有 `subtype: "success"`、`is_error: false` 和非空白 `result`，且迭代器随后正常结束时，运行才会完成。[最小诊断决策](../../archived/simplification/2026-08-21-product-subagent-minimal-diagnostics.md)负责所有非成功行动类别、阶段、进程结果，以及它们与参与失败的权限决定之间的顺序。本地取消会胜出并成为 `aborted`，且不附带这两类诊断事实。
 

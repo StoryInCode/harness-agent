@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-Delegate a self-contained text task to the installed Antigravity CLI in the parent workspace. This optional Profile Bundle returns one final answer or a safe failure diagnostic and leaves authentication and permissions with the native product. Each task starts a fresh process and conversation; no parent history is copied. Install the Bundle for Host availability and separately expose a delegation tool in an Agent Preset.
+Delegate a self-contained text task to the installed Antigravity CLI in the selected workspace. This optional Profile Bundle returns one final answer or a safe failure diagnostic and leaves authentication and permissions with the native product. Each task starts a fresh process and conversation; no parent history is copied. Install the Bundle for Host availability and separately expose a delegation tool in an Agent Preset.
 
 ## Table of Contents
 
@@ -45,7 +45,7 @@ Each Host provider row accepts these deployment-owned fields. Native permission 
 | `maxOutputBytes` | `1048576` | Positive integer UTF-8 retention cap per stream; stdout overflow fails closed |
 | `disposeGraceMs` | `3000` | Positive managed-range termination grace in milliseconds, at most `2147483647` |
 
-The child inherits the absolute, accessible parent Session cwd. Missing or relative parent workspaces fail before spawn. The subprocess service scrubs credential-shaped and managed `DSH_*` ambient variables before applying `env`; explicit entries deliberately opt in. Ordinary native home, project settings, and cached authentication remain accessible to the CLI.
+The child uses `request.cwd` when supplied, otherwise the parent Session cwd. The selected directory must be absolute and accessible; an invalid explicit value rejects without fallback before spawn. Omission still requires a usable parent workspace. The subprocess service scrubs credential-shaped and managed `DSH_*` ambient variables before applying `env`; explicit entries deliberately opt in. Ordinary native home, project settings, and cached authentication remain accessible to the CLI.
 
 ### Results and failures
 
@@ -83,7 +83,7 @@ Read the [subagent service](../subagent/README.md) for delegation semantics, the
 
 #### What the model sees
 
-The Antigravity child receives only the standalone text task in a fresh conversation, with native settings and tools in the parent workspace. The provider advertises no support for parent agent options, output schemas, depth enforcement, tool filters, or personas; the shared service rejects requests requiring them.
+The Antigravity child receives only the standalone text task in a fresh conversation, with native settings and tools in the selected workspace. The provider advertises no support for parent agent options, output schemas, depth enforcement, tool filters, or personas; the shared service rejects requests requiring them.
 
 #### Token effect
 

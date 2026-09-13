@@ -37,7 +37,7 @@ kind: "package-library"
 
 ### 子 agent 获得什么
 
-子 agent 获得父级的工作目录／会话谱系，除非 `request.agentOptions` 覆盖，否则继承父级的提供方、模型、推理强度与输出 token 上限。它获得全新的扁平注册作用域：父级工具限制与权限不会被导入。一次运行会把父级显式的沙箱覆盖项与 `'never'` 审批钉定带入子 agent，并在子 agent 的初始轮次内追加一份每次运行的描述符。
+子 agent 使用显式 `request.cwd`，省略时原样继承父 Session cwd，包括 `undefined`。显式 cwd 必须是绝对路径；无效值会在子级设置或发布前拒绝，且不回退。驱动器不探测 Host 文件系统。子 agent 保留父级会话谱系，除非 `request.agentOptions` 覆盖，否则继承父级的提供方、模型、推理强度与输出 token 上限。它获得全新的扁平注册作用域：父级工具限制与权限不会被导入。一次运行会把父级显式的沙箱覆盖项与 `'never'` 审批钉定带入子 agent，并在子 agent 的初始轮次内追加一份每次运行的描述符。
 
 -----
 

@@ -35,8 +35,9 @@ export interface Config {
    * Working directory override for the child process and its ACP session.
    * Must be non-empty; a relative path resolves against the harness launch
    * directory at load, and the result must be an existing directory. When
-   * omitted, each child inherits its delegating parent session's cwd — and
-   * starting one from a parent session that has no cwd fails.
+   * no request cwd is supplied, this overrides the parent session's cwd.
+   * With neither override, a missing parent cwd fails. Explicit request cwd
+   * must be absolute and usable; invalid values reject without fallback.
    */
   cwd?: string
   /**
@@ -122,14 +123,13 @@ function assertUsableCwd(label: string, cwd: string): string {
 }
 
 /**
- * Resolve the child's working directory: the deployment `cwd` override when
- * configured (already validated at load), else the parent session's workspace
- * cwd (validated here, its earliest resolvable point). Fails loud when neither
- * exists — falling back to the harness process cwd would silently bind the
- * child to the server's launch directory instead of the delegating session's
- * workspace (one server process serves many sessions, each with its own cwd).
+ * Resolve the child's working directory: request cwd, then the load-validated
+ * deployment override, then parent cwd. Explicit and inherited values must be
+ * absolute, enterable local directories. Invalid explicit values reject without
+ * fallback; missing values never default to the harness process directory.
  */
 function resolveCwd(configured: string | undefined, request: SubagentStartRequest): string {
+  if (request.cwd !== undefined) return assertUsableCwd('request cwd', request.cwd)
   if (configured !== undefined) return configured
   const parentCwd = request.parent.session.header.cwd
   if (parentCwd === undefined) {

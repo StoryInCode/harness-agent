@@ -48,6 +48,8 @@ This package takes no configuration: the root plugin provides `send_message` and
 
 Sends a message to an Agent named by `agent_id`: any exact live Agent may target its direct continuable child, while a resident continuable child may also target its direct parent. A working target receives the message at its nearest step boundary through Steer; an idle target starts a turn, and a cold direct child resumes through the continuation lifecycle. The call returns only acceptance (the accepted message's stable `messageId`), never a reply. A failure — an unsupported target, unavailable parent, unknown child, descriptor-less child that cannot be resumed, or rejected admission — states the message was not delivered.
 
+Cold resume keeps the child's original identity and persisted initial cwd, not the sender's current workspace. These control tools expose no cwd parameter and do not retarget an existing child.
+
 ### interrupt_agent
 
 Stops only the target's current turn: queued messages stay parked until a later `send_message`, descendants keep running, and the child stays available for follow-ups. The call returns when the stop request is accepted, not when the target is quiet; interrupting an already-finished agent is an accepted no-op, and self, sibling, stale, and non-ancestor callers get errored results.

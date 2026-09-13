@@ -58,7 +58,7 @@ class AntigravityProvider implements SubagentProvider {
   }
 
   async start(request: ResolvedSubagentStartRequest) {
-    const cwd = resolveChildCwd(name, undefined, request.parent.session.header.cwd)
+    const cwd = resolveChildCwd(name, undefined, request.parent.session.header.cwd, request.cwd)
     return startAntigravityRun(request, {
       ...this.config,
       cwd,

@@ -35,6 +35,8 @@ kind: "package-reference"
 
 初始内容止于父级最后一个已完成的轮次。subagent 启动时，父级当前的工具调用轮次仍在进行，因此该进行中的轮次绝不会被包含；在第一个已完成轮次之前，初始内容为空，子 agent 的行为与全新 spawn 相同。
 
+Host 调用方可以通过 `request.cwd` 选择子级工作区；省略时继承父 Session cwd，包括缺省状态。显式值必须是绝对工作区路径，无效时在子级设置前拒绝，且不回退。一次性与可继续子级使用相同选择规则；冷恢复保留子级已持久化的 cwd 与身份。参见[共享 cwd 规则](../subagent/README.zh.md#use-this-package)。
+
 ### 最小配置
 
 先加载 subagent 服务与本后端，再配置一个委派工具。此组合暴露由 fork 支撑的 `subagent` 工具：

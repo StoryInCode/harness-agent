@@ -37,7 +37,7 @@ interface SubagentCapabilities {
 
 ## The one-shot start request
 
-The tool layer builds this request from the model input and its own config; the service validates it against the named provider before `start`. Required `parent` supplies the session cwd, lineage, and delegation depth. Optional Agent provider, model, reasoning-effort, and token overrides, output schema, depth, tool filter, and persona require matching capability flags. In-process backends merge `agentOptions` over the parent Agent's options, scope filters and personas to child creation, and implement the supported object-rooted schema with a forced capture tool. The DSH SDK backend merges the four Agent route fields over its instance defaults and validates them in the child runtime's initialization; ACP, Codex, and Claude Code reject `agentOptions` before starting their transports.
+The tool layer builds this request from the model input and its own config; the service validates it against the named provider before `start`. Required `parent` supplies lineage and delegation depth; its cwd is the inherited fallback. Explicit request `cwd` takes precedence over supported provider-configured cwd, then parent cwd; invalid explicit values reject without fallback. Omission preserves provider defaults, including an undefined in-process workspace. The selected cwd is initial child workspace metadata retained on cold resume, not a command-local directory override. Optional Agent provider, model, reasoning-effort, and token overrides, output schema, depth, tool filter, and persona require matching capability flags. In-process backends merge `agentOptions` over the parent Agent's options, scope filters and personas to child creation, and implement the supported object-rooted schema with a forced capture tool. The DSH SDK backend merges the four Agent route fields over its instance defaults and validates them in the child runtime's initialization; ACP, Codex, and Claude Code reject `agentOptions` before starting their transports.
 
 ```ts type-equiv
 /**
@@ -48,14 +48,21 @@ The tool layer builds this request from the model input and its own config; the 
  * {@link SubagentProvider.start}.
  */
 interface SubagentStartRequest {
+  /**
+   * Absolute child workspace selected before setup, publication, and model work.
+   * Overrides provider-configured cwd, then parent cwd; invalid explicit values
+   * reject without fallback. Omission preserves provider defaults, including an
+   * undefined in-process workspace. Continuable children retain it on cold resume.
+   */
+  readonly cwd?: string
   /** Optional short display label persisted with a session-backed child. */
   readonly label?: string
   /** Content delivered as the child's user message. */
   readonly prompt: ContentBlock[]
   /**
-   * The spawning agent. In-process providers derive workspace, lineage, and
-   * delegation depth from its durable session state. ACP reads only its cwd,
-   * and only when no deployment `cwd` override is configured.
+   * The spawning agent. In-process providers derive lineage and delegation
+   * depth from its durable session state. Providers inherit its workspace
+   * only when neither request cwd nor a supported configured cwd is supplied.
    */
   readonly parent: Agent
   /**
@@ -113,7 +120,8 @@ The caller-facing request does not carry catalog format details or continuation 
 ```ts type-equiv
 /**
  * Provider-facing one-shot request after {@link SubagentRuntime.start} resolves
- * the durable child descriptor.
+ * the durable child descriptor. The provider still owns cwd selection and
+ * validation at its request-to-creation or run-spec step.
  */
 interface ResolvedSubagentStartRequest extends SubagentStartRequest {
   /** Detached descriptor a session-backed provider persists in the child log. */

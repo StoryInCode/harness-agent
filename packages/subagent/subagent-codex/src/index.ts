@@ -1,7 +1,8 @@
 /**
  * Profile-named Codex one-shot subagent provider. Every accepted run starts a
  * fresh official package-local Codex wrapper with `app-server --stdio` in the
- * delegating Session's workspace and publishes only after an ephemeral thread exists.
+ * requested workspace, or the delegating Session's workspace when omitted,
+ * and publishes only after an ephemeral thread exists.
  *
  * @module @deepseek-ai/dsh-subagent-codex
  */
@@ -72,7 +73,7 @@ class CodexProvider implements SubagentProvider {
 
   start(request: ResolvedSubagentStartRequest) {
     const parentCwd = request.parent.session.header.cwd
-    if (parentCwd === undefined) {
+    if (request.cwd === undefined && parentCwd === undefined) {
       throw new Error(
         'subagent-codex: no working directory for the child — delegate from a parent session that has one',
       )
@@ -83,6 +84,7 @@ class CodexProvider implements SubagentProvider {
         'subagent-codex',
         undefined,
         parentCwd,
+        request.cwd,
       )
     } catch (error: unknown) {
       if (request.signal.aborted) {

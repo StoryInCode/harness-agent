@@ -119,7 +119,7 @@ export function resolveChildAgentOptions(
 }
 
 /**
- * Build the child session's durable creation metadata: the parent's workspace,
+ * Build the child session's durable creation metadata: the selected workspace,
  * its direct lineage, coarse product origin, the recursion budget that must
  * survive persistence, the seed boundary that separates inherited parent
  * history from child work, and the composition the child runs under.
@@ -133,17 +133,19 @@ export function resolveChildAgentOptions(
  * @param parent - the delegating parent agent.
  * @param childDepth - the resolved delegation depth to persist.
  * @param isSeeded - whether this child inherits a parent-log prefix, including an explicitly empty one.
+ * @param cwd - child workspace selected by the creation owner; undefined leaves the header without a workspace.
  * @returns the `meta` for `ctx.agents.create()`.
  */
 export function childSessionMeta(
   parent: Agent,
   childDepth: number,
   isSeeded: boolean,
+  cwd: string | undefined,
 ): NonNullable<CreateAgentOptions['meta']> {
   const parentHeader = parent.session.header
   const agentPreset = parent.ctx.get('agentPresets')?.composedPreset(parent.ctx)
   return {
-    ...parentHeader.cwd !== undefined ? { cwd: parentHeader.cwd } : {},
+    ...cwd !== undefined ? { cwd } : {},
     ...agentPreset === undefined ? {} : { agentPreset },
     parentSession: parentHeader.id,
     isSeeded,

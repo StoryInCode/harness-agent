@@ -42,7 +42,7 @@ kind: "package-reference"
 | `profile` | `sdk` | 具名子 profile |
 | `patches` | `[]` | 每次启动的有序 profile patch 文件，在插件加载时解析并校验 |
 | `dshHome` | 必填 | 每个嵌套子进程的绝对隔离 Harness home |
-| `cwd` | 父会话 cwd | 子进程及其 SDK 会话的工作目录覆盖值 |
+| `cwd` | 父会话 cwd | 省略 `request.cwd` 时子进程及其 SDK 会话的 cwd |
 | `provider` | `deepseek-official` | 写入子进程 `initialize` 的提供方路由 |
 | `model` | `deepseek-v4-flash` | 写入子进程 `initialize` 的模型 |
 | `maxTokens` | 适配器／提供方路由默认值 | 写入子进程 `initialize` 的单次请求输出 token 上限 |
@@ -104,7 +104,7 @@ kind: "package-reference"
 
 ### 运行流程
 
-一次启动会在 spawn 前解析子进程工作目录与一条进程级 SDK 路由。`request.agentOptions` 中每个已声明字段（`provider`、`model`、`reasoningEffort` 或 `maxTokens`）都会覆盖对应的提供方实例默认值；省略时保留已配置的提供方／模型与可选上限，而推理强度只有在请求提供时才会出现。随后，提供方通过 SDK 客户端 spawn 运行时，并在履行前完成 `initialize` 握手，其中包括确切模型与推理强度校验。路由、spawn、握手或发布前取消失败时，只会在子进程被回收后拒绝；工作目录解析失败则会在尚未 spawn 任何内容时拒绝。发布后，提供方拥有一段 SDK 活动，并从子会话事件中读取答案：最后一条完整且非空的 `assistant/message`（记录 usage 的空内容消息会被跳过）；若没有这类消息，则取累积的 `text-delta` 流。dispose 是幂等的：先在本地把结果确定为 `aborted`，发出有界的协议 `shutdown` 请求，再经 stdin EOF → SIGTERM → SIGKILL 升级到实际退出。
+一次启动会依次选择 `request.cwd`、配置的 `cwd`、父 Session cwd，并在 spawn 前解析一条进程级 SDK 路由。所选目录必须绝对且可访问；无效的显式 cwd 会拒绝且不回退。进程与 SDK 会话使用同一所选目录。`request.agentOptions` 中每个已声明字段（`provider`、`model`、`reasoningEffort` 或 `maxTokens`）都会覆盖对应的提供方实例默认值；省略时保留已配置的提供方／模型与可选上限，而推理强度只有在请求提供时才会出现。随后，提供方通过 SDK 客户端 spawn 运行时，并在履行前完成 `initialize` 握手，其中包括确切模型与推理强度校验。路由、spawn、握手或发布前取消失败时，只会在子进程被回收后拒绝；工作目录解析失败则会在尚未 spawn 任何内容时拒绝。发布后，提供方拥有一段 SDK 活动，并从子会话事件中读取答案：最后一条完整且非空的 `assistant/message`（记录 usage 的空内容消息会被跳过）；若没有这类消息，则取累积的 `text-delta` 流。dispose 是幂等的：先在本地把结果确定为 `aborted`，发出有界的协议 `shutdown` 请求，再经 stdin EOF → SIGTERM → SIGKILL 升级到实际退出。
 
 ### 停止原因映射
 

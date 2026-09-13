@@ -35,6 +35,8 @@ Choose fork when the child needs the conversation's completed turns — a follow
 
 The seed ends at the parent's last completed turn. A parent's current tool-calling turn is still open when a subagent starts, so that in-flight turn is never included; before the first completed turn the seed is empty and the child behaves like a fresh spawn.
 
+Host callers can select the child's workspace with `request.cwd`; omission inherits the parent Session cwd, including absence. An explicit value must be an absolute workspace path; invalid values reject without fallback before child setup. The same selection applies to one-shot and continuable children; cold resume retains the child's persisted cwd and identity. See the [shared cwd rules](../subagent/README.md#use-this-package).
+
 ### Minimal configuration
 
 Load the subagent service and this backend, then configure a delegation tool. This composition exposes a `subagent` tool backed by fork:

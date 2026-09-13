@@ -698,7 +698,7 @@ describe('a delegated child', () => {
     // Exactly what an in-process subagent driver's creation window does.
     const child = await parent.agent.ctx.agents.create({
       sessionId: SessionId('preset-child'),
-      meta: childSessionMeta(parent.agent, 1, false),
+      meta: childSessionMeta(parent.agent, 1, false, parent.agent.session.header.cwd),
       setup: (agentCtx) => {
         applyChildComposition(agentCtx, parent.agent, {})
       },
@@ -724,7 +724,7 @@ describe('a delegated child', () => {
     await ctx.agentPresets.recompose(parent.agent.ctx, 'minimal')
     const child = await parent.agent.ctx.agents.create({
       sessionId: SessionId('preset-child-switch'),
-      meta: childSessionMeta(parent.agent, 1, false),
+      meta: childSessionMeta(parent.agent, 1, false, parent.agent.session.header.cwd),
       setup: (agentCtx) => {
         applyChildComposition(agentCtx, parent.agent, {})
       },

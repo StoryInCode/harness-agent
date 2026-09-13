@@ -14,6 +14,7 @@
  */
 
 import { randomUUID } from 'node:crypto'
+import { isAbsolute } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 import { brandString } from '@deepseek-ai/dsh-brand'
@@ -95,7 +96,8 @@ export class SubagentContinuationManager {
   /**
    * Start one continuable background child and resolve at initial inbox acceptance.
    * Every earlier failure disposes any created handle and rolls back Activation
-   * and parent ownership without returning either id.
+   * and parent ownership without returning either id. The initial cwd is
+   * selected before provider preparation and persists across cold resume.
    * @param spec - provider, delegation request, and caller cancellation.
    * @returns the durable child id and accepted initial prompt message id.
    */
@@ -108,6 +110,10 @@ export class SubagentContinuationManager {
     const childId = spec.childId ?? brandString<SessionId>(randomUUID())
     this.activations.assertChildIdAvailable(childId)
     const childDepth = resolveChildDepth(parent, request.maxDepth)
+    if (request.cwd !== undefined && !isAbsolute(request.cwd)) {
+      throw new Error('subagent request cwd must be an absolute path')
+    }
+    const cwd = request.cwd ?? parent.session.header.cwd
     // Snapshot before any await: invalid descriptor JSON rejects the call
     // before a child exists, and the detached value is what reaches the log.
     const agentOptions = resolveChildAgentOptions(parent, request.agentOptions, childDepth)
@@ -162,7 +168,7 @@ export class SubagentContinuationManager {
           parent,
           create: {
             seed,
-            meta: childSessionMeta(parent, childDepth, prepared.seed !== undefined),
+            meta: childSessionMeta(parent, childDepth, prepared.seed !== undefined, cwd),
             inheritedEventCount,
             delegatedPolicies,
             descriptor,

@@ -37,7 +37,7 @@ interface SubagentCapabilities {
 
 ## 单次启动请求
 
-工具层根据模型输入和自身配置构建此请求；服务在 `start` 之前针对指定提供方进行校验。必填的 `parent` 提供会话 cwd、谱系与委派深度。可选的 Agent 提供方、模型、推理强度与 token 覆盖、output schema、depth、工具过滤器和 persona 需要对应的能力 flag 匹配。进程内后端会把 `agentOptions` 合并到父 Agent 选项之上，将 filter 和 persona 的作用域限定在子 agent 创建阶段，并通过强制 capture 工具实现所支持的 object-rooted schema。DSH SDK 后端会把四个 Agent 路由字段合并到实例默认值之上，并在子运行时初始化期间校验；ACP、Codex 与 Claude Code 会在启动传输前拒绝 `agentOptions`。
+工具层根据模型输入和自身配置构建此请求；服务在 `start` 之前针对指定提供方进行校验。Required `parent` supplies lineage and delegation depth; its cwd is the inherited fallback. Explicit request `cwd` takes precedence over supported provider-configured cwd, then parent cwd; invalid explicit values reject without fallback. Omission preserves provider defaults, including an undefined in-process workspace. The selected cwd is initial child workspace metadata retained on cold resume, not a command-local directory override. 可选的 Agent 提供方、模型、推理强度与 token 覆盖、output schema、depth、工具过滤器和 persona 需要对应的能力 flag 匹配。进程内后端会把 `agentOptions` 合并到父 Agent 选项之上，将 filter 和 persona 的作用域限定在子 agent 创建阶段，并通过强制 capture 工具实现所支持的 object-rooted schema。DSH SDK 后端会把四个 Agent 路由字段合并到实例默认值之上，并在子运行时初始化期间校验；ACP、Codex 与 Claude Code 会在启动传输前拒绝 `agentOptions`。
 
 ```ts type-equiv
 /**
@@ -48,14 +48,21 @@ interface SubagentCapabilities {
  * {@link SubagentProvider.start}.
  */
 interface SubagentStartRequest {
+  /**
+   * Absolute child workspace selected before setup, publication, and model work.
+   * Overrides provider-configured cwd, then parent cwd; invalid explicit values
+   * reject without fallback. Omission preserves provider defaults, including an
+   * undefined in-process workspace. Continuable children retain it on cold resume.
+   */
+  readonly cwd?: string
   /** Optional short display label persisted with a session-backed child. */
   readonly label?: string
   /** Content delivered as the child's user message. */
   readonly prompt: ContentBlock[]
   /**
-   * The spawning agent. In-process providers derive workspace, lineage, and
-   * delegation depth from its durable session state. ACP reads only its cwd,
-   * and only when no deployment `cwd` override is configured.
+   * The spawning agent. In-process providers derive lineage and delegation
+   * depth from its durable session state. Providers inherit its workspace
+   * only when neither request cwd nor a supported configured cwd is supplied.
    */
   readonly parent: Agent
   /**
@@ -113,7 +120,8 @@ interface SubagentStartRequest {
 ```ts type-equiv
 /**
  * Provider-facing one-shot request after {@link SubagentRuntime.start} resolves
- * the durable child descriptor.
+ * the durable child descriptor. The provider still owns cwd selection and
+ * validation at its request-to-creation or run-spec step.
  */
 interface ResolvedSubagentStartRequest extends SubagentStartRequest {
   /** Detached descriptor a session-backed provider persists in the child log. */

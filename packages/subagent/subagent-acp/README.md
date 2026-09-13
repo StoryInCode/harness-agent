@@ -38,7 +38,7 @@ Choose this backend when the child must run with its own runtime, model, and too
 | `providerName` | `acp` | Registry name on `ctx.subagents` |
 | `command` | required | Executable spawned for each run (the child ACP agent) |
 | `args` | `[]` | Command arguments |
-| `cwd` | parent session cwd | Working-directory override for the child process and its ACP session |
+| `cwd` | parent session cwd | Child process and ACP session cwd when `request.cwd` is omitted |
 | `permission` | `reject` | Auto-answer permission requests by rejecting, or choosing the first `allow_once` or `allow_always` option (`allow`) |
 | `env` | `{}` | Explicit child environment layered over the credential-scrubbed parent environment |
 | `disposeEofGraceMs` | `6000` | Grace after stdin EOF before platform termination |
@@ -91,7 +91,7 @@ This section explains how the backend drives a child over ACP and where the obse
 
 ### Start and ownership flow
 
-A start resolves the child's working directory (the configured `cwd` override, else the parent session's cwd), spawns the command through the subprocess seam, performs the ACP `initialize` and `newSession` handshake, and only then publishes the run. Fulfillment means a remote session is ready and ownership has transferred to the caller. Disposal is idempotent: it closes stdin and waits a configured grace for cooperative quiescence, then escalates through SIGTERM to SIGKILL and awaits whole-range exit. Cleanup failures remain observable as ordered safe facts and never claim quiescence.
+A start resolves the child's working directory (`request.cwd`, then configured `cwd`, then parent Session cwd; the selected path must be absolute and accessible, and invalid explicit values reject without fallback), spawns the command through the subprocess seam, performs the ACP `initialize` and `newSession` handshake, and only then publishes the run. Fulfillment means a remote session is ready and ownership has transferred to the caller. Disposal is idempotent: it closes stdin and waits a configured grace for cooperative quiescence, then escalates through SIGTERM to SIGKILL and awaits whole-range exit. Cleanup failures remain observable as ordered safe facts and never claim quiescence.
 
 ### Stop-reason mapping
 

@@ -42,7 +42,7 @@ The provider advertises `agentOptions: true`, with `outputSchema`/`depthLimit`/`
 | `profile` | `sdk` | Named child profile |
 | `patches` | `[]` | Ordered per-launch profile patch files, resolved and checked at plugin load |
 | `dshHome` | required | Absolute isolated Harness home for every nested child process |
-| `cwd` | parent session cwd | Working-directory override for the child process and its SDK session |
+| `cwd` | parent session cwd | Child process and SDK session cwd when `request.cwd` is omitted |
 | `provider` | `deepseek-official` | Provider route sent in the child's `initialize` |
 | `model` | `deepseek-v4-flash` | Model sent in the child's `initialize` |
 | `maxTokens` | adapter/provider route default | Per-request output-token cap sent in the child's `initialize` |
@@ -104,7 +104,7 @@ This section explains how the backend drives a child Harness runtime and where t
 
 ### Run flow
 
-A start resolves the child's working directory and one process-wide SDK route before spawning. Each declared `request.agentOptions` field (`provider`, `model`, `reasoningEffort`, or `maxTokens`) overrides the matching provider-instance default; omission preserves the configured provider/model and optional cap, while reasoning effort remains absent unless the request supplies it. The provider spawns the runtime through the SDK client and completes the `initialize` handshake, including exact-model and effort validation, before it fulfills. A route, spawn, handshake, or pre-publication cancellation failure rejects only after the subprocess is reaped; a working-directory resolution failure rejects before spawning. After publication the provider owns one SDK activity and reads the child's answer from its session events: the last complete non-empty `assistant/message` (an empty-content message that records usage is skipped), or the accumulated `text-delta` stream when no such message exists. Disposal is idempotent: it settles the result locally as `aborted`, sends a bounded protocol `shutdown` request, then escalates through stdin EOF → SIGTERM → SIGKILL to actual exit.
+A start selects `request.cwd`, then configured `cwd`, then parent Session cwd, and resolves one process-wide SDK route before spawning. The selected directory must be absolute and accessible; an invalid explicit cwd rejects without fallback. The process and SDK session use the same selected directory. Each declared `request.agentOptions` field (`provider`, `model`, `reasoningEffort`, or `maxTokens`) overrides the matching provider-instance default; omission preserves the configured provider/model and optional cap, while reasoning effort remains absent unless the request supplies it. The provider spawns the runtime through the SDK client and completes the `initialize` handshake, including exact-model and effort validation, before it fulfills. A route, spawn, handshake, or pre-publication cancellation failure rejects only after the subprocess is reaped; a working-directory resolution failure rejects before spawning. After publication the provider owns one SDK activity and reads the child's answer from its session events: the last complete non-empty `assistant/message` (an empty-content message that records usage is skipped), or the accumulated `text-delta` stream when no such message exists. Disposal is idempotent: it settles the result locally as `aborted`, sends a bounded protocol `shutdown` request, then escalates through stdin EOF → SIGTERM → SIGKILL to actual exit.
 
 ### Stop-reason mapping
 

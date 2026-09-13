@@ -9,7 +9,7 @@ kind: "package-bundle"
 
 ## 概述
 
-当委派工作需要在父会话工作区中的真实无人值守 Codex 会话内运行时，把 `@deepseek-ai/dsh-subagent-codex` 安装进 Profile。每次委派都会为一个自包含文本任务使用全新且隔离的 Codex 线程，并且只返回其最终答案或安全失败诊断。原生 Codex 配置和身份验证继续作为权威来源，而 `permissionMode` 选择非交互式审批和沙箱行为。Bundle 会提供兼容的原生 Codex 载荷，但只有配置委派工具后才会向模型公开相应能力。
+当委派工作需要在所选工作区中的真实无人值守 Codex 会话内运行时，把 `@deepseek-ai/dsh-subagent-codex` 安装进 Profile。每次委派都会为一个自包含文本任务使用全新且隔离的 Codex 线程，并且只返回其最终答案或安全失败诊断。原生 Codex 配置和身份验证继续作为权威来源，而 `permissionMode` 选择非交互式审批和沙箱行为。Bundle 会提供兼容的原生 Codex 载荷，但只有配置委派工具后才会向模型公开相应能力。
 
 ## 目录
 
@@ -25,7 +25,7 @@ kind: "package-bundle"
 <a id="use-this-package"></a>
 ## 使用本包
 
-当委派应以父级工作区中的真实 Codex 会话运行时，挂载本提供方。常用路径是显式的：把 Bundle 安装进 Profile，可选地配置提供方行，并通过委派工具行把它暴露给模型。
+当委派应以所选工作区中的真实 Codex 会话运行时，挂载本提供方。常用路径是显式的：把 Bundle 安装进 Profile，可选地配置提供方行，并通过委派工具行把它暴露给模型。
 
 ### 安装 Bundle
 
@@ -98,7 +98,7 @@ dsh --profile <name>
 ### 设计理念
 
 - **每次运行一个全新进程、线程与轮次。** 每次运行都会 spawn 全新 app-server、创建一个临时线程并恰好执行一个轮次；没有续接、恢复或池化。
-- **原生配置是权威。** Codex 配置与身份验证经父级 cwd、`HOME` 与 `CODEX_HOME` 保持原生；提供方只覆盖可选模型以及线程的 approval、reviewer 与 sandbox 字段。
+- **原生配置是权威。** Codex 配置与身份验证经所选子级 cwd、`HOME` 与 `CODEX_HOME` 保持原生；提供方只覆盖可选模型以及线程的 approval、reviewer 与 sandbox 字段。
 - **刻意无人值守。** 审批、用户输入与 MCP 请求都会在无人参与的情况下被应答或拒绝；未知服务器请求会使运行失败。
 
 ### 源码地图
@@ -112,7 +112,7 @@ dsh --profile <name>
 
 ### 运行流程
 
-一次启动只接受非空的文本块序列，并根据父会话确定子级 cwd。它经子进程 seam spawn 固定命令，完成 `initialize` → `initialized` 握手，把 Profile 选择的模式与可选模型映射为官方 `thread/start` 字段并与 `{ cwd, ephemeral: true }` 一起发送，且仅在 Codex 返回有效的临时线程后发布运行。已发布的结果恰好启动一个轮次，只接受与此次运行的线程和轮次匹配的通知，并等待权威的 `turn/completed` 终态。以最后一条 `phase: "final_answer"` 的 `agentMessage` 为准；若 Codex 没有发出明确的最终阶段，则以最后一条 `phase: null` 的消息作为兼容性回退。成功完成的轮次若没有非空白答案，结果也会判为错误。失败轮次使用粗粒度类别 `limit`、`access-policy`、`service`、`transport`、`product-error`、`invalid-result` 或 `unknown`；app-server 提前退出使用 `process`，适用的连接与 stream 失败保留数值 `httpStatusCode`。
+一次启动只接受非空的文本块序列，并选择 `request.cwd`，省略时取父 Session cwd。所选目录必须绝对且可访问；无效的显式值会在 spawn 前拒绝，且不回退。它经子进程 seam spawn 固定命令，完成 `initialize` → `initialized` 握手，把 Profile 选择的模式与可选模型映射为官方 `thread/start` 字段并与 `{ cwd, ephemeral: true }` 一起发送，且仅在 Codex 返回有效的临时线程后发布运行。已发布的结果恰好启动一个轮次，只接受与此次运行的线程和轮次匹配的通知，并等待权威的 `turn/completed` 终态。以最后一条 `phase: "final_answer"` 的 `agentMessage` 为准；若 Codex 没有发出明确的最终阶段，则以最后一条 `phase: null` 的消息作为兼容性回退。成功完成的轮次若没有非空白答案，结果也会判为错误。失败轮次使用粗粒度类别 `limit`、`access-policy`、`service`、`transport`、`product-error`、`invalid-result` 或 `unknown`；app-server 提前退出使用 `process`，适用的连接与 stream 失败保留数值 `httpStatusCode`。
 
 </details>
 
@@ -138,7 +138,7 @@ dsh --profile <name>
 
 #### 模型看到什么
 
-Codex 子级会在一个全新的临时线程中，以单个轮次接收这些独立文本块。它的工作区是父会话 cwd；所选提供方实例会固定已配置的模型、环境、非交互审批策略与沙箱模式，而省略的模型及其余产品设置来自 Codex 原生配置。可执行版本来自 Bundle 锁定的平台载荷。
+Codex 子级会在一个全新的临时线程中，以单个轮次接收这些独立文本块。它的工作区是所选子级 cwd（默认为父 Session cwd）；所选提供方实例会固定已配置的模型、环境、非交互审批策略与沙箱模式，而省略的模型及其余产品设置来自 Codex 原生配置。可执行版本来自 Bundle 锁定的平台载荷。
 
 #### Token 影响
 

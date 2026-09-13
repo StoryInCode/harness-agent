@@ -1,0 +1,14 @@
+- name: 'cordis:llm'
+- name: 'cordis:sessions'
+- name: 'cordis:projections'
+- name: 'cordis:prompt'
+  config:
+    personaPrefix: 'Workspace {{cwd}}.'
+- name: 'cordis:tools'
+- name: 'cordis:agents'
+- name: 'cordis:loop'
+  config:
+    agents: []
+- name: 'cordis:subagents'
+- name: 'cordis:spawn'
+- name: 'cordis:fork'

@@ -19,7 +19,7 @@ import { deadline, timeoutOf } from '@deepseek-ai/dsh-timeout'
 export interface AntigravityRunSpec {
   /** Installed executable name or absolute path. */
   readonly command: string
-  /** Validated absolute parent workspace. */
+  /** Validated absolute child workspace. */
   readonly cwd: string
   /** Optional native model override. */
   readonly model?: string

@@ -9,7 +9,7 @@ kind: "package-reference"
 
 ## 概述
 
-`dsh-subagent-spawn-in-process` 是一个进程内 subagent 后端：它在当前进程中运行每个委派任务，子 agent（智能体）是一个全新子 `Agent`，复用宿主的 agent 工厂及 LLM（大语言模型）/工具服务。子 agent 以空对话开始，因此任务提示词必须自足；除非 `request.agentOptions` 覆盖，否则它继承父 agent 的工作目录、会话谱系、提供方、模型、推理强度与输出 token 上限。委派工具或 API 调用以 `spawn` 提供方名称找到它。需要成本最低的委派传输时选择它；需要子 agent 建立在父级已完成对话轮次之上时，请选择 fork 后端。
+`dsh-subagent-spawn-in-process` 在全新子 agent（智能体）中运行每个委派任务，共享当前进程及其 agent 工厂、LLM（大语言模型）与工具服务。子 agent 以空对话开始，因此任务提示词必须自足；它保留父级谱系，默认使用父级 cwd 与模型设置。Host 调用方可以通过 `request.cwd` 覆盖 cwd，通过 `request.agentOptions` 覆盖模型设置。委派工具或 API 调用以 `spawn` 提供方名称找到它。需要成本最低的委派传输时选择它；需要子 agent 建立在父级已完成对话轮次之上时，请选择 fork 后端。
 
 ## 目录
 
@@ -48,6 +48,8 @@ kind: "package-reference"
 | `providerName` | `spawn` | 注册到 `ctx.subagents` 的提供方名称 |
 
 生成的[配置目录](../../../docs/config-catalog.zh.md#deepseek-aidsh-subagent-spawn-in-process)是每个受支持字段及其 JSDoc 的穷尽式真源。
+
+Host 调用方可以把 `request.cwd` 设为绝对工作区路径；无效值会在子级设置前拒绝，且不回退。省略时原样继承父 Session cwd，包括缺省状态。可继续子级持久化其初始 cwd，并在冷恢复时保留该值与原始身份。参见[共享 cwd 规则](../subagent/README.zh.md#use-this-package)。
 
 ### 一次委派会做什么
 
@@ -137,7 +139,7 @@ kind: "package-reference"
 
 这些限制说明何时选择该后端是错误的；它们是当前包约束。
 
-- **全新表示不含父级 transcript（文本记录）**——子 agent 继承 cwd、谱系、提供方、模型、推理强度、输出 token 上限及显式配置的 persona/工具限制，但不继承父级的任何对话；需要已完成轮次上下文时，请使用 fork 后端。
+- **全新表示不含父级 transcript（文本记录）**——子 agent 默认使用父级 cwd 与模型设置，保留谱系，并应用显式配置的 persona/工具限制，但不继承父级的任何对话；需要已完成轮次上下文时，请使用 fork 后端。
 
 <a id="dev-note"></a>
 ### 开发备注

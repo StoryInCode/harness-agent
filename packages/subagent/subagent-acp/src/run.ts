@@ -34,8 +34,8 @@ export interface AcpRunSpec {
   args: string[]
   /**
    * Absolute working directory for the child process AND its ACP session
-   * `cwd`. The provider resolves it before this spec exists: config override,
-   * else the delegating parent session's workspace.
+   * `cwd`. The provider resolves it before this spec exists: request cwd,
+   * then config override, then the parent session's workspace.
    */
   cwd: string
   /** How to auto-answer the child's permission prompts. */

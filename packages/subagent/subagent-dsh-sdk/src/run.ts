@@ -39,7 +39,7 @@ export interface SdkRunSpec {
   /**
    * Absolute working directory for the child process AND the workspace cwd
    * of its SDK session. The provider resolves it before this spec exists:
-   * config override, else the delegating parent session's workspace.
+   * request cwd, then config override, then the parent session's workspace.
    */
   cwd: string
   /** Provider route the child runtime initializes with. */

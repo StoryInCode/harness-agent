@@ -62,6 +62,8 @@ Under `continuable` policy, an omitted or `true` `run_in_background` starts a du
 
 `maxDepth` caps recursion (default `3`; `0` forbids delegation) and requires a provider with the `depthLimit` capability; `'provider-managed'` leaves the budget to an out-of-process provider. `persona` and `toolFilter` configure every child when the provider supports them, and the tool stays visible at the cap — each attempted start checks the calling agent's current depth and rejects with an errored result.
 
+The tool exposes no cwd parameter and omits `SubagentStartRequest.cwd` in foreground, one-shot background, and continuable starts. Children therefore use provider-configured cwd defaults where supported, otherwise parent Session inheritance. Host API callers can select a workspace through the [subagent service](../subagent/README.md#use-this-package); task text is not a cwd override.
+
 ### Selecting a child LLM
 
 Set `modelSelectionSettings: true` to sample the Host's `subagent-model-selection` preference when each fresh top-level Session is composed. A restored Session without a recorded policy remains disabled, including an explicitly empty restore. When enabled, the non-empty exact provider/model route list is recorded in the Session, inherited by child Sessions, and unchanged by later settings edits. The tool then exposes optional `provider`, `model`, and `reasoning_effort` fields and registers the shared `list_subagent_models` tool. This mode requires a backend that advertises `agentOptions`; both in-process backends and DSH SDK support it, while ACP, Codex, and Claude Code reject it rather than ignore it.

@@ -2453,8 +2453,9 @@ export interface Config {
    * Working directory override for the child process and its ACP session.
    * Must be non-empty; a relative path resolves against the harness launch
    * directory at load, and the result must be an existing directory. When
-   * omitted, each child inherits its delegating parent session's cwd — and
-   * starting one from a parent session that has no cwd fails.
+   * no request cwd is supplied, this overrides the parent session's cwd.
+   * With neither override, a missing parent cwd fails. Explicit request cwd
+   * must be absolute and usable; invalid values reject without fallback.
    */
   cwd?: string
   /**
@@ -2548,7 +2549,7 @@ export interface Config {
 export type ClaudeCodePermissionMode = typeof CLAUDE_CODE_PERMISSION_MODES[number]
 ```
 
-Source: [`packages/subagent/subagent-claude-code/src/index.ts:38`](../packages/subagent/subagent-claude-code/src/index.ts)
+Source: [`packages/subagent/subagent-claude-code/src/index.ts:39`](../packages/subagent/subagent-claude-code/src/index.ts)
 
 <a id="deepseek-aidsh-subagent-codex"></a>
 
@@ -2581,7 +2582,7 @@ export type CodexPermissionMode =
   | 'dangerously-bypass-approvals-and-sandbox'
 ```
 
-Source: [`packages/subagent/subagent-codex/src/index.ts:36`](../packages/subagent/subagent-codex/src/index.ts)
+Source: [`packages/subagent/subagent-codex/src/index.ts:37`](../packages/subagent/subagent-codex/src/index.ts)
 
 <a id="deepseek-aidsh-subagent-dsh-sdk"></a>
 
@@ -2606,9 +2607,9 @@ export interface Config {
    * Working directory override for the child process and its SDK session
    * workspace. Must be non-empty; a relative path resolves against the
    * harness launch directory at load, and the result must be an existing
-   * directory. When omitted, each child inherits its delegating parent
-   * session's cwd — and starting one from a parent session that has no cwd
-   * fails.
+   * directory. When no request cwd is supplied, this overrides the parent
+   * session's cwd. With neither override, a missing parent cwd fails. Explicit
+   * request cwd must be absolute and usable; invalid values reject without fallback.
    */
   cwd?: string
   /** Provider route the child runtime initializes with (default `deepseek-official`). */

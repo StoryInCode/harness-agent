@@ -16,7 +16,7 @@ import { statSync } from 'node:fs'
 import { isAbsolute, resolve } from 'node:path'
 import z from '@deepseek-ai/schemastery'
 import type { AgentOptions } from '@deepseek-ai/dsh-agent'
-import type { SubagentCapabilities, SubagentProvider, SubagentStartRequest } from '@deepseek-ai/dsh-subagent'
+import type { SubagentCapabilities, SubagentProvider, ResolvedSubagentStartRequest } from '@deepseek-ai/dsh-subagent'
 import { assertPositiveFinite, NO_START_CAPABILITIES, resolveChildCwd, validateConfiguredCwd } from '@deepseek-ai/dsh-subagent'
 import {
   DEFAULT_DISPOSE_EOF_GRACE_MS,
@@ -46,9 +46,9 @@ export interface Config {
    * Working directory override for the child process and its SDK session
    * workspace. Must be non-empty; a relative path resolves against the
    * harness launch directory at load, and the result must be an existing
-   * directory. When omitted, each child inherits its delegating parent
-   * session's cwd — and starting one from a parent session that has no cwd
-   * fails.
+   * directory. When no request cwd is supplied, this overrides the parent
+   * session's cwd. With neither override, a missing parent cwd fails. Explicit
+   * request cwd must be absolute and usable; invalid values reject without fallback.
    */
   cwd?: string
   /** Provider route the child runtime initializes with (default `deepseek-official`). */
@@ -141,13 +141,13 @@ class SdkSubagentProvider implements SubagentProvider {
     this.agentRouteDefaults = Object.freeze({ provider: config.provider, model: config.model })
   }
 
-  start(request: SubagentStartRequest) {
+  start(request: ResolvedSubagentStartRequest) {
     if (request.signal.aborted) {
       throw new Error('subagent request was aborted before the SDK child started')
     }
     let cwd: string
     try {
-      cwd = resolveChildCwd('subagent-dsh-sdk', this.config.cwd, request.parent.session.header.cwd)
+      cwd = resolveChildCwd('subagent-dsh-sdk', this.config.cwd, request.parent.session.header.cwd, request.cwd)
     } catch (error: unknown) {
       const failure = sdkConfigurationFailure(error)
       this.ctx.logger.warn(`subagent-dsh-sdk "${this.name}": child start failed: %o`, error)

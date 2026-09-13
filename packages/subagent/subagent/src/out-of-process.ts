@@ -2,8 +2,8 @@
  * Provider-side vocabulary for OUT-OF-PROCESS subagent backends — the pieces
  * that enforce this seam's own contracts around a child in another process:
  * the no-capabilities advertisement, timing-bound validation, child
- * working-directory resolution (config override, else the delegating parent
- * session's workspace), the never-reject result settlement, and the standard
+ * working-directory resolution (request override, then config, then the
+ * delegating parent session's workspace), the never-reject result settlement, and the standard
  * run-handle publication. Backends compose these with their own wire drivers;
  * the process machinery itself (spawn, env scrub, managed-range teardown)
  * belongs to the `dsh-subprocess` seam.
@@ -132,19 +132,24 @@ export function validateConfiguredCwd(prefix: string, cwd: string | undefined): 
 }
 
 /**
- * Resolve the child's working directory at start: the deployment override
- * when configured (already validated at load), else the parent session's
- * workspace cwd (validated here, its earliest resolvable point). Fails loud
- * when neither exists — falling back to the harness process cwd would
- * silently bind the child to the server's launch directory instead of the
- * delegating session's workspace (one server process serves many sessions,
- * each with its own cwd).
+ * Resolve the child's working directory at start: explicit request cwd, then
+ * the load-validated deployment override, then the parent session's workspace.
+ * Explicit and inherited values must be absolute, enterable directories in the
+ * provider's local execution world. Invalid explicit values reject without
+ * fallback; missing values never default to the harness process directory.
  * @param prefix - the consuming plugin's diagnostic prefix.
  * @param configured - the load-validated override, or `undefined`.
  * @param parentCwd - the delegating parent session's workspace cwd, if any.
+ * @param requested - per-child absolute override; invalid values reject without fallback.
  * @returns the absolute child working directory.
  */
-export function resolveChildCwd(prefix: string, configured: string | undefined, parentCwd: string | undefined): string {
+export function resolveChildCwd(
+  prefix: string,
+  configured: string | undefined,
+  parentCwd: string | undefined,
+  requested?: string,
+): string {
+  if (requested !== undefined) return assertUsableCwd(prefix, 'request cwd', requested)
   if (configured !== undefined) return configured
   if (parentCwd === undefined) {
     throw new Error(`${prefix}: no working directory for the child — configure \`cwd\` or delegate from a parent session that has one`)

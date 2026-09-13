@@ -46,6 +46,12 @@ An agent that calls the tool gets the child's final answer as the tool result. M
 
 One-shot children run once and settle with a single result, plus an optional structured output and a safe diagnostic on failure. A start request may override the child Agent's provider, model, reasoning effort, and output-token limit through `agentOptions`; every requested option requires the provider's matching capability. Continuable children keep a durable session and accept later messages in order: the caller receives a stable child id, sends adjacent-Agent messages, and can interrupt the current turn without destroying the child. The tool row's `backgroundMode` picks the shape (`one-shot` by default, or `continuable` on providers that support it).
 
+### Child working directory
+
+Host callers may set `SubagentStartRequest.cwd` to an absolute child workspace path. It takes precedence over a provider's configured `cwd` (ACP and DSH SDK), then the parent Session cwd. An invalid explicit value rejects without fallback, before child setup, publication, or model execution. Omission preserves provider defaults: in-process children may have no cwd; external children require a usable directory. Selection changes neither the parent Session nor the host process cwd.
+
+A continuable child's initial cwd is persisted in its Session header. Cold resume retains that cwd and the child's original identity rather than inheriting the current parent's workspace. Model-facing delegation and control tools expose no cwd parameter.
+
 ### Messaging, interrupting, and discovering
 
 Every exact live Agent can use `sendMessage()` with a direct continuable child; a resident continuable child can also use it with its direct parent. A working target receives the Agent message through Steer at its nearest step; an idle target starts a turn, and only a direct child can be cold-resumed. The parent can also interrupt a running descendant or list its children at any time. A browser continuation prompt independently selects Queue or Steer and may carry image parts: the Host admits and persists each image batch through the attachment store before the child inbox accepts the message, and refuses delivery when the child's declared model does not accept image input. Discovery covers both shapes: the service lists direct children and the full descendant tree — mode, activity, and lineage — reading live session state and optional persistence, without loading any child.

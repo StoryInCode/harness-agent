@@ -62,6 +62,8 @@ kind: "package-reference"
 
 `maxDepth` 限制递归深度（默认 `3`；`0` 禁止委派），并要求提供方具备 `depthLimit` 能力；`'provider-managed'` 把预算留给进程外提供方。当提供方支持时，`persona` 与 `toolFilter` 会配置每个子 agent；工具在达到上限时仍然可见——每次尝试启动都会检查调用 agent 的当前深度，被拒绝时返回出错的工具结果。
 
+工具不公开 cwd 参数，并在前台、一次性后台与可继续启动中省略 `SubagentStartRequest.cwd`。因此子级会在提供方支持时使用其配置的 cwd 默认值，否则继承父 Session。Host API 调用方可以通过 [subagent 服务](../subagent/README.zh.md#use-this-package)选择工作区；任务文本不是 cwd 覆盖值。
+
 ### 选择子级 LLM
 
 设置 `modelSelectionSettings: true`，即可在组合每个全新顶层 Session 时读取宿主的 `subagent-model-selection` 偏好。没有已记录策略的恢复 Session 会保持禁用，包括显式为空的恢复。启用后，非空的精确 provider/model 路由列表会记录进 Session、由子 Session 继承，后续设置编辑不会改变它。工具随后公开可选的 `provider`、`model` 与 `reasoning_effort` 字段，并注册共享的 `list_subagent_models` 工具。此模式要求后端声明 `agentOptions`；两个进程内后端和 DSH SDK 支持该能力，而 ACP、Codex 与 Claude Code 会拒绝它，而不是忽略它。

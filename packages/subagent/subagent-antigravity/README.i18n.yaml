@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/subagent/subagent-antigravity/README.md
-README.md: 728288851747bf56bf0c122ca794782eebfb1bc1
-README.zh.md: 6c46953eb078c2e9b761d2845953f6c2be5ecadd
+README.md: 1595c91d2bfa7e06c5819f85d17782f260335fd4
+README.zh.md: fce59fa5e5fd2051e069b9f77e099522d9286ef0

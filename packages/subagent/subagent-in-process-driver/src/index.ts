@@ -12,6 +12,7 @@
  */
 
 import { randomUUID } from 'node:crypto'
+import { isAbsolute } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
 import { brandString } from '@deepseek-ai/dsh-brand'
 import { foldConsumedWork } from '@deepseek-ai/dsh-agent'
@@ -96,7 +97,9 @@ function attachDescriptorAppend(childCtx: Context, descriptor: SubagentDescripto
  * and disposal work through the returned run. Rejection means the agent
  * factory's unpublished creation transaction reached quiescence without
  * publishing a child. Every start appends its resolved descriptor inside the
- * child's initial turn.
+ * child's initial turn. Explicit cwd must be absolute; omission inherits the
+ * parent workspace, including undefined. Metadata reaches the factory before
+ * setup and publication, without filesystem probes in the Host process.
  * @param request - the trusted typed start request, including its required signal.
  * @param options - the optional fork seed.
  * @returns a published holder-owned run.
@@ -108,6 +111,10 @@ export async function startInProcessRun(
   assertSubagentMaxDepth(request.maxDepth)
   if (request.signal.aborted) throw prePublicationAbort()
   const parent = request.parent
+  if (request.cwd !== undefined && !isAbsolute(request.cwd)) {
+    throw new Error('subagent request cwd must be an absolute path')
+  }
+  const cwd = request.cwd ?? parent.session.header.cwd
   const childDepth = resolveChildDepth(parent, request.maxDepth)
 
   const childId = brandString<SessionId>(randomUUID())
@@ -134,7 +141,7 @@ export async function startInProcessRun(
   const handle = await parent.ctx.agents.create({
     sessionId: childId,
     parentAgent: parent,
-    meta: childSessionMeta(parent, childDepth, seed !== undefined),
+    meta: childSessionMeta(parent, childDepth, seed !== undefined, cwd),
     ...seed !== undefined ? { seed } : {},
     ...seed === undefined ? {} : { inheritedEventCount: activationBoundary },
     agentOptions: resolveChildAgentOptions(parent, request.agentOptions, childDepth),

@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-`dsh-subagent-spawn-in-process` is an in-process subagent backend: it runs each delegated task in a fresh child agent that shares this process and its agent factory, LLM, and tool services. The child starts with an empty conversation, so a task prompt must stand alone; it inherits the parent's working directory, session lineage, provider, model, reasoning effort, and output-token limit unless `request.agentOptions` overrides them. A delegation tool or API call reaches it under the `spawn` provider name. Choose it for the cheapest delegation transport; choose the fork backend when the child must build on the parent's completed conversation turns.
+`dsh-subagent-spawn-in-process` runs each delegated task in a fresh child agent sharing this process and its agent factory, LLM, and tool services. The child starts with an empty conversation, so a task prompt must stand alone; it retains parent lineage and defaults to the parent's cwd and model settings. Host callers can override cwd through `request.cwd` and model settings through `request.agentOptions`. A delegation tool or API call reaches it under the `spawn` provider name. Choose it for the cheapest delegation transport; choose the fork backend when the child must build on the parent's completed conversation turns.
 
 ## Table of Contents
 
@@ -48,6 +48,8 @@ Load the subagent service and this backend, then configure one delegation tool p
 | `providerName` | `spawn` | Provider name registered on `ctx.subagents` |
 
 The generated [configuration catalog](../../../docs/config-catalog.md#deepseek-aidsh-subagent-spawn-in-process) is the exhaustive source for every accepted field and its JSDoc.
+
+Host callers may set `request.cwd` to an absolute workspace path; invalid values reject without fallback before child setup. Omission inherits the parent Session cwd unchanged, including absence. Continuable children persist their initial cwd and retain it with their original identity on cold resume. See the [shared cwd rules](../subagent/README.md#use-this-package).
 
 ### What a delegation does
 
@@ -137,7 +139,7 @@ Append-only; newly visible content follows the reusable request prefix and does 
 
 These limits define when the backend is the wrong choice; they are current package constraints.
 
-- **Fresh means no parent transcript** — the child inherits cwd, lineage, provider, model, reasoning effort, output-token limit, and explicitly configured persona or tool restrictions, but none of the parent's conversation; use the fork backend when completed-turn context is required.
+- **Fresh means no parent transcript** — the child defaults to the parent's cwd and model settings, retains lineage, and applies explicitly configured persona or tool restrictions, but inherits none of the parent's conversation; use the fork backend when completed-turn context is required.
 
 <a id="dev-note"></a>
 ### Dev Note
