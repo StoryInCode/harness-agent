@@ -1,0 +1,13 @@
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+
+ RUN  v4.1.8 /home/sic/harness-agent/.worktrees/roles-tests
+
+ ✓ |thread-safe| packages/dev-loop/queue/tests/queue.spec.ts (40 tests | 38 skipped) 62ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 38 skipped (40)
+   Start at  07:23:58
+   Duration  927ms (transform 655ms, setup 152ms, import 642ms, tests 62ms, environment 0ms)
+

@@ -1,0 +1,63 @@
+{
+  "scenario": "snapshots/session/dev-loop-research-policy",
+  "workdir": "/home/sic/harness-agent/.worktrees/research-policy",
+  "authority": "Independent delegated Test Writer; no production edits, historical fixture edits, branch, staging, or commit operations.",
+  "recording": "Authored model streams refreshed through the real shipped dsh --profile headless process, persisted as parent and child Session v3 JSONL, then replayed keylessly without fixture writes. Not a live-provider recording or an inline mock snapshot.",
+  "freeze": "packages/dev-loop/roles/tests/research-snapshot-frozen.sha256",
+  "frozenFileCount": 19,
+  "runs": [
+    {
+      "command": "DSH_EXAMPLE_MODE=src DSH_SNAPSHOT=refresh pnpm exec vitest run --config vitest.snapshot.config.ts snapshots/session/headless.snapshot.ts -t 'refreshs dev-loop-research-policy through'",
+      "exitCode": 0,
+      "result": "1 passed, 98 skipped; refresh test 6380ms; harvested actual parent and spawn child, generated prompt/schema sidecars, compared complete retained workspace. Earlier attempts failed before acceptance: missing shared workspace setup, missing apps/cli commander dependency, then malformed authored bootstrap lifecycle; each cause was corrected before this successful run."
+    },
+    {
+      "command": "DSH_EXAMPLE_MODE=src DSH_SNAPSHOT=replay pnpm exec vitest run --config vitest.snapshot.config.ts snapshots/session/headless.snapshot.ts -t 'replays dev-loop-research-policy through'",
+      "exitCode": 0,
+      "result": "Initial read-only replay: 1 passed, 98 skipped; test 7293ms."
+    },
+    {
+      "command": "DSH_EXAMPLE_MODE=src DSH_SNAPSHOT=replay pnpm exec vitest run --config vitest.snapshot.config.ts snapshots/session/headless.snapshot.ts -t 'gives every composition|stores session-owned inputs'",
+      "exitCode": 0,
+      "result": "2 passed, 97 skipped; header ownership and typed identity/prompt/schema fixed-point guards include this scenario."
+    },
+    {
+      "command": "DSH_EXAMPLE_MODE=src DSH_SNAPSHOT=replay pnpm exec vitest run --config vitest.snapshot.config.ts snapshots/session/headless.snapshot.ts -t 'replays dev-loop-research-policy through'",
+      "mutation": "Temporarily changed only own cordis.snapshot.yml Research allow from [read] to [read, write]; no production changes and no refresh.",
+      "exitCode": 1,
+      "result": "1 failed, 98 skipped; child Session 1 comparison at headless.snapshot.ts:1019 rejected actual write success. Expected ToolNotFoundError/UNKNOWN_TOOL, isError:true and Error: unknown tool \"write\"; received isError:false and <path>{{cwd}}/.worktrees/00.07/forbidden.txt</path> ... Created file. The test stopped at Session comparison before schema/workspace assertions; this is not a claimed negative workspace-oracle failure."
+    },
+    {
+      "command": "DSH_EXAMPLE_MODE=src DSH_SNAPSHOT=replay pnpm exec vitest run --config vitest.snapshot.config.ts snapshots/session/headless.snapshot.ts -t 'replays dev-loop-research-policy through'",
+      "restoration": "Restored own replay patch Research allow to [read].",
+      "exitCode": 0,
+      "result": "1 passed, 98 skipped; restored replay test 6397ms; complete workspace comparison also passed."
+    },
+    {
+      "command": "DSH_EXAMPLE_MODE=src DSH_SNAPSHOT=replay pnpm exec vitest run --config vitest.snapshot.config.ts scripts/session-snapshot-corpus.corpus.ts -t 'keeps every recorded session owned'",
+      "exitCode": 0,
+      "result": "1 passed, 2 skipped; whole-corpus ownership, Session generation, typed identity, prompt/schema sidecar, child-role, and workspace-oracle presence checks include this scenario."
+    }
+  ],
+  "observed": {
+    "modelEntry": "Parent calls dev_loop_delegate with role Research and pieceId 00.07 through actual scoped production consumer mounted by fixture.ts.",
+    "child": "Actual spawn provider; one-shot descriptor Research: 00.07; child cwd {{cwd}}/.worktrees/00.07; first advertised catalog contains read only.",
+    "firstCall": "Excluded inherited write is attempted first and returns ToolNotFoundError/UNKNOWN_TOOL: Error: unknown tool \"write\".",
+    "allowedCall": "Actual read(evidence.txt) returns line 1: retained evidence, with persisted read metadata locating the retained worktree.",
+    "receipt": "Completed/quiescent receipt contains relationship-preserving delegation, parent Session, child Session, and worktree tokens; provenance.kind reported and provenance.role Research; no invented effectivePreset.",
+    "workspace": "Independent complete expected tree includes mainline and retained .worktrees/00.07 seed files and excludes forbidden.txt. Git administration only is excluded by the shared capture helper.",
+    "baseCommit": "1dd643b8fe104b1264c969014fba466e3dbfdaeb"
+  },
+  "inspectedAllowedImplementation": [
+    "packages/fs/tool-fs/src/index.ts mounts applyReadTool",
+    "packages/fs/tool-fs/src/read.ts resolves regular read target, calls ctx.fs.readText/streamText, and emits fs/observed"
+  ],
+  "normalization": "Official refresh retains recorded embedded stream/catalog clocks; normalize.ts zeroes them for comparison. Executed guards prove typed identity and prompt/schema fixed points, not a claim that raw fixture clocks are zero.",
+  "limitations": [
+    "Snapshot covers spawn/native text read and first inherited write denial; parent-owned policy suite covers image reads, fork/PTC, other excluded capabilities, validation and lifecycle matrix.",
+    "No live model API was called. Source launch was selected explicitly; built-artifact and macOS execution were not performed here.",
+    "The snapshot explicitly runs danger-full-access with a test-only passthrough sandbox runner; model transport is not its only fixture adaptation. This case does not test sandbox containment. Tool filtering is not general filesystem confinement against trusted plugins, allowed executable bodies, or child-local registrations.",
+    "Parent coordinated shared snapshot-support files and source aliases; this writer changed only the new scenario and new owner-local proof/hash files.",
+    "The three workspace.expected/.worktrees/00.07 oracle files are Git-ignored by the oracle's own .gitignore: transfer all filesystem files and force-add those three when staging."
+  ]
+}

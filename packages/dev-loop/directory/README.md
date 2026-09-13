@@ -5,6 +5,8 @@ kind: "package-reference"
 
 # @deepseek-ai/dsh-dev-loop-directory
 
+English | [中文](README.zh.md)
+
 ## Summary
 
 Use this package to read the development-loop piece corpus. It discovers piece specification files under a configured root, parses each one's header and sections, and validates them against the `axiom` blocks in `plans/AGENTS.md`, returning a `PieceRecord` per file. Reads go through the `fs` seam, never `node:fs`, so a sandboxed or remote backend governs every file access. The markdown grammar is a pure function, so the verification gates can validate text they already hold without touching disk. This is host-side state only: it registers no tool, prompt, or session event, so the model never sees it.
@@ -97,6 +99,7 @@ Nothing here enters a model request, so provider cache reuse is unaffected.
 - **Parsed reference rows are not exposed** — a consumer needing the table's columns must re-parse the section body, because no current caller needs them and the `PieceRecord` stays minimal until one does.
 - **`validate` reports blockers by throwing and warnings by returning** — two channels for one concept. A uniform `{ record, findings }` return would let a caller report every file's problems in one pass; the split is kept because the specification's error codes are written as failures.
 
+<a id="dev-note"></a>
 ### Dev Note
 
 <details>

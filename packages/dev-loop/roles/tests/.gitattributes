@@ -1,0 +1,2 @@
+# Raw captured execution evidence retains SHA-exact bytes.
+*.log whitespace=-blank-at-eol,-blank-at-eof

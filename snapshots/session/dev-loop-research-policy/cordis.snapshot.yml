@@ -1,0 +1,76 @@
+# Model transport replays recorded streams; the sandbox runner is a fixture passthrough.
+# Roles, Git, spawn, and tool dispatch stay real; this case does not test sandbox containment.
+- id: llm-deepseek
+  disabled: true
+- id: plugin-package-inventory-deepseek
+  disabled: true
+- id: session-title-llm
+  disabled: true
+- id: session-persistence-jsonl
+  config:
+    root: !!js dshHomePath('sessions')
+    compression: none
+- id: sandbox
+  config:
+    runnerCommand:
+      - bash
+      - -c
+      - while [ "$1" != "--" ]; do shift; done; shift; exec "$@"
+      - passthrough-runner
+    runnerFailureSignatures:
+      - 'passthrough-runner: profile rejected'
+- insert:
+    - id: llm-replay
+      name: '@deepseek-ai/dsh-llm-replay'
+      config:
+        providers:
+          - id: deepseek-official
+            name: DeepSeek
+            models:
+              - id: deepseek-v4-flash
+              - id: deepseek-v4-pro
+    - id: dev-loop-directory
+      name: '../../../packages/dev-loop/directory/src/index.ts'
+      config:
+        root: plans/pieces
+    - id: dev-loop-lifecycle
+      name: '../../../packages/dev-loop/lifecycle/src/index.ts'
+    - id: dev-loop-queue
+      name: '../../../packages/dev-loop/queue/src/index.ts'
+      config:
+        maxConcurrency: 1
+    - id: dev-loop-worktree
+      name: '../../../packages/dev-loop/worktree/src/index.ts'
+      config:
+        mainlinePath: !!js process.cwd()
+        commandTimeoutMs: 20000
+        outputMaxBytes: 128000
+        terminationGraceMs: 1000
+    - id: dev-loop-roles
+      name: '../../../packages/dev-loop/roles/src/index.ts'
+      config:
+        roles:
+          Research:
+            provider: spawn
+            persona: 'Research reads inspected evidence and reports limitations.'
+            toolFilter:
+              allow: [read]
+          Test Writer:
+            provider: spawn
+            persona: 'Test Writer defines acceptance.'
+            toolFilter:
+              allow: [read, write, edit]
+          Implementer:
+            provider: spawn
+            persona: 'Implementer applies accepted changes.'
+            toolFilter:
+              allow: [read, write, edit]
+          Utility:
+            provider: spawn
+            persona: 'Utility performs bounded maintenance.'
+            toolFilter:
+              allow: [read, write, edit]
+        maxBriefBytes: 8192
+        maxOutcomeBytes: 16384
+    - id: snapshot-research-role-tools
+      name: './fixture.ts'

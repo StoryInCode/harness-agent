@@ -32,6 +32,7 @@ import UserQuestionService from '@deepseek-ai/dsh-user-questions'
 import DevLoopDirectory from '@deepseek-ai/dsh-dev-loop-directory'
 import DevLoopLifecycle from '@deepseek-ai/dsh-dev-loop-lifecycle'
 import * as DevLoopApproval from '@deepseek-ai/dsh-dev-loop-approval'
+import * as DevLoopRoleTools from '@deepseek-ai/dsh-dev-loop-roles/tool'
 import PlanModeController from '@deepseek-ai/dsh-plan-mode'
 import WebRuntime from '@deepseek-ai/dsh-web'
 import * as WebSearchExa from '@deepseek-ai/dsh-web-search-exa'
@@ -188,10 +189,29 @@ export interface ToolPackage {
 
 /**
  * The boot manifest: every shipped tool package (a `tool-*` leaf under
- * `packages/`). Ordered by package name (the render order); the completeness
- * guard proves it is exhaustive against the on-disk glob.
+ * `packages/`). Entries retain their declared render order; the completeness
+ * guard proves coverage of the on-disk tool-package glob.
  */
 const TOOL_PACKAGES: ToolPackage[] = [
+  {
+    pkg: '@deepseek-ai/dsh-dev-loop-roles',
+    dir: 'roles',
+    source: 'packages/dev-loop/roles/src/tool.ts',
+    requires: ['ctx.tools', 'ctx.agents', 'ctx.devLoopRoles'],
+    writes: ['tool/call', 'tool/result', 'dev_loop_roles durable delegation history'],
+    async mount(ctx) {
+      await mountCatalogChildScope(ctx, (child) => {
+        DevLoopRoleTools.apply(child, { maxToolOutputBytes: 16384, maxHistoryRecords: 10 })
+      }, undefined, ['tools'])
+    },
+    scope: (ctx) => {
+      const scope = catalogChildScopes.get(ctx)
+      if (scope === undefined) throw new Error('gen-tool-catalog: Roles child scope was not mounted')
+      return scope
+    },
+    note: 'The opt-in scoped consumer requires explicit budgets; this schema uses 16384 output bytes and 10 history records. '
+      + 'Schema harvest does not execute delegation. The Host service owns role policy and durable history; returned reports are attributed evidence, not parent inspection.',
+  },
   // FORK-LOCAL: this consumer is outside the upstream tool-* discovery pattern.
   {
     pkg: '@deepseek-ai/dsh-dev-loop-approval',

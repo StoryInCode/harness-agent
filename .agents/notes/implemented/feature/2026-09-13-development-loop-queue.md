@@ -2,6 +2,8 @@
 
 Status: implemented
 
+English | [中文](2026-09-13-development-loop-queue.zh.md)
+
 ## Problem
 
 A lifecycle approval announcement contains a status transition, not an Agent, provider, role assignment, or worktree. It cannot construct executable work. Separately, a worker result can settle before cleanup finishes, so counting completion announcements can free capacity while resources remain active.

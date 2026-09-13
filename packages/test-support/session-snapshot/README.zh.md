@@ -120,9 +120,15 @@ spill 场景通过真实本地提供方保存到私有临时根目录。fixture 
 | [`src/identity.ts`](src/identity.ts) | 跨父子日志的类型化首次出现身份 token 化 |
 | [`src/normalize.ts`](src/normalize.ts) | 纯规范化器与擦除辅助 |
 | [`src/workspace.ts`](src/workspace.ts) | 场景 workspace 设置与完整预期状态比较 |
+| [`src/git-workspace.ts`](src/git-workspace.ts) | 可复现的私有 Git 输入与保留 worktree 的文件预期状态 |
+| [`src/roles-records.ts`](src/roles-records.ts) | 按类型识别委派／历史回执，不改写报告语义 |
 | [`src/suite.ts`](src/suite.ts) | 场景表套件工厂、fixture 保护、录制/刷新回写 |
 | [`src/index.ts`](src/index.ts) | 再导出四个层的包入口 |
 | — | 不发布运行时不变式伴生入口；该测试支持包不拥有任何生产事件流或可变数据；消费它的测试套件会检验该工具包。 |
+
+Roles 回执仅通过匹配的 `dev_loop_delegate` 或 `dev_loop_delegations` 调用及成功的工具结果 JSON 来识别。身份字段共享带类型的委派、worktree 和 Session token；仅将 `requestedAt` 与 `finishedAt` 时钟归零。报告文本、来源、限制、Git 基点提交，以及无关 JSON 或用户文字仍可用于检测回归。按父级上下文规范化 cwd 会保留子级分配的 worktree 后缀。
+
+开发循环 Git 设置以固定的作者、提交者、日期、分支和换行策略提交种子文件。其预期状态检查排除现有的 harness 所有运行时根目录、根 Git 数据库，以及精确的 `.worktrees/<piece>/.git` 指针文件；全部保留检出文件及意外写入仍然可见。场景拥有独立、完整的预期工作区，而不是从报告推导成功。
 
 ### 数据流
 

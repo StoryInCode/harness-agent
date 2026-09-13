@@ -1,13 +1,15 @@
 ---
-description: "The development-loop package group: piece specification discovery and guarded lifecycle changes, for contributors choosing a service and locating its reference."
+description: "The development-loop package group: piece discovery, guarded lifecycle changes, retained worktrees, and durable role delegation, for contributors choosing a service and locating its reference."
 kind: "package-group"
 ---
 
-# dev-loop/ — Piece discovery and lifecycle
+# dev-loop/ — Piece discovery and delegation
+
+English | [中文](README.zh.md)
 
 ## Summary
 
-Read development-loop piece specifications and change their status through guarded operations. The directory package discovers and validates files; the lifecycle package manages in-memory transitions and Git promotion of completed pieces. The approval tool requests an explicit human decision before moving a current todo piece to pending. These packages do not provide a complete autonomous loop or durable transition records.
+Discover piece specifications, request human approval, and change status through guarded operations. Delegate specialist assignments with durable, attributed reports while retaining their worktrees for handoff. Queue bounds admitted work through cleanup; Roles composes delegation without owning assignment retirement. These packages do not provide a complete autonomous loop or durable lifecycle-transition records.
 
 ## Table of Contents
 
@@ -28,6 +30,7 @@ Choose the service by the operation it owns.
 | [`directory`](directory/README.md) | Discover and validate piece specifications through the filesystem service. |
 | [`lifecycle`](lifecycle/README.md) | Guard status changes and promote tracked piece files into `done/`. |
 | [`queue`](queue/README.md) | Admit consumer-owned one-shot delegations and bound startup through complete cleanup. |
+| [`roles`](roles/README.md) | Delegate specialist assignments and retain bounded, attributed history. |
 | [`worktree`](worktree/README.md) | Retain detached piece checkouts across roles and conservatively retire clean owned trees. |
 
 <a id="related-documentation"></a>

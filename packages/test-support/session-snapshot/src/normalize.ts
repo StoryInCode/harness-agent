@@ -11,6 +11,7 @@ import {
 } from '@deepseek-ai/dsh-session'
 import { prepareSessionSnapshotFixtureForComparison } from '@deepseek-ai/dsh-llm-replay'
 import { redactSessionSnapshotIds } from './identity.ts'
+import { visitRolesRecords } from './roles-records.ts'
 
 const SESSION_ID = '{{sessionId}}'
 const MESSAGE_ID = '{{messageId}}'
@@ -265,19 +266,20 @@ function tokenizeFixtureValue(
  * path.
  *
  * @param rawLog The raw or refresh-stabilized session JSONL fixture.
+ * @param context Shared parent workspace spellings; child cwd suffixes remain visible.
  * @returns Compact JSONL whose known cwd spellings become `{{cwd}}`.
  * @throws If a non-empty line is invalid JSON or the session cwd has no basename.
  */
-export function tokenizeSessionFixtureCwd(rawLog: string): string {
+export function tokenizeSessionFixtureCwd(rawLog: string, context?: NormalizeContext): string {
   const lines = rawLog.split('\n')
   const firstLine = lines.find(line => line.trim().length > 0)
   const header = firstLine === undefined ? undefined : JSON.parse(firstLine) as { cwd?: unknown }
-  const cwd = typeof header?.cwd === 'string' ? header.cwd : ''
+  const cwd = context?.cwd ?? (typeof header?.cwd === 'string' ? header.cwd : '')
   const basename = cwd.split(/[\\/]/).at(-1)
   if (basename === undefined || basename.length === 0) {
     throw new Error('acp-snapshot: cannot tokenize a cwd without a basename')
   }
-  const ctx: NormalizeContext = { sessionIds: [], cwd }
+  const ctx: NormalizeContext = context ?? { sessionIds: [], cwd }
   return lines.map((line) => {
     if (line.trim().length === 0) return line
     return JSON.stringify(tokenizeFixtureValue(JSON.parse(line), ctx, basename))
@@ -346,8 +348,9 @@ export function normalizeSessionLog(
   const cwdPathMode = options.cwdPathMode ?? 'canonical'
   const identityMode = options.identityMode ?? 'legacy'
   const lines = rawLog.split('\n').filter(line => line.trim().length > 0)
-  const records = lines.map((line) => {
-    const record = JSON.parse(line) as Record<string, unknown>
+  const parsed = lines.map(line => JSON.parse(line) as Record<string, unknown>)
+  visitRolesRecords(parsed, normalizeRolesClocks)
+  const records = parsed.map((record) => {
     if (record.type === 'session') {
       if ('createdAt' in record) record.createdAt = 0
     } else if (isPackedFixtureRow(record)) {
@@ -536,11 +539,14 @@ export function scrubModelRequestBulk(rawLog: string): string {
  */
 export function scrubSessionSnapshot(rawLog: string): string {
   const scrubbed = scrubModelRequestBulk(rawLog)
+  const records = scrubbed.split('\n').filter(line => line.trim().length > 0)
+    .map(line => JSON.parse(line) as Record<string, unknown>)
+  visitRolesRecords(records, normalizeRolesClocks)
   let recordIndex = 0
   return scrubbed.split('\n').map((line) => {
     if (line.trim().length === 0) return line
-    const record = JSON.parse(line) as Record<string, unknown>
-    if (recordIndex++ === 0) {
+    const record = records[recordIndex++] as Record<string, unknown>
+    if (recordIndex === 1) {
       if (record.type !== 'session') throw new Error('session snapshot must start with a session header')
       return line
     }
@@ -548,6 +554,12 @@ export function scrubSessionSnapshot(rawLog: string): string {
     normalizeFeedbackClocks(record)
     return JSON.stringify(record)
   }).join('\n')
+}
+
+/** Normalize only Roles lifecycle clocks, retaining reported durations and errors. */
+function normalizeRolesClocks(record: Record<string, unknown>): void {
+  record.requestedAt = 0
+  if (record.state === 'settled') record.finishedAt = 0
 }
 
 /** Normalize service-owned feedback clocks without touching user-authored payloads. */

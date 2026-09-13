@@ -15,6 +15,7 @@ This table connects model-visible tool names to the plugin package and service s
 
 | Tool package | Model-visible names | Requires | Writes / affects | Shipped aliases | Deployment note |
 | --- | --- | --- | --- | --- | --- |
+| `@deepseek-ai/dsh-dev-loop-roles` | `dev_loop_delegate`, `dev_loop_delegations` | `ctx.tools`, `ctx.agents`, `ctx.devLoopRoles` | `tool/call`, `tool/result`, `dev_loop_roles durable delegation history` | - | The opt-in scoped consumer requires explicit budgets; this schema uses 16384 output bytes and 10 history records. Schema harvest does not execute delegation. The Host service owns role policy and durable history; returned reports are attributed evidence, not parent inspection. |
 | `@deepseek-ai/dsh-dev-loop-approval` | `present_piece_for_approval` | `ctx.tools`, `ctx.userQuestions`, `ctx.devLoopDirectory`, `ctx.devLoopLifecycle`, `ctx.fs` | `tool/call`, `piece/approved after explicit acceptance`, `tool/result` | - | The opt-in consumer presents current source to a live root caller. Accept changes lifecycle memory to pending; it does not dispatch work or persist an approval grant. |
 | `@deepseek-ai/dsh-tool-ask-user` | `ask_user_question` | `ctx.tools`, `ctx.userQuestions` | `tool/call`, `tool/result after a UI/provider answers the question` | - | ask_user_question pauses the tool call until the active UI provider returns a human answer. |
 | `@deepseek-ai/dsh-tools` | `run_code` | `ctx.tools`, `ctx.codeRuntime (execution time)`, `ctx.systemPrompt` | `tool/call`, `one tool/ptc-dispatch-start + tool/ptc-dispatch pair per bridged sub-call`, `tool/result` | - | Owned by the tool registry as a reserved transport outside filterable capability layers under `mode: ptc` / `mode: both` (see the PTC mode Agent Note). Under `ptc` it is the registry's only wire contribution; the other visible capabilities are declared in a generated SDK section in the loaded runtime's language, and a program calls them through bindings scheduled under the native concurrency contract (submission-ordered starts and policy; concurrency-safe bodies overlap up to `maxParallelSubCalls`) that re-enter the complete guarded tool pipeline and link each nested execution to this outer result. |
@@ -42,6 +43,104 @@ This table connects model-visible tool names to the plugin package and service s
 | `@deepseek-ai/dsh-tool-todo` | `todo_write` | `ctx.tools`, `owning Agent session` | `tool/call`, `todo/write`, `tool/result` | - | todo_write is session-owned state; UIs render the latest todo/write event as a checklist. `allowParallelInProgress` is required with no default, so the catalog states its choice: `true`, whose description invites several `in_progress` items. A deployment choosing `false` receives the same tool with a description asking for exactly one active task. |
 | `@deepseek-ai/dsh-tool-workflow` | `workflow` | `ctx.tools`, `ctx.workflowEngine`, `ctx.systemPrompt`, `a calling Agent (exec.agent parents the script children)` | `tool/call`, `tool/result` | - | - |
 | `@deepseek-ai/dsh-tool-web` | `web_fetch`, `web_search` | `ctx.tools`, `ctx.web`, `ctx.systemPrompt` | `tool/call`, `tool/result` | - | web_search and web_fetch keep provider selection behind ctx.web so model-visible schemas stay stable across backend swaps. |
+
+<a id="deepseek-aidsh-dev-loop-roles"></a>
+
+## `@deepseek-ai/dsh-dev-loop-roles`
+
+### `dev_loop_delegate`
+
+Delegate a bounded assignment to Research, Test Writer, Implementer, or Utility in the piece’s retained worktree. Returns durable reported evidence after child cleanup. Attribute reports to the recorded role and preset, not your direct inspection.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "pieceId": {
+      "type": "string",
+      "description": "Canonical dotted piece id in this repository."
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "Research",
+        "Test Writer",
+        "Implementer",
+        "Utility"
+      ]
+    },
+    "assignment": {
+      "type": "string",
+      "description": "Complete bounded assignment."
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Decision or work that requires this delegation."
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "claim": {
+          "type": "string"
+        },
+        "decisionRestingOnClaim": {
+          "type": "string"
+        },
+        "permittedSources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requiredEvidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "claim",
+        "decisionRestingOnClaim",
+        "permittedSources",
+        "requiredEvidence"
+      ]
+    }
+  },
+  "required": [
+    "pieceId",
+    "role",
+    "assignment",
+    "rationale"
+  ]
+}
+```
+
+Source: [`packages/dev-loop/roles/src/tool.ts`](../packages/dev-loop/roles/src/tool.ts)
+
+### `dev_loop_delegations`
+
+Read complete ordered durable delegation history for a piece. Requested records are unresolved intent, not proof of running children. Reports are attributed to their recorded role and actual preset; an absent preset means no preset was recorded. Overflow returns no partial array.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "pieceId": {
+      "type": "string",
+      "description": "Canonical dotted piece id in this repository."
+    }
+  },
+  "required": [
+    "pieceId"
+  ]
+}
+```
+
+Source: [`packages/dev-loop/roles/src/tool.ts`](../packages/dev-loop/roles/src/tool.ts)
+
+The opt-in scoped consumer requires explicit budgets; this schema uses 16384 output bytes and 10 history records. Schema harvest does not execute delegation. The Host service owns role policy and durable history; returned reports are attributed evidence, not parent inspection.
 
 <a id="deepseek-aidsh-dev-loop-approval"></a>
 

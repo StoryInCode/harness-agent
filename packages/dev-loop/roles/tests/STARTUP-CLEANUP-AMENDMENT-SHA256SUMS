@@ -1,0 +1,4 @@
+18441be72ab7973cd42466eba16fb577743f3ed9a6d1cb8625b1ace024196c20  packages/dev-loop/roles/tests/startup-cleanup.spec.ts
+f60fc49fbfb3199f0a51d4d5bf202a901c5e4a5c18169b5462efb30499259875  packages/dev-loop/roles/tests/coverage-public.spec.ts
+88af1e2435a97e716c405bdd0fb0b2b5088538ee2226738dfabb5566ccc01997  packages/dev-loop/roles/tests/supplemental-lifecycle.spec.ts
+7a213a974a48dcb1a64a00712e5e643222f7e48c3b64fb674201aa8e0f63f11e  packages/dev-loop/roles/tests/startup-cleanup-amendment-RED.log

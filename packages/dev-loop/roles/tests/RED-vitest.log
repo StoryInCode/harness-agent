@@ -1,0 +1,305 @@
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+
+ RUN  v4.1.8 /home/sic/harness-agent/.worktrees/roles-tests
+
+ ❯ |thread-safe| packages/dev-loop/roles/tests/model-tools.spec.ts (2 tests | 2 failed) 104ms
+   × exposes both scoped schemas, rejects Reviewer and parser-only authority fields without a child 57ms
+   × logs delegation/history receipts exactly as the next Brain request sees them and denies Research write execution 45ms
+ ❯ |thread-safe| packages/dev-loop/roles/tests/durability.spec.ts (4 tests | 4 failed) 143ms
+   × persists requested intent before child execution, records cancellation after cleanup, and reopens it 54ms
+   × rejects an initial JSON write failure before starting a child or enqueueing 32ms
+   × rejects a terminal JSON write failure and preserves the prior unresolved request on reopen 30ms
+   × refuses malformed authoritative records rather than silently skipping them on restart 26ms
+ ❯ |thread-safe| packages/dev-loop/roles/tests/bounds.spec.ts (6 tests | 6 failed) 249ms
+   × requires four explicit Host role policies and positive safe-integer retention budgets 67ms
+   × rejects a missing provider at mount instead of degrading the role policy 43ms
+   × refuses the real ACP provider because it cannot enforce persona and tool filters 44ms
+   × rejects tool budgets too small for the complete fixed overflow envelope at the consumer mount 38ms
+   × returns an explicit history overflow rather than silently returning a partial array 27ms
+   × names the durable id when a complete delegation tool result exceeds its consumer byte budget 29ms
+ ❯ |thread-safe| packages/dev-loop/roles/tests/roles.spec.ts (9 tests | 9 failed) 334ms
+     × Research records the actual child, caller, assigned cwd and reported provenance after cleanup 70ms
+     × Test Writer records the actual child, caller, assigned cwd and reported provenance after cleanup 42ms
+     × Implementer records the actual child, caller, assigned cwd and reported provenance after cleanup 44ms
+     × Utility records the actual child, caller, assigned cwd and reported provenance after cleanup 39ms
+     × records the actual live inherited preset rather than the stale parent creation label 29ms
+     × retains the Test Writer file for Implementer and after Host dispose/remount 26ms
+     × rejects a service call without the exact live initiator before any history exists 30ms
+     × rejects a complete multibyte brief above the Host byte budget without enqueue or persistence 26ms
+     × records outcome overflow as failed with an explicit limitation, never clipped completion 26ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 21 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/bounds.spec.ts > requires four explicit Host role policies and positive safe-integer retention budgets
+AssertionError: promise resolved "undefined" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+undefined
+
+ ❯ packages/dev-loop/roles/tests/bounds.spec.ts:11:45
+      9|   const { Utility: _utility, ...missing } = config.roles
+     10|   await expect(fixture([], () => Promise.resolve(), { ...config,
+     11|     roles: missing as typeof config.roles })).rejects.toThrow(/role|Ut…
+       |                                             ^
+     12|   await expect(fixture([], () => Promise.resolve(), { maxBriefBytes: 0…
+     13| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/21]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/bounds.spec.ts > rejects a missing provider at mount instead of degrading the role policy
+AssertionError: promise resolved "undefined" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+undefined
+
+ ❯ packages/dev-loop/roles/tests/bounds.spec.ts:18:60
+     16|   const config = policy()
+     17|   config.roles.Research.provider = 'missing-provider'
+     18|   await expect(fixture([], () => Promise.resolve(), config)).rejects.t…
+       |                                                            ^
+     19| })
+     20|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/21]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/bounds.spec.ts > refuses the real ACP provider because it cannot enforce persona and tool filters
+AssertionError: promise resolved "undefined" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+undefined
+
+ ❯ packages/dev-loop/roles/tests/bounds.spec.ts:24:60
+     22|   const config = policy()
+     23|   config.roles.Research.provider = 'acp'
+     24|   await expect(fixture([], () => Promise.resolve(), config)).rejects.t…
+       |                                                            ^
+     25| })
+     26|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/21]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/bounds.spec.ts > rejects tool budgets too small for the complete fixed overflow envelope at the consumer mount
+AssertionError: promise resolved "undefined" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+undefined
+
+ ❯ packages/dev-loop/roles/tests/bounds.spec.ts:28:98
+     26|
+     27| it('rejects tool budgets too small for the complete fixed overflow env…
+     28|   await expect(fixture([], () => Promise.resolve(), {}, { ...toolConfi…
+       |                                                                                                  ^
+     29|     .rejects.toThrow(/output|budget|bytes|limit/i)
+     30| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/21]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/bounds.spec.ts > returns an explicit history overflow rather than silently returning a partial array
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/durability.spec.ts > persists requested intent before child execution, records cancellation after cleanup, and reopens it
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/durability.spec.ts > refuses malformed authoritative records rather than silently skipping them on restart
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/roles.spec.ts > Host role delegation > Research records the actual child, caller, assigned cwd and reported provenance after cleanup
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/roles.spec.ts > Host role delegation > Test Writer records the actual child, caller, assigned cwd and reported provenance after cleanup
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/roles.spec.ts > Host role delegation > Implementer records the actual child, caller, assigned cwd and reported provenance after cleanup
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/roles.spec.ts > Host role delegation > Utility records the actual child, caller, assigned cwd and reported provenance after cleanup
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/roles.spec.ts > Host role delegation > records the actual live inherited preset rather than the stale parent creation label
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/roles.spec.ts > Host role delegation > retains the Test Writer file for Implementer and after Host dispose/remount
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/roles.spec.ts > Host role delegation > records outcome overflow as failed with an explicit limitation, never clipped completion
+Error: NOT_IMPLEMENTED
+ ❯ Proxy.delegate packages/dev-loop/roles/src/index.ts:30:27
+     28|    */
+     29|   delegate(_brief: DelegationBrief, _signal: AbortSignal): Promise<Set…
+     30|     return Promise.reject(new Error('NOT_IMPLEMENTED'))
+       |                           ^
+     31|   }
+     32|
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/roles/tests/harness.ts:126:85
+ ❯ packages/core/agent/src/index.ts:633:66
+ ❯ Proxy.runWithInitiator packages/core/agent/src/index.ts:633:35
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ Proxy.withInitiator packages/core/agent/src/index.ts:325:17
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/21]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/bounds.spec.ts > names the durable id when a complete delegation tool result exceeds its consumer byte budget
+Error: NOT_IMPLEMENTED
+ ❯ Proxy.getDelegations packages/dev-loop/roles/src/index.ts:39:27
+     37|    */
+     38|   getDelegations(_pieceId: string): Promise<readonly DelegationRecord[…
+     39|     return Promise.reject(new Error('NOT_IMPLEMENTED'))
+       |                           ^
+     40|   }
+     41| }
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/roles/tests/bounds.spec.ts:53:54
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ packages/dev-loop/roles/tests/bounds.spec.ts:50:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/21]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/durability.spec.ts > rejects an initial JSON write failure before starting a child or enqueueing
+Error: NOT_IMPLEMENTED
+ ❯ Proxy.getDelegations packages/dev-loop/roles/src/index.ts:39:27
+     37|    */
+     38|   getDelegations(_pieceId: string): Promise<readonly DelegationRecord[…
+     39|     return Promise.reject(new Error('NOT_IMPLEMENTED'))
+       |                           ^
+     40|   }
+     41| }
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/roles/tests/durability.spec.ts:38:45
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ packages/dev-loop/roles/tests/durability.spec.ts:35:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/21]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/durability.spec.ts > rejects a terminal JSON write failure and preserves the prior unresolved request on reopen
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ packages/dev-loop/roles/tests/durability.spec.ts:51:32
+     49|     failTerminal = () => { renameSync(file, saved); mkdirSync(file) }
+     50|     await expect(f.delegate()).rejects.toThrow()
+     51|     expect(f.adapter.requests).toHaveLength(1)
+       |                                ^
+     52|     const prior = JSON.parse(await readFile(saved, 'utf8')) as { table…
+     53|     const records = Object.values(prior.tables.delegations)
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ packages/dev-loop/roles/tests/durability.spec.ts:46:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/21]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/model-tools.spec.ts > exposes both scoped schemas, rejects Reviewer and parser-only authority fields without a child
+AssertionError: expected [ 'read', 'write', 'edit' ] to deeply equal ArrayContaining{…}
+
+- Expected
++ Received
+
+- ArrayContaining [
+-   "dev_loop_delegate",
+-   "dev_loop_delegations",
++ [
++   "read",
++   "write",
++   "edit",
+  ]
+
+ ❯ packages/dev-loop/roles/tests/model-tools.spec.ts:16:48
+     14|     expect('default' in tool).toBe(false)
+     15|     const schemas = tools.schemas(f.handle.agent)
+     16|     expect(schemas.map(schema => schema.name)).toEqual(expect.arrayCon…
+       |                                                ^
+     17|     expect(tools.schemas().map(schema => schema.name)).not.toContain('…
+     18|     for (const args of [{ ...brief, role: 'Reviewer' }, { ...brief, cw…
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:11
+ ❯ packages/dev-loop/roles/tests/model-tools.spec.ts:12:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/21]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/model-tools.spec.ts > logs delegation/history receipts exactly as the next Brain request sees them and denies Research write execution
+AssertionError: expected [ [ 'delegate', true ], …(1) ] to deeply equal [ [ 'delegate', false ], …(1) ]
+
+- Expected
++ Received
+
+  [
+    [
+      "delegate",
+-     false,
++     true,
+    ],
+    [
+-     "history",
++     "forbidden-write",
+      false,
+    ],
+  ]
+
+ ❯ packages/dev-loop/roles/tests/model-tools.spec.ts:45:54
+     43|         text: block.content.filter(member => member.type === 'text').m…
+     44|     } })
+     45|     expect(logged.map(row => [row.id, row.isError])).toEqual([['delega…
+       |                                                      ^
+     46|     const history = await f.ctx.get('devLoopRoles')!.getDelegations(br…
+     47|     expect(history).toHaveLength(1)
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ packages/dev-loop/roles/tests/model-tools.spec.ts:31:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/21]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/roles.spec.ts > Host role delegation > rejects a service call without the exact live initiator before any history exists
+AssertionError: expected [Function] to throw error matching /initiator|live/i but got 'NOT_IMPLEMENTED'
+
+- Expected:
+/initiator|live/i
+
++ Received:
+"NOT_IMPLEMENTED"
+
+ ❯ packages/dev-loop/roles/tests/roles.spec.ts:84:92
+     82|   it('rejects a service call without the exact live initiator before a…
+     83|     await fixture([], async (f) => {
+     84|       await expect(f.ctx.get('devLoopRoles')!.delegate(brief, new Abor…
+       |                                                                                            ^
+     85|       expect(await f.ctx.get('devLoopRoles')!.getDelegations(brief.pie…
+     86|       const stale = f.handle.agent
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:11
+ ❯ packages/dev-loop/roles/tests/roles.spec.ts:83:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/21]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/roles/tests/roles.spec.ts > Host role delegation > rejects a complete multibyte brief above the Host byte budget without enqueue or persistence
+AssertionError: expected [Function] to throw error matching /brief|bytes|limit/i but got 'NOT_IMPLEMENTED'
+
+- Expected:
+/brief|bytes|limit/i
+
++ Received:
+"NOT_IMPLEMENTED"
+
+ ❯ packages/dev-loop/roles/tests/roles.spec.ts:96:73
+     94|   it('rejects a complete multibyte brief above the Host byte budget wi…
+     95|     await fixture([], async (f) => {
+     96|       await expect(f.delegate({ ...brief, rationale: '界'.repeat(4000) …
+       |                                                                         ^
+     97|       expect(await f.ctx.get('devLoopRoles')!.getDelegations(brief.pie…
+     98|       expect(f.ctx.get('devLoopQueue')!.getQueuedEntries()).toEqual([])
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:11
+ ❯ packages/dev-loop/roles/tests/roles.spec.ts:95:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/21]⎯
+
+
+ Test Files  4 failed (4)
+      Tests  21 failed (21)
+   Start at  06:50:09
+   Duration  1.54s (transform 3.37s, setup 555ms, import 3.91s, tests 829ms, environment 0ms)
+

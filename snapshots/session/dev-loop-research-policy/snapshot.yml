@@ -1,0 +1,13 @@
+version: 1
+scenario: dev-loop-research-policy
+profile: headless
+composition: dev-loop-research-policy
+recording: authored
+header:
+  class: dev-loop-research-policy
+  pin: true
+  childSystemPrompts: [1]
+  childToolSchemas: [1]
+workspace:
+  setup: dev-loop-research
+  final: true

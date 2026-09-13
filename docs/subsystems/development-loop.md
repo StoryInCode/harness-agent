@@ -1,8 +1,10 @@
 # Development loop
 
+English | [中文](development-loop.zh.md)
+
 ## Summary
 
-Discover development-loop piece specifications, inspect validation results, and request guarded status changes. This reference owns the shared types and Cordis API of [packages/dev-loop](../../packages/dev-loop/README.md). The directory reads files; the lifecycle service holds process-local status and promotes completed files through Git. Neither service supplies human approval enforcement, durable transition records, or a complete autonomous development loop.
+Discover piece specifications, request guarded status changes, and delegate specialist work with retained files and durable reports. This reference owns the shared types and Cordis API of [packages/dev-loop](../../packages/dev-loop/README.md). Approval, admission, worktree allocation, and role delegation have separate owners. Durable delegation history does not make lifecycle transitions durable or provide a complete autonomous development loop.
 
 ## Table of Contents
 
@@ -11,6 +13,7 @@ Discover development-loop piece specifications, inspect validation results, and 
 - [Human decisions](#human-decisions)
 - [Dispatch requests](#dispatch-requests)
 - [Worktree assignments](#worktree-assignments)
+- [Role delegation records](#role-delegation-records)
 - [Completion and events](#completion-and-events)
 - [Failure and cancellation](#failure-and-cancellation)
 - [Cordis API](#cordis-surface)
@@ -18,6 +21,7 @@ Discover development-loop piece specifications, inspect validation results, and 
 
 -----
 
+<a id="directory-values"></a>
 ## Directory values
 
 The [directory type declarations](../../packages/dev-loop/directory/src/types.ts) define parsed records and per-file validation results. Directory configuration and the accepted file grammar belong to the [directory package](../../packages/dev-loop/directory/README.md#use-this-package).
@@ -34,24 +38,36 @@ The [directory type declarations](../../packages/dev-loop/directory/src/types.ts
 
 A scan combines a set directory and its `done/` child. Malformed files remain visible as rejections without withholding valid siblings; missing sets, duplicate ids among accepted records, and filesystem failures still reject the request. Single-piece lookup distinguishes an absent id from its rejected file. Queue candidates include only valid `todo` and `pending` records; selection alone proves neither dependency completion nor approval.
 
+<a id="lifecycle-state"></a>
 ## Lifecycle state
 
 The lifecycle service hydrates valid records once during mounting. `getStatus` reads committed memory, not a fresh directory scan; external edits do not refresh it. Rejected files retain their parse errors instead of acquiring a status.
 
 `LEGAL_TRANSITIONS` permits `todo → pending`, `pending → done`, `pending → blocked`, and `blocked → todo`. `done` has no outgoing edge. `transition` requires the expected status and claims the piece before asynchronous work; stale or competing claims reject. Readers continue to see committed status while completion is in flight. Non-completing transitions change memory only, so logical `pending` can coexist with a disk header declaring `todo`.
 
+<a id="human-decisions"></a>
 ## Human decisions
 
 The [approval result declarations](../../packages/dev-loop/approval/src/types.ts) define `ApprovalDecision` as `accept`, `question`, or `change`, and `PresentPieceResult` as the requested `pieceId`, explicit `decision`, and optional trimmed `feedback`. The [approval package](../../packages/dev-loop/approval/README.md) owns presentation, exact-choice validation, live-root calling requirements, and source-version checks. Only acceptance attempts `todo → pending`; it creates no durable authorization and does not restrict direct callers of the lifecycle service.
 
+<a id="dispatch-requests"></a>
 ## Dispatch requests
 
 The [queue declarations](../../packages/dev-loop/queue/src/types.ts) define `QueueRequest` as a piece id, caller cancellation signal, and startup callback receiving the captured Agent and combined signal. `QueueTicket` contains the piece id, result promise, and awaited cancellation method; it is an operational handle, not a JSON record. `QueueEntry` is a detached scalar snapshot of canonical priority, admission time, queued/starting/running status, and optional child SessionId. The [queue package](../../packages/dev-loop/queue/README.md) owns admission, ordering, dependency wakeups, reservation lifetime, and cleanup-failure semantics. It does not select providers or create requests from approval announcements.
 
+<a id="worktree-assignments"></a>
 ## Worktree assignments
 
 The [worktree declarations](../../packages/dev-loop/worktree/src/types.ts) define `AssignWorktreeRequest` as a piece id, caller directory, and cancellation signal. `WorktreeAssignment` records a branded `WorktreeAssignmentId`, validated `GitCommit` base, mainline and worktree paths, piece id, and created/borrowed ownership. This retained record describes an assignment, not a live assertion that its files or HEAD remain unchanged. `WorktreeRetirement` distinguishes removal from preservation because a tree is borrowed, dirty, or at a changed HEAD. The [worktree package](../../packages/dev-loop/worktree/README.md) owns allocation, repository identity, command quiescence, and conservative retirement. It neither transfers changes nor sets child-session metadata.
 
+<a id="role-delegation-records"></a>
+## Role delegation records
+
+The [Roles declarations](../../packages/dev-loop/roles/src/types.ts) define the closed `DevLoopRole` union, bounded `DelegationBrief`, optional `VerificationAssignment`, Host `RoleConfig` and `Config`, and scoped `ToolConfig`. `DelegationRecord` discriminates unresolved `RequestedDelegation` intent from `SettledDelegation` observations by `state`. The branded `DelegationId` identifies the same durable row throughout that lifecycle; child identity, worktree assignment, and actual preset are optional observations, not inferred authority.
+
+A settled record separates completion status from `cleanup`: uncertain cleanup forces `failed`, while `reported` provenance never establishes independent verification. The [Roles package](../../packages/dev-loop/roles/README.md) owns persistence ordering, cleanup evidence, byte limits, and policy limitations. Its history survives service restart, but neither reconciles unresolved requests nor restores Worktree's process-local assignment map.
+
+<a id="completion-and-events"></a>
 ## Completion and events
 
 The [lifecycle type declarations](../../packages/dev-loop/lifecycle/src/types.ts) distinguish a cancellable request from a published result.
@@ -68,6 +84,7 @@ Completion requires a tracked source, edits its actual disk header to `done` usi
 
 `piece/approved`, `piece/blocked`, and `piece/completed` use `emit` after memory publication. Synchronous listener errors propagate without rollback; asynchronous listeners are not awaited. These announcements cannot provide awaited persistence. `blocked → todo` has no announcement, and the service does not require a non-empty blocking reason.
 
+<a id="failure-and-cancellation"></a>
 ## Failure and cancellation
 
 Pre-publication failures leave memory unchanged and release the claim. Every failure after the header edit and before publication attempts to restore only the previous disk header with the forward edit's returned version, including cancellation after successful movement; recovery does not reset the Git index. `PieceRecoveryFailedError` retains both failures and requires inspection of the source, destination, and index before retrying. A cancelled or interrupted move does not prove rollback.
@@ -237,6 +254,34 @@ getQueuedEntries(): QueueEntry[]
 
 Source: [`packages/dev-loop/queue/src/index.ts`](../../packages/dev-loop/queue/src/index.ts)
 
+<a id="ctxdevlooproles--devlooproles"></a>
+
+### `ctx.devLoopRoles` — `DevLoopRoles`
+
+Coordinates role policy, retained assignments, Queue leases and durable observations.
+
+```ts cordis-catalog
+/**
+ * Delegate from the exact live initiator; persist intent before Queue admission.
+ * Cancellation joins the ticket; uncertain startup or cleanup records failure, not quiescence. Assignments are never retired.
+ * @param brief - complete bounded role assignment, without execution authority.
+ * @param signal - caller cancellation lifetime, combined with service disposal.
+ * @returns detached settled observation after Queue cleanup and terminal durability.
+ * @throws on invalid input, stale initiator, closed service, or failed durable recording.
+ */
+async delegate(brief: DelegationBrief, signal: AbortSignal): Promise<SettledDelegation>
+
+/**
+ * Read full durable history, including unresolved requests that do not imply activity.
+ * @param pieceId - canonical piece identity in this Host's repository association.
+ * @returns detached records ordered by requested time, then delegation id; never truncated.
+ * @throws when the piece id is invalid or storage is closed.
+ */
+getDelegations(pieceId: string): Promise<readonly DelegationRecord[]>
+```
+
+Source: [`packages/dev-loop/roles/src/index.ts`](../../packages/dev-loop/roles/src/index.ts)
+
 <a id="ctxdevloopworktree--devloopworktree"></a>
 
 ### `ctx.devLoopWorktree` — `DevLoopWorktree`
@@ -340,6 +385,7 @@ Await completion policy before filesystem or Git work. Listeners return void or 
 Source: [`packages/dev-loop/lifecycle/src/index.ts`](../../packages/dev-loop/lifecycle/src/index.ts)
 <!-- END GENERATED cordis-surface -->
 
+<a id="dev-note"></a>
 ## Dev Note
 
 None.

@@ -1,11 +1,13 @@
 /** Relationship-preserving identity redaction for committed session snapshots. */
 
+import { visitRolesRecords } from './roles-records.ts'
+
 const UUID_FRAGMENT_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
 const LEGACY_TOKEN_RE = /^\{\{(?:sessionId|messageId)\}\}$/
-const CANONICAL_TOKEN_RE = /^\{\{(session|message|approval|workflow|command|rpc|retry|id):([1-9]\d*)\}\}$/
+const CANONICAL_TOKEN_RE = /^\{\{(session|message|approval|workflow|command|rpc|retry|delegation|worktree|id):([1-9]\d*)\}\}$/
 const ID_KEY_RE = /(?:^id$|Id$|Ids$)/
 
-type IdentityKind = 'session' | 'message' | 'approval' | 'workflow' | 'command' | 'rpc' | 'retry' | 'id'
+type IdentityKind = 'session' | 'message' | 'approval' | 'workflow' | 'command' | 'rpc' | 'retry' | 'delegation' | 'worktree' | 'id'
 
 interface ParsedLog {
   readonly records: Record<string, unknown>[]
@@ -109,11 +111,28 @@ export function redactSessionSnapshotIds(logs: readonly string[]): string[] {
     }
   }
 
-  const replacements = [...tokenByValue]
+  const rolesOnly = new Set<string>()
+  const roleIdentity = (record: Record<string, unknown>, key: string, kind: IdentityKind): void => {
+    const value = record[key]
+    if (typeof value !== 'string') return
+    if (!tokenByValue.has(value)) rolesOnly.add(value)
+    claim(value, kind, true)
+    record[key] = tokenByValue.get(value)
+  }
+  for (const log of parsed) {
+    visitRolesRecords(log.records, (record) => {
+      roleIdentity(record, 'delegationId', 'delegation')
+      roleIdentity(record, 'parentSessionId', 'session')
+      roleIdentity(record, 'subagentSessionId', 'session')
+      if (isRecord(record.worktreeAssignment)) roleIdentity(record.worktreeAssignment, 'id', 'worktree')
+    })
+  }
+
+  const replacements = [...tokenByValue].filter(([value]) => !rolesOnly.has(value))
     .sort(([left], [right]) => right.length - left.length)
   const replace = (value: unknown): unknown => {
     if (typeof value === 'string') {
-      const exact = tokenByValue.get(value)
+      const exact = rolesOnly.has(value) ? undefined : tokenByValue.get(value)
       if (exact !== undefined) return exact
       let output = value
       for (const [source, token] of replacements) output = output.split(source).join(token)

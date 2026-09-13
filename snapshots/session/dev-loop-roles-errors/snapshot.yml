@@ -1,0 +1,8 @@
+version: 1
+scenario: dev-loop-roles-errors
+profile: headless
+composition: dev-loop-roles-errors
+recording: authored
+header:
+  class: dev-loop-roles-errors
+  pin: true

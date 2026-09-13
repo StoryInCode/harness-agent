@@ -5,6 +5,8 @@ kind: "package-reference"
 
 # @deepseek-ai/dsh-dev-loop-approval
 
+English | [中文](README.zh.md)
+
 ## Summary
 
 Ask a human to Accept, Question, or Change one specification piece. The tool displays the complete current markdown, warns about missing teaching subsections, and queues only an unchanged todo piece explicitly accepted by the human. Questions and feedback never authorize work. This fork-owned consumer uses the existing user-question interface; it does not provide a new browser panel or durable approval storage.

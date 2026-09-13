@@ -207,6 +207,7 @@
     { "path": "./packages/dev-loop/directory" },
     { "path": "./packages/dev-loop/lifecycle" },
     { "path": "./packages/dev-loop/queue" },
+    { "path": "./packages/dev-loop/roles" },
     { "path": "./packages/dev-loop/worktree" },
     { "path": "./packages/session/session-title" },
     { "path": "./packages/session/session-title-llm" },

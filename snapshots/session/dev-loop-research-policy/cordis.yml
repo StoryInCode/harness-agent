@@ -1,0 +1,47 @@
+# Host-owned role policy; the headless application supplies the real caller.
+- insert:
+    - id: dev-loop-directory
+      name: '../../../packages/dev-loop/directory/src/index.ts'
+      config:
+        root: plans/pieces
+    - id: dev-loop-lifecycle
+      name: '../../../packages/dev-loop/lifecycle/src/index.ts'
+    - id: dev-loop-queue
+      name: '../../../packages/dev-loop/queue/src/index.ts'
+      config:
+        maxConcurrency: 1
+    - id: dev-loop-worktree
+      name: '../../../packages/dev-loop/worktree/src/index.ts'
+      config:
+        mainlinePath: !!js process.cwd()
+        commandTimeoutMs: 20000
+        outputMaxBytes: 128000
+        terminationGraceMs: 1000
+    - id: dev-loop-roles
+      name: '../../../packages/dev-loop/roles/src/index.ts'
+      config:
+        roles:
+          Research:
+            provider: spawn
+            persona: 'Research reads inspected evidence and reports limitations.'
+            toolFilter:
+              allow: [read]
+          Test Writer:
+            provider: spawn
+            persona: 'Test Writer defines acceptance.'
+            toolFilter:
+              allow: [read, write, edit]
+          Implementer:
+            provider: spawn
+            persona: 'Implementer applies accepted changes.'
+            toolFilter:
+              allow: [read, write, edit]
+          Utility:
+            provider: spawn
+            persona: 'Utility performs bounded maintenance.'
+            toolFilter:
+              allow: [read, write, edit]
+        maxBriefBytes: 8192
+        maxOutcomeBytes: 16384
+    - id: snapshot-research-role-tools
+      name: './fixture.ts'

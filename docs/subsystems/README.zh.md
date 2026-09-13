@@ -12,6 +12,7 @@
 | [scope.md](scope.zh.md) | 作用域注册标识、dispatch 载体，以及拥有的 `Scope` 上下文 |
 | [typert.md](typert.zh.md) | 远程调用描述符、lookup/Context 声明、Typert 注册表，以及 Host Gateway/Client API 边界 |
 | [goal.md](goal.zh.md) | 持久 goal 标识、生命周期快照、激活、变更记录与 Round 归属 |
+| [development-loop.md](development-loop.zh.md) | 任务块发现、进程本地生命周期状态、受保护的 Git 晋升、Queue 请求、保留的 Worktree 分配，以及持久化 Roles 委派记录 |
 | [schedule.md](schedule.zh.md) | 仅限会话内的提醒记录、持久转换、活动视图与普通对话交付 |
 | [todo.md](todo.zh.md) | todo 包的整列表条目类型、持久事件所有权、投影和未结束轮次不变式 |
 | [commands.md](commands.zh.md) | 人类命令注册表服务：定义、适配器发现、直接调用、结果与解析视图 |

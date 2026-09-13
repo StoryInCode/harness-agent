@@ -1,0 +1,4 @@
+6c12a8405988f54efc6b6ca55b2e55c3df5eb5d046df8ea8cc1dc5a724b30c70  tests/supplemental-error-minimum.spec.ts
+dd8037d7d416c1bad4a009bdea317ee3f6d127ba17045ff7912c69f1ba60f572  tests/error-minimum-RED-vitest.log
+b0c3b77d1467fd34adafacfea169fb9848ce0f0e29a03c51da5b2a15389232b4  tests/error-minimum-oxlint.log
+1564406fe2d5f0081cfd6fbc186afea2b7d37e1a64c0bc9ab3078f1ee03d47fa  tests/ERROR-MINIMUM-RED.md

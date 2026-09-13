@@ -1,0 +1,22 @@
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+
+ RUN  v4.1.8 /home/sic/harness-agent/.worktrees/roles-tests
+
+ ✓ |thread-safe| packages/dev-loop/roles/tests/supplemental-ptc.spec.ts (2 tests) 3005ms
+   ✓ denies a Research inherited write through a real PTC worker and leaves its body without a filesystem effect  2964ms
+ ✓ |thread-safe| packages/dev-loop/roles/tests/supplemental-lifecycle.spec.ts (2 tests) 5435ms
+   ✓ cancels during actual Git worktree allocation before any child starts  2765ms
+   ✓ cancels in real child publication before SubagentRuntime.start returns its lease  2669ms
+ ✓ |thread-safe| packages/dev-loop/roles/tests/supplemental-bounds.spec.ts (4 tests) 17627ms
+   ✓ accepts an exact multibyte brief budget and rejects one byte less before recording intent  2900ms
+   ✓ counts the complete settled record at exact outcome equality, including metadata and multibyte text  8693ms
+   ✓ accepts the exact complete rendered history envelope and refuses one byte less without a partial array  3037ms
+   ✓ records a non-text provider report as failed rather than claiming complete text evidence  2997ms
+
+ Test Files  3 passed (3)
+      Tests  8 passed (8)
+   Start at  07:24:12
+   Duration  18.71s (transform 2.20s, setup 452ms, import 2.56s, tests 26.07s, environment 0ms)
+

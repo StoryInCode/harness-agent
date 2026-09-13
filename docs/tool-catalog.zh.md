@@ -19,6 +19,7 @@
 
 | 工具包 | 模型可见名称 | 依赖 | 写入／影响 | 随产品发布的别名 | 部署说明 |
 | --- | --- | --- | --- | --- | --- |
+| `@deepseek-ai/dsh-dev-loop-roles` | `dev_loop_delegate`, `dev_loop_delegations` | `ctx.tools`, `ctx.agents`, `ctx.devLoopRoles` | `tool/call`, `tool/result`, `dev_loop_roles durable delegation history` | - | 此选择启用的作用域 Consumer 要求显式预算；本 schema 使用 16384 输出字节和 10 条历史记录。Schema 采集不执行委派。Host 服务拥有角色策略和持久化历史；返回报告是有归属的证据，不是父级检查。 |
 | `@deepseek-ai/dsh-dev-loop-approval` | `present_piece_for_approval` | `ctx.tools`, `ctx.userQuestions`, `ctx.devLoopDirectory`, `ctx.devLoopLifecycle`, `ctx.fs` | `tool/call`, `piece/approved after explicit acceptance`, `tool/result` | - | The opt-in consumer presents current source to a live root caller. Accept changes lifecycle memory to pending; it does not dispatch work or persist an approval grant. |
 | `@deepseek-ai/dsh-tool-ask-user` | `ask_user_question` | `ctx.tools`、`ctx.userQuestions` | `tool/call`、`tool/result after a UI/provider answers the question` | - | ask_user_question 会暂停工具调用，直到当前 UI 提供方返回人类答案。 |
 | `@deepseek-ai/dsh-tools` | `run_code` | `ctx.tools`、`ctx.codeRuntime (execution time)`、`ctx.systemPrompt` | `tool/call`、`one tool/ptc-dispatch-start + tool/ptc-dispatch pair per bridged sub-call`、`tool/result` | - | 在 `mode: ptc`／`mode: both` 下，它由工具注册表所有，作为可过滤能力层之外的保留传输机制（参见 PTC mode Agent Note）。在 `ptc` 下，它是注册表对协议格式（wire format）的唯一贡献；其他可见能力在使用已加载运行时语言生成的 SDK 章节中声明。程序通过 binding 调用这些能力，调用按照原生并发约定调度：启动顺序和策略遵循提交顺序，并发安全的函数体最多重叠执行 `maxParallelSubCalls` 个。调用会重新进入完整且受守卫保护的工具流水线，并将每个嵌套执行关联到此外层结果。 |
@@ -46,6 +47,104 @@
 | `@deepseek-ai/dsh-tool-todo` | `todo_write` | `ctx.tools`、`owning Agent session` | `tool/call`、`todo/write`、`tool/result` | - | todo_write 是会话所有的状态；UI 将最新的 todo/write 事件渲染为检查清单。`allowParallelInProgress` 是没有默认值的必填项，因此本目录明确选择 `true`，对应描述允许同时存在多个 `in_progress` 项。选择 `false` 的部署会获得同一工具，但描述会要求只能有 1 个活动任务。 |
 | `@deepseek-ai/dsh-tool-workflow` | `workflow` | `ctx.tools`、`ctx.workflowEngine`、`ctx.systemPrompt`、`a calling Agent (exec.agent parents the script children)` | `tool/call`、`tool/result` | - | - |
 | `@deepseek-ai/dsh-tool-web` | `web_fetch`、`web_search` | `ctx.tools`、`ctx.web`、`ctx.systemPrompt` | `tool/call`、`tool/result` | - | web_search 和 web_fetch 将提供方选择置于 ctx.web 之后，使模型可见 schema 在更换后端时保持稳定。 |
+
+<a id="deepseek-aidsh-dev-loop-roles"></a>
+
+## `@deepseek-ai/dsh-dev-loop-roles`
+
+### `dev_loop_delegate`
+
+Delegate a bounded assignment to Research, Test Writer, Implementer, or Utility in the piece’s retained worktree. Returns durable reported evidence after child cleanup. Attribute reports to the recorded role and preset, not your direct inspection.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "pieceId": {
+      "type": "string",
+      "description": "Canonical dotted piece id in this repository."
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "Research",
+        "Test Writer",
+        "Implementer",
+        "Utility"
+      ]
+    },
+    "assignment": {
+      "type": "string",
+      "description": "Complete bounded assignment."
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Decision or work that requires this delegation."
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "claim": {
+          "type": "string"
+        },
+        "decisionRestingOnClaim": {
+          "type": "string"
+        },
+        "permittedSources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requiredEvidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "claim",
+        "decisionRestingOnClaim",
+        "permittedSources",
+        "requiredEvidence"
+      ]
+    }
+  },
+  "required": [
+    "pieceId",
+    "role",
+    "assignment",
+    "rationale"
+  ]
+}
+```
+
+来源：[`packages/dev-loop/roles/src/tool.ts`](../packages/dev-loop/roles/src/tool.ts)
+
+### `dev_loop_delegations`
+
+Read complete ordered durable delegation history for a piece. Requested records are unresolved intent, not proof of running children. Reports are attributed to their recorded role and actual preset; an absent preset means no preset was recorded. Overflow returns no partial array.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "pieceId": {
+      "type": "string",
+      "description": "Canonical dotted piece id in this repository."
+    }
+  },
+  "required": [
+    "pieceId"
+  ]
+}
+```
+
+来源：[`packages/dev-loop/roles/src/tool.ts`](../packages/dev-loop/roles/src/tool.ts)
+
+此选择启用的作用域 Consumer 要求显式预算；本 schema 使用 16384 输出字节和 10 条历史记录。Schema 采集不执行委派。Host 服务拥有角色策略和持久化历史；返回报告是有归属的证据，不是父级检查。
 
 <a id="deepseek-aidsh-dev-loop-approval"></a>
 

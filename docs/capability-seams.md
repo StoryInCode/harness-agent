@@ -14,6 +14,8 @@ flowchart LR
   pkg_dev_loop_queue["dev-loop-queue"]
   svc_devLoopLifecycle["ctx.devLoopLifecycle<br/>Guarded piece transitions"]
   svc_devLoopQueue["ctx.devLoopQueue<br/>Bounded piece dispatch"]
+  pkg_dev_loop_roles["dev-loop-roles"]
+  svc_devLoopRoles["ctx.devLoopRoles<br/>Durable specialist delegation"]
   pkg_dev_loop_worktree["dev-loop-worktree"]
   svc_devLoopWorktree["ctx.devLoopWorktree<br/>Retained piece worktrees"]
   pkg_attachment["attachment"]
@@ -268,6 +270,7 @@ flowchart LR
   pkg_dev_loop_directory --> svc_devLoopDirectory
   pkg_dev_loop_lifecycle --> svc_devLoopLifecycle
   pkg_dev_loop_queue --> svc_devLoopQueue
+  pkg_dev_loop_roles --> svc_devLoopRoles
   pkg_dev_loop_worktree --> svc_devLoopWorktree
   pkg_e2b --> svc_e2b
   pkg_experimental_agent_team --> svc_agentTeams
@@ -387,6 +390,9 @@ flowchart LR
   svc_devLoopDirectory --> pkg_dev_loop_queue
   svc_devLoopLifecycle --> pkg_dev_loop_approval
   svc_devLoopLifecycle --> pkg_dev_loop_queue
+  svc_devLoopQueue --> pkg_dev_loop_roles
+  svc_devLoopRoles --> pkg_dev_loop_roles
+  svc_devLoopWorktree --> pkg_dev_loop_roles
   svc_directoryPicker --> pkg_api_workspace_controller
   svc_dynamicCordisRunner --> pkg_tool_cordis
   svc_e2b --> pkg_fs_e2b
@@ -503,8 +509,9 @@ flowchart LR
 | --- | --- | --- | --- | --- | --- | --- |
 | `ctx.devLoopDirectory` | `core` | [`dev-loop-directory`](../packages/dev-loop/directory) | - | [`dev-loop-lifecycle`](../packages/dev-loop/lifecycle), [`dev-loop-approval`](../packages/dev-loop/approval), [`dev-loop-queue`](../packages/dev-loop/queue) | - | Reads the configured corpus through ctx.fs and returns validated records and independent file rejections. |
 | `ctx.devLoopLifecycle` | `core` | [`dev-loop-lifecycle`](../packages/dev-loop/lifecycle) | - | [`dev-loop-approval`](../packages/dev-loop/approval), [`dev-loop-queue`](../packages/dev-loop/queue) | - | Owns process-local status, transition claims, and compensating Git promotion through filesystem and subprocess services. |
-| `ctx.devLoopQueue` | `core` | [`dev-loop-queue`](../packages/dev-loop/queue) | - | - | - | Admits consumer-owned one-shot callbacks and retains capacity through startup, result settlement, and cleanup. |
-| `ctx.devLoopWorktree` | `core` | [`dev-loop-worktree`](../packages/dev-loop/worktree) | - | - | - | Allocates detached Git checkouts and retains assignments across roles; only explicitly retires clean unchanged owned trees. |
+| `ctx.devLoopQueue` | `core` | [`dev-loop-queue`](../packages/dev-loop/queue) | - | [`dev-loop-roles`](../packages/dev-loop/roles) | - | Admits consumer-owned one-shot callbacks and retains capacity through startup, result settlement, and cleanup. |
+| `ctx.devLoopRoles` | `core` | [`dev-loop-roles`](../packages/dev-loop/roles) | - | [`dev-loop-roles`](../packages/dev-loop/roles) | - | Records bounded assignments before Queue admission and attributed observations after cleanup; scoped tools expose delegation and complete history. |
+| `ctx.devLoopWorktree` | `core` | [`dev-loop-worktree`](../packages/dev-loop/worktree) | - | [`dev-loop-roles`](../packages/dev-loop/roles) | - | Allocates detached Git checkouts and retains assignments across roles; only explicitly retires clean unchanged owned trees. |
 | `ctx.attachments` | `seam` | [`attachment`](../packages/attachment/attachment) | [`attachment-local`](../packages/attachment/attachment-local) | [`api-session-controller`](../packages/api/session-controller), [`tool-fs`](../packages/fs/tool-fs), [`llm-pi-ai`](../packages/llm/llm-pi-ai), [`llm-deepseek`](../packages/llm/llm-deepseek) | - | The host commits accepted images before session events; provider adapters resolve authorized durable references into provider-native content. |
 | `ctx.fileUploads` | `core` | [`client-file-upload`](../packages/client/file-upload) | - | [`api-session-controller`](../packages/api/session-controller) | - | Owns streaming intake, durable storage, and staged receipt lifetime; the Session controller binds receipts to accepted submissions. |
 | `ctx.llm` | `seam` | [`llm`](../packages/llm/llm) | [`llm-deepseek`](../packages/llm/llm-deepseek), [`llm-pi-ai`](../packages/llm/llm-pi-ai), [`llm-replay`](../packages/test-support/llm-replay) | [`agent-loop`](../packages/core/agent-loop), [`compaction-basic`](../packages/compaction/compaction-basic) | - | Adapters register provider implementations; the loop and compaction call the provider-neutral stream service. |

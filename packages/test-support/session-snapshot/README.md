@@ -120,9 +120,15 @@ The shared core owns manifests, generation-qualified role selection, workspace s
 | [`src/identity.ts`](src/identity.ts) | Typed first-seen identity tokenization across parent and child logs |
 | [`src/normalize.ts`](src/normalize.ts) | Pure normalizers and scrubbing helpers |
 | [`src/workspace.ts`](src/workspace.ts) | Scenario workspace setup and complete expected-state comparison |
+| [`src/git-workspace.ts`](src/git-workspace.ts) | Reproducible private Git inputs and retained worktree file oracles |
+| [`src/roles-records.ts`](src/roles-records.ts) | Typed delegation/history receipt recognition without rewriting report semantics |
 | [`src/suite.ts`](src/suite.ts) | Scenario-table suite factory, fixture guards, record/refresh write-back |
 | [`src/index.ts`](src/index.ts) | Package entry re-exporting the four layers |
 | — | No runtime invariant companion is published; this test-support package owns no production event stream or mutable data; consuming test suites exercise its behavior. |
+
+Roles receipts are recognized only through matching `dev_loop_delegate` or `dev_loop_delegations` calls and successful tool-result JSON. Identity fields share typed delegation, worktree, and Session tokens; only `requestedAt` and `finishedAt` clocks are zeroed. Report text, provenance, limitations, Git base commits, and unrelated JSON or user prose remain regression-visible. Parent-context cwd normalization preserves a child's assigned worktree suffix.
+
+The development-loop Git setup commits seeded files with fixed author, committer, dates, branch, and line-ending policy. Its oracle excludes the existing harness-owned runtime roots, the root Git database, and exact `.worktrees/<piece>/.git` pointer files; all retained checkout files and unexpected writes remain visible. The scenario owns an independent complete expected workspace rather than deriving success from a report.
 
 ### Data flow
 

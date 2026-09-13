@@ -12,7 +12,7 @@ One page per subsystem of the DeepSeek Harness: what it is, the data structures 
 | [scope.md](scope.md) | scoped registration identity, dispatch carriers, and the owned `Scope` context |
 | [typert.md](typert.md) | Remote invocation descriptors, lookup/Context declarations, Typert registries, and the Host Gateway/Client API boundaries |
 | [goal.md](goal.md) | persisted goal identity, lifecycle snapshots, activation, change records, and round attribution |
-| [development-loop.md](development-loop.md) | piece discovery and validation results, process-local lifecycle state, guarded Git promotion, and lifecycle events <!-- FORK-LOCAL: canonical owner for packages/dev-loop. --> |
+| [development-loop.md](development-loop.md) | piece discovery, process-local lifecycle state, guarded Git promotion, Queue requests, retained Worktree assignments, and durable Roles delegation records |
 | [schedule.md](schedule.md) | Session-local reminder records, durable transitions, active views, and ordinary-conversation delivery |
 | [todo.md](todo.md) | the todo package's whole-list item type, durable event ownership, projection, and open-turn invariant |
 | [commands.md](commands.md) | the human-command registry service: definitions, adapter discovery, direct invocation, results, and parsing views |

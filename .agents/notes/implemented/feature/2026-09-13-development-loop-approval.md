@@ -2,6 +2,8 @@
 
 Status: implemented
 
+English | [中文](2026-09-13-development-loop-approval.zh.md)
+
 ## Problem
 
 A specification summary can omit the details a person needs to authorize work. Free-text feedback is not an unambiguous decision, and the file can change while the person considers it. Marking a piece pending must distinguish explicit acceptance from questions, revisions, and stale observations.

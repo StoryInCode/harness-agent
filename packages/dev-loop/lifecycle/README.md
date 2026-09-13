@@ -5,6 +5,8 @@ kind: "package-reference"
 
 # @deepseek-ai/dsh-dev-loop-lifecycle
 
+English | [中文](README.zh.md)
+
 ## Summary
 
 Change a development-loop piece's status through a compare-and-set writer that rejects stale or illegal transitions. Completion awaits policy listeners, rewrites the disk header, and stages a move into the set's `done/` directory. Cancellation waits for active work and guarded header recovery. Status remains in memory; this package alone does not enforce verification or provide restart durability.
@@ -90,6 +92,7 @@ The local operation does not constitute the full autonomous development loop.
 - **Completion requires a tracked Git source and a POSIX execution world:** `mkdir -p` is not portable to native Windows. Portable directory creation requires a filesystem capability change.
 - **Reopening is unspecified:** 02.04 and the supervisor plan disagree on the target status; `done` stays absorbing until the plan owner resolves that policy.
 
+<a id="dev-note"></a>
 ### Dev Note
 
 None.

@@ -120,13 +120,23 @@ const SERVICE_ROLES: ServiceRole[] = [
     pkg: 'dev-loop-queue',
     title: 'Bounded piece dispatch',
     mode: 'core',
+    consumers: ['dev-loop-roles'],
     note: 'Admits consumer-owned one-shot callbacks and retains capacity through startup, result settlement, and cleanup.',
+  },
+  {
+    key: 'devLoopRoles',
+    pkg: 'dev-loop-roles',
+    title: 'Durable specialist delegation',
+    mode: 'core',
+    consumers: ['dev-loop-roles'],
+    note: 'Records bounded assignments before Queue admission and attributed observations after cleanup; scoped tools expose delegation and complete history.',
   },
   {
     key: 'devLoopWorktree',
     pkg: 'dev-loop-worktree',
     title: 'Retained piece worktrees',
     mode: 'core',
+    consumers: ['dev-loop-roles'],
     note: 'Allocates detached Git checkouts and retains assignments across roles; only explicitly retires clean unchanged owned trees.',
   },
   {

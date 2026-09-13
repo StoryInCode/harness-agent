@@ -1,0 +1,43 @@
+# Roles is opt-in; the shipped headless profile owns the process and core services.
+- insert:
+    - id: dev-loop-directory
+      name: '@deepseek-ai/dsh-dev-loop-directory'
+      config:
+        root: plans/pieces
+    - id: dev-loop-lifecycle
+      name: '@deepseek-ai/dsh-dev-loop-lifecycle'
+    - id: dev-loop-queue
+      name: '@deepseek-ai/dsh-dev-loop-queue'
+      config:
+        maxConcurrency: 1
+    - id: dev-loop-worktree
+      name: '@deepseek-ai/dsh-dev-loop-worktree'
+      config:
+        mainlinePath: !!js process.cwd()
+        commandTimeoutMs: 20000
+        outputMaxBytes: 128000
+        terminationGraceMs: 1000
+    - id: dev-loop-roles
+      name: '@deepseek-ai/dsh-dev-loop-roles'
+      config:
+        roles:
+          Research:
+            provider: spawn
+            persona: Inspect evidence and report limitations.
+            toolFilter: { allow: [read] }
+          Test Writer:
+            provider: spawn
+            persona: Write behavioral tests.
+            toolFilter: { allow: [read, write] }
+          Implementer:
+            provider: spawn
+            persona: Implement the bounded assignment.
+            toolFilter: { allow: [read, write, edit] }
+          Utility:
+            provider: spawn
+            persona: Verify the bounded assignment.
+            toolFilter: { allow: [read] }
+        maxBriefBytes: 8192
+        maxOutcomeBytes: 16384
+    - id: snapshot-role-tools
+      name: './fixture.ts'

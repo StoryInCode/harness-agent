@@ -5,6 +5,8 @@ kind: "package-reference"
 
 # @deepseek-ai/dsh-dev-loop-worktree
 
+English | [中文](README.zh.md)
+
 ## Summary
 
 Give each development-loop piece a separate checkout and keep its files across Test Writer and Implementer runs. Repeated requests retain the same directory and base commit. Existing linked isolation is borrowed rather than nested. Cancellation and unloading preserve physical trees; explicit retirement refuses work that may still need transfer.

@@ -600,6 +600,45 @@ export interface Config {
 
 Source: [`packages/dev-loop/queue/src/types.ts:7`](../packages/dev-loop/queue/src/types.ts)
 
+<a id="deepseek-aidsh-dev-loop-roles"></a>
+
+## `@deepseek-ai/dsh-dev-loop-roles`
+
+需要：`agents` · `subagents` · `devLoopQueue` · `devLoopWorktree` · `storageDomain`
+
+```ts config-catalog
+/** Host-owned policy and complete persisted-value budgets; all fields are required. */
+export interface Config {
+  /** Explicit policies for all four roles. Deployment owns the safety of capabilities it permits. */
+  roles: Record<DevLoopRole, RoleConfig>
+  /** Positive safe-integer UTF-8 byte limit for complete brief JSON; excess rejects before intent storage. */
+  maxBriefBytes: number
+  /** Positive safe-integer byte limit for a complete terminal record, including metadata and provenance. */
+  maxOutcomeBytes: number
+}
+
+/** Canonical specialist roles; there is no Reviewer alias. */
+export type DevLoopRole = 'Research' | 'Test Writer' | 'Implementer' | 'Utility'
+
+/** Explicit provider and child capability policy. */
+export interface RoleConfig {
+  /** Registered subagent provider name, not an LLM route; missing providers fail mount. */
+  provider: string
+  /** Nonempty child persona template; requires provider persona support. */
+  persona: string
+  /** Explicit inherited-tool allow/deny restriction, applied during child creation by the provider. */
+  toolFilter: ToolRestriction
+  /** Optional child model-route overrides; requires provider agentOptions support. */
+  agentOptions?: AgentOptions
+  /** Optional nonnegative safe-integer absolute child depth; requires provider depthLimit support. */
+  maxDepth?: number
+}
+```
+
+依赖：[`AgentOptions`](subsystems/core.zh.md) · [`ToolRestriction`](subsystems/tools.zh.md)
+
+来源：[`packages/dev-loop/roles/src/types.ts:51`](../packages/dev-loop/roles/src/types.ts)
+
 <a id="deepseek-aidsh-dev-loop-worktree"></a>
 
 ## `@deepseek-ai/dsh-dev-loop-worktree`

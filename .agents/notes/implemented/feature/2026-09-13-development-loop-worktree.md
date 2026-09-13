@@ -2,6 +2,8 @@
 
 Status: implemented
 
+English | [中文](2026-09-13-development-loop-worktree.zh.md)
+
 ## Problem
 
 A Test Writer's files must remain available to the Implementer and to later transfer checks. Ending a child run or unloading its service does not establish that its checkout is disposable. A clean detached HEAD can contain commits absent from the mainline, while ignored files can contain evidence or secrets.

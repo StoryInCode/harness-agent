@@ -5,6 +5,8 @@ kind: "package-reference"
 
 # @deepseek-ai/dsh-dev-loop-queue
 
+English | [中文](README.zh.md)
+
 ## Summary
 
 Submit an approved piece and a consumer-owned startup callback to a bounded dispatch queue. Canonical queue priority and dependencies control when the callback runs. A reservation covers startup, execution, and cleanup, including late startup after cancellation. This fork-owned service does not infer assignments from approval events or create subagents without a submitted request.
@@ -57,6 +59,7 @@ The queue adds no model context. Its scheduling and snapshots do not alter a reu
 - **Quiescence depends on providers:** failed cleanup permanently closes this service instance. Stuck startup or cleanup delays cancellation and disposal; there is no detached timeout that falsely declares the worker stopped.
 - **Dependency policy is event-driven:** parked requests wait for lifecycle wakeups or another scheduling trigger. Cyclic dependencies and priorities that starve lower-priority work are not resolved by this package.
 
+<a id="dev-note"></a>
 ### Dev Note
 
 The [decision record](../../../.agents/notes/implemented/feature/2026-09-13-development-loop-queue.md) explains callback ownership and why capacity follows run cleanup rather than global event counts.

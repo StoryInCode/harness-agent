@@ -105,6 +105,7 @@ export {
   type Scenario,
   type SnapshotSuiteOptions,
 } from './suite.ts'
+export { prepareDevLoopSnapshotWorkspace, captureDevLoopSnapshotWorkspace } from './git-workspace.ts'
 export {
   captureExpectedWorkspaceSnapshot,
   captureWorkspaceSnapshot,

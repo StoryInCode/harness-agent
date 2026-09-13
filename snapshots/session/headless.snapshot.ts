@@ -17,6 +17,8 @@ import {
   assertSessionFixtureVersion,
   captureExpectedWorkspaceSnapshot,
   captureWorkspaceSnapshot,
+  captureDevLoopSnapshotWorkspace,
+  prepareDevLoopSnapshotWorkspace,
   fixtureContext,
   formatSystemPromptSnapshot,
   formatToolSchemasSnapshot,
@@ -228,7 +230,7 @@ async function writeSessionFixtures(
   const fresh = actualLogs.map((log, index) => {
     const stable = tokenizeSessionFixtureCwd(mode === 'refresh'
       ? stabilizeRefreshLog(log.content, prior[index] as string, replacements, ctx)
-      : log.content)
+      : log.content, ctx)
     return scrubSessionSnapshot(prepareSessionSnapshotFixtureForComparison(stable))
   })
   const output = redactSessionSnapshotIds(stabilizeFixtureMessageIds(fresh, prior))
@@ -459,6 +461,7 @@ async function seedWorkspace(scenario: HeadlessScenario, cwd: string): Promise<v
 }
 
 const workspaceSetups: Record<string, (cwd: string) => Promise<void>> = {
+  'dev-loop-research': prepareDevLoopSnapshotWorkspace,
   async 'editing-cordis-skill'(cwd) {
     const target = join(cwd, '.dsh', 'skills', 'editing-cordis-compositions', 'SKILL.md')
     await mkdir(dirname(target), { recursive: true })
@@ -905,6 +908,9 @@ describe('headless recorded-session snapshots', () => {
         ? join(patchRoot, `${String(index)}-${basename(source)}`)
         : source)
 
+      const captureScenarioWorkspace = scenario.manifest.workspace?.setup === 'dev-loop-research'
+        ? captureDevLoopSnapshotWorkspace
+        : (cwd: string) => captureWorkspaceSnapshot(cwd, { ignoredRootEntries: RUNTIME_WORKSPACE_ENTRIES })
       let actualLogs: SessionLog[] = []
       let initialWorkspace: WorkspaceSnapshotEntry[] | undefined
       let finalWorkspace: WorkspaceSnapshotEntry[] | undefined
@@ -957,18 +963,14 @@ describe('headless recorded-session snapshots', () => {
               }
             })
             await seedWorkspace(scenario, cwd)
-            initialWorkspace = await captureWorkspaceSnapshot(cwd, {
-              ignoredRootEntries: RUNTIME_WORKSPACE_ENTRIES,
-            })
+            initialWorkspace = await captureScenarioWorkspace(cwd)
           },
           inspect: async (cwd) => {
             actualLogs = await persistedSessions(cwd)
             if (scenario.name === 'session-query-spill') {
               await verifySessionQuerySpill(actualLogs[0]!.content, spillRoot, locatorRoot)
             }
-            finalWorkspace = await captureWorkspaceSnapshot(cwd, {
-              ignoredRootEntries: RUNTIME_WORKSPACE_ENTRIES,
-            })
+            finalWorkspace = await captureScenarioWorkspace(cwd)
           },
         })
       } finally {

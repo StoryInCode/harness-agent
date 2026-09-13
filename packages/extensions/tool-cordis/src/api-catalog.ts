@@ -934,6 +934,27 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'devLoopRoles',
+    summary: 'Coordinates role policy, retained assignments, Queue leases and durable observations.',
+    description: 'Coordinates role policy, retained assignments, Queue leases and durable observations.',
+    methods: [
+      {
+        signature: 'async delegate(brief: DelegationBrief, signal: AbortSignal): Promise<SettledDelegation>',
+        description: 'Delegate from the exact live initiator; persist intent before Queue admission. Cancellation joins the ticket; uncertain startup or cleanup records failure, not quiescence. Assignments are never retired.',
+        parameters: [{ name: 'brief', description: 'complete bounded role assignment, without execution authority.' }, { name: 'signal', description: 'caller cancellation lifetime, combined with service disposal.' }],
+        returns: 'detached settled observation after Queue cleanup and terminal durability.',
+        throws: ['on invalid input, stale initiator, closed service, or failed durable recording.'],
+      },
+      {
+        signature: 'getDelegations(pieceId: string): Promise<readonly DelegationRecord[]>',
+        description: 'Read full durable history, including unresolved requests that do not imply activity.',
+        parameters: [{ name: 'pieceId', description: 'canonical piece identity in this Host\'s repository association.' }],
+        returns: 'detached records ordered by requested time, then delegation id; never truncated.',
+        throws: ['when the piece id is invalid or storage is closed.'],
+      },
+    ],
+  },
+  {
     key: 'devLoopWorktree',
     summary: 'Process-lifetime assignments shared across roles; unload preserves all physical trees.',
     description: 'Process-lifetime assignments shared across roles; unload preserves all physical trees.',
@@ -4241,6 +4262,22 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export type DeepSeekLlmApiJson = null | boolean | number | string | DeepSeekLlmApiJson[] | {\n    [key: string]: DeepSeekLlmApiJson;\n};',
   },
   {
+    name: 'DelegationBrief',
+    declaration: 'export interface DelegationBrief {\n    pieceId: string;\n    role: DevLoopRole;\n    assignment: string;\n    rationale: string;\n    verification?: VerificationAssignment;\n}',
+  },
+  {
+    name: 'DelegationId',
+    declaration: 'export type DelegationId = Branded<\'DevLoopDelegationId\'>;',
+  },
+  {
+    name: 'DelegationRecord',
+    declaration: 'export type DelegationRecord = RequestedDelegation | SettledDelegation;',
+  },
+  {
+    name: 'DevLoopRole',
+    declaration: 'export type DevLoopRole = \'Research\' | \'Test Writer\' | \'Implementer\' | \'Utility\';',
+  },
+  {
     name: 'DiffCallView',
     declaration: 'export interface DiffCallView {\n    card: \'diff\';\n    title: string;\n    diffs: FileDiff[];\n    locations?: FileLocation[];\n}',
   },
@@ -5125,6 +5162,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export interface RequestContext {\n    provider: string;\n    model: string;\n    contextWindow?: number;\n    systemPromptUpdate?: SystemPromptUpdate;\n}',
   },
   {
+    name: 'RequestedDelegation',
+    declaration: 'export interface RequestedDelegation extends DelegationBrief {\n    delegationId: DelegationId;\n    parentSessionId: SessionId;\n    provider: string;\n    requestedAt: number;\n    state: \'requested\';\n}',
+  },
+  {
     name: 'RequestErrorAction',
     declaration: 'export type RequestErrorAction = {\n    kind: \'retry\';\n} | undefined;',
   },
@@ -5801,6 +5842,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export type SettingsUpdateSource = \'update\' | \'provider\';',
   },
   {
+    name: 'SettledDelegation',
+    declaration: 'export interface SettledDelegation extends Omit<RequestedDelegation, \'state\'> {\n    state: \'settled\';\n    finishedAt: number;\n    subagentSessionId?: SessionId;\n    effectivePreset?: string;\n    worktreeAssignment?: WorktreeAssignment;\n    stopReason?: SubagentStopReason;\n    status: \'completed\' | \'aborted\' | \'failed\';\n    cleanup: \'quiescent\' | \'unproven\';\n    outcome: string;\n    limitations: readonly string[];\n    provenance: {\n        kind: \'reported\';\n        role: DevLoopRole;\n        preset?: string;\n    };\n}',
+  },
+  {
     name: 'ShellExecRequest',
     declaration: 'export interface ShellExecRequest {\n    command: string;\n    workdir?: string | undefined;\n    timeoutMs?: number | undefined;\n    stdoutMaxBytes?: number | undefined;\n    signal?: AbortSignal | undefined;\n    stdin?: string | undefined;\n    env?: Record<string, string> | undefined;\n    dshEnv?: DshEnvironment | undefined;\n    sandboxPolicy?: SandboxExecutionPolicy | undefined;\n}',
   },
@@ -6475,6 +6520,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'UserMessage',
     declaration: 'export interface UserMessage extends Message {\n    readonly role: \'user\';\n}',
+  },
+  {
+    name: 'VerificationAssignment',
+    declaration: 'export interface VerificationAssignment {\n    claim: string;\n    decisionRestingOnClaim: string;\n    permittedSources: readonly string[];\n    requiredEvidence: readonly string[];\n}',
   },
   {
     name: 'VerifiedWebhookDelivery',
