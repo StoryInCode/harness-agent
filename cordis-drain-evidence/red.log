@@ -1,0 +1,39 @@
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+
+ RUN  v4.1.8 /home/sic/harness-agent/.worktrees/cordis-drain-tests
+
+ ✓ |thread-safe| packages/extensions/tool-cordis/tests/cordis-lifecycle.spec.ts (11 tests) 41ms
+ ❯ |thread-safe| packages/extensions/tool-cordis/tests/cordis-drain.spec.ts (7 tests | 5 failed) 42ms
+     × joins terminal consumers before resource close: root 17ms
+     × joins terminal consumers before resource close: simultaneous 4ms
+     × joins terminal consumers before resource close: chain 4ms
+     × joins terminal consumers before resource close: nested 4ms
+     × joins terminal consumers before resource close: registry-delete 4ms
+     ✓ keeps a re-registered runtime after the deleted runtime finishes draining 4ms
+     ✓ does not reactivate a terminal consumer when its service is republished during cleanup 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |thread-safe| packages/extensions/tool-cordis/tests/cordis-drain.spec.ts > Cordis terminal dependency drain > joins terminal consumers before resource close: root
+ FAIL  |thread-safe| packages/extensions/tool-cordis/tests/cordis-drain.spec.ts > Cordis terminal dependency drain > joins terminal consumers before resource close: simultaneous
+ FAIL  |thread-safe| packages/extensions/tool-cordis/tests/cordis-drain.spec.ts > Cordis terminal dependency drain > joins terminal consumers before resource close: chain
+ FAIL  |thread-safe| packages/extensions/tool-cordis/tests/cordis-drain.spec.ts > Cordis terminal dependency drain > joins terminal consumers before resource close: nested
+ FAIL  |thread-safe| packages/extensions/tool-cordis/tests/cordis-drain.spec.ts > Cordis terminal dependency drain > joins terminal consumers before resource close: registry-delete
+AssertionError: expected [] to include Fiber{ parent: Context <root>, …(16) }
+ ❯ packages/extensions/tool-cordis/tests/cordis-drain.spec.ts:69:81
+     67|         await entered.promise
+     68|         await withdrawn.promise
+     69|         expect(root.reflect.notify([middle ? 'drain-middle' : 'drain-s…
+       |                                                                                 ^
+     70|       } finally {
+     71|         release.resolve(undefined)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  5 failed | 13 passed (18)
+   Start at  10:40:01
+   Duration  499ms (transform 547ms, setup 605ms, import 38ms, tests 83ms, environment 0ms)

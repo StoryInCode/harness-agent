@@ -36,6 +36,9 @@ declare module './context.ts' {
      * once the fiber is active; it is unregistered (waking dependents) when
      * the returned disposer runs or the fiber unloads. Throws if the name is
      * already provided in this scope or declared as an accessor.
+     * The disposer joins affected consumers' cleanup, including terminal
+     * consumers. Return it directly after resource cleanup in an outer effect's
+     * disposer array to withdraw and drain before closing the resource.
      *
      * @param name — the service name.
      * @param value — the service value.
@@ -309,18 +312,19 @@ export class ReflectService {
    *
    * @param names — the service names that changed.
    * @param filter — restricts notification to matching isolation scopes.
-   * @returns the fibers whose dependency state was refreshed.
+   * @returns affected fibers, including terminal consumers still draining.
+   * Terminal fibers remain joinable with `await()` but are not refreshed or restarted.
    */
   notify(names: string[], filter = (ctx: Context, name: string) => ctx[symbols.isolate][name] === this.ctx[symbols.isolate][name]) {
     const fibers: Fiber[] = []
-    for (const runtime of this.ctx.registry.values()) {
+    for (const runtime of [...this.ctx.registry.values(), ...this.ctx.registry._draining]) {
       for (const fiber of runtime.fibers) {
         let hasUpdate = false
         for (const name of names) {
           if (!(name in fiber.inject)) continue
           if (!filter(fiber.ctx, name)) continue
           hasUpdate = true
-          fiber._checkImpl(name)
+          if (fiber.uid !== null) fiber._checkImpl(name)
         }
         if (!hasUpdate) continue
         fiber._refresh()

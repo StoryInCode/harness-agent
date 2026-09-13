@@ -108,12 +108,15 @@ function validateDescriptor(descriptor: KvUnitDescriptor): void {
  */
 export function apply(ctx: Context, config: Config) {
   const backend = new JsonStorageBackend(config.root)
-  ctx.effect(() => {
-    const unregister = ctx.storage.backend.register('json', backend)
-    return async () => {
-      unregister()
-      await backend.close()
-    }
-  })
-  ctx.provide(storageBackendServiceKey('json'), backend)
+  // Reverse disposal withdraws the service before fallback cleanup.
+  ctx.effect(() => [
+    ctx.effect(() => {
+      const unregister = ctx.storage.backend.register('json', backend)
+      return async () => {
+        unregister()
+        await backend.close()
+      }
+    }),
+    ctx.provide(storageBackendServiceKey('json'), backend),
+  ])
 }

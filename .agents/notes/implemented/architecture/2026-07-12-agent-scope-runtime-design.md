@@ -50,6 +50,10 @@ A Cordis fiber is the live instance created when a plugin or child context is ac
 
 The vendored Cordis fiber implementation establishes ownership before arbitrary setup or `internal/plugin` observers run. A reentrant unload can see the child fiber or effect that has started, reject effects added after unload begins, and join cleanup already started through a public single-shot disposer. Teardown observers are contained individually so one callback cannot prevent structural cleanup.
 
+Terminal disposal sets `Fiber.uid` to `null` immediately but retains the consumer in `runtime.fibers` until its existing inertia settles. Service withdrawal joins that cleanup without rechecking terminal implementations or refreshing their dependency epoch. Registry deletion removes the public entry synchronously and returns `Runtime | undefined`; `_draining` retains retired runtimes only for dependency cleanup discovery. Final cleanup removes the exact retired runtime and checks runtime identity before deleting a public entry, so fresh registration of the same callback survives an older drain.
+
+Public absence and cleanup completion are different facts: removing terminal consumers from dependency discovery early permits a provider to close a resource while consumer cleanup still uses it. The existing provide disposer owns that join; providers return `[cleanupEffect, provideDisposer]` inside `ctx.effect()` to transfer both effects to one reverse-ordered composition. An async wrapper around the provide disposer leaves its original ownership intact and cannot establish that ordering. Independent root effects remain concurrent rather than imposing a global teardown sequence.
+
 These are framework lifecycle guarantees rather than agent-specific policy. Agent creation depends on them because setup can activate arbitrary plugins and synchronously reenter owner disposal.
 
 ### Receivers route listeners; waterfalls compose decisions

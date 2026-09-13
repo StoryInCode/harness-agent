@@ -182,7 +182,7 @@ const INACTIVE = '__INACTIVE__'
  * cleanup for the plugin context returned by `ctx.plugin()`.
  */
 export class Fiber {
-  /** Unique id within the registry; 0 for the root fiber, `null` once disposed. */
+  /** Unique id within the registry; 0 for the root, `null` from terminal disposal admission. */
   public uid: number | null
   /** The context this fiber's plugin runs in (extends the parent context). */
   public readonly ctx: Context
@@ -192,9 +192,9 @@ export class Fiber {
   public _config: any
   /** Current lifecycle state; transitions emit `internal/status`. */
   public state = FiberState.PENDING
-  /** Dispose this fiber: unload the plugin, then settle once cleanup finished. */
+  /** Reject new work immediately, then unload; affected providers can join cleanup until settlement. */
   public readonly dispose: () => Promise<void>
-  /** Snapshot of required service implementations while loaded; `undefined` otherwise. */
+  /** Required service implementations retained through cleanup; `undefined` once unloaded. */
   public store: Dict<Impl> | undefined
   /** The in-flight load/unload transition, if one is currently running. */
   public inertia: Promise<void> | undefined
@@ -267,11 +267,9 @@ export class Fiber {
         return async () => {
           this.uid = null
           emitPluginDisposed(this.context, this)
-          if (this.ctx.registry.has(runtime.callback)) {
-            remove()
-            if (!runtime.fibers.length) {
-              this.ctx.registry.delete(runtime.callback)
-            }
+          if (this.ctx.registry.get(runtime.callback) === runtime
+            && [...runtime.fibers].every(fiber => fiber.uid === null)) {
+            this.ctx.registry.delete(runtime.callback)
           }
           this._setEpoch(INACTIVE)
           // A PENDING fiber can already own effects registered by an
@@ -290,8 +288,18 @@ export class Fiber {
           // itself failing, which we can't recover from in this exact spot
           // (calling the logger again is what just failed). Let the
           // rejection propagate; process-level crash is the honest outcome.
-          while (this.inertia) {
-            await this.inertia
+          try {
+            while (this.inertia) {
+              await this.inertia
+            }
+          } finally {
+            remove()
+            if (!runtime.fibers.length) {
+              this.ctx.registry._draining.delete(runtime)
+              if (this.ctx.registry.get(runtime.callback) === runtime) {
+                this.ctx.registry.delete(runtime.callback)
+              }
+            }
           }
         }
       }, 'ctx.plugin()')
@@ -609,6 +617,7 @@ export class Fiber {
   }
 
   _refresh() {
+    if (this.uid === null) return
     let epoch: string | boolean = false
     epoch = ''
     for (const name of Object.keys(this.inject)) {

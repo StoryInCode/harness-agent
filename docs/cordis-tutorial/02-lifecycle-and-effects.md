@@ -93,6 +93,10 @@ For a resource Cordis does not manage, acquire it inside `ctx.effect()` and retu
 
 One ordering caveat: disposers start in reverse registration order, but multiple **async** disposers run concurrently. If teardown steps must run in sequence, keep them in one disposer and await them there.
 
+A provider that must drain dependent plugins before closing its resource returns `[cleanupEffect, provideDisposer]` from inside `ctx.effect()`, where `provideDisposer` is the disposer returned by `ctx.provide()`. Cordis composes that array in reverse order and joins affected consumers even when their terminal disposal has already started. An async wrapper that merely calls `provideDisposer()` does not transfer its ownership to the outer effect; return the disposer itself. Independent root cleanup remains concurrent.
+
+Explicit fiber disposal marks the fiber terminal immediately; that marker is not proof that cleanup finished. Similarly, `ctx.registry.delete(plugin)` removes the public registration immediately and returns the removed runtime or `undefined` synchronously, without awaiting cleanup. `get()` and `has()` report absence during that drain unless the plugin is registered again.
+
 Next: [Services](03-services.md) — how plugins share capabilities.
 
 [![](https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white)](https://github.com/deepseek-ai/deepseek-harness)

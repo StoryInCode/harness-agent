@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": false,
+    "incremental": false,
+    "strict": true,
+    "paths": {
+      "@deepseek-ai/cordis": ["../../../vendor/cordis/lib/types/index.d.ts"],
+      "@deepseek-ai/cosmokit": ["../../../vendor/cosmokit/lib/types/index.d.ts"]
+    }
+  },
+  "include": ["../packages/extensions/tool-cordis/tests/cordis-drain.spec.ts"]
+}

@@ -93,6 +93,10 @@ PENDING → LOADING → ACTIVE → UNLOADING → DISPOSED
 
 有一项顺序注意事项：disposer 会按注册顺序的逆序启动，但多个**异步** disposer 会并发运行。如果拆除步骤必须按顺序执行，请把它们放在同一个 disposer 中，并在其中依次等待每步完成。
 
+如果 provider 必须先等待依赖它的插件完成清理，再关闭资源，就必须在 `ctx.effect()` 内返回 `[cleanupEffect, provideDisposer]`，其中 `provideDisposer` 是 `ctx.provide()` 返回的 disposer。Cordis 按逆序组合该数组，即使受影响的 consumer 已开始终结性 dispose，也会等待其清理完成。仅调用 `provideDisposer()` 的异步包装函数不会将其所有权转移给外层 effect；必须返回 disposer 本身。互不依赖的根级清理仍然并发执行。
+
+显式释放 fiber 会立即将其标记为终态；该标记并不证明清理已完成。同样，`ctx.registry.delete(plugin)` 会立即移除公开注册，同步返回移除的 runtime 或 `undefined`，不会等待清理完成。在清理期间，`get()` 和 `has()` 会报告该插件不存在，除非它已重新注册。
+
 下一章：[服务](03-services.zh.md)：插件如何共享功能。
 
 [![](https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white)](https://github.com/deepseek-ai/deepseek-harness)

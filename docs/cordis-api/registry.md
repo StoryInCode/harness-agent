@@ -108,7 +108,7 @@ namespace Plugin {
   export interface Runtime {
     /** Display name copied from the first registered plugin shape. */
     name?: string
-    /** Every live fiber of this plugin (one per `ctx.plugin()` call). */
+    /** Fibers of this runtime, including terminal fibers until their cleanup settles. */
     fibers: DisposableList<Fiber>
     /** The executable entrypoint all fibers share (registry identity key). */
     callback: globalThis.Function

@@ -1,0 +1,21 @@
+# Superseded frozen spec revisions (files no longer present; preserved per amendment chain):
+# f45eb7191e9233e2f18bb1a1251bdbe0c97cd9a6ed3a92593a0bf005c7cc29ce  cordis-drain.spec.ts (original frozen RED)
+# 43935ced94feaac28ee7cc02cda9b3dd860f82914bcd994f118406bf68b7e9aa  cordis-drain.spec.ts (intermediate amendment: bare [cleanup, unprovide]; withdrawn barrier unresolved)
+d419970a1474acf322c02811daa9dfcedfeadd9dcfc5b7fae719e3cd38c96853  packages/extensions/tool-cordis/tests/cordis-drain.spec.ts
+cb7c1ad02eb394bca4db9ddf8391fb3230cfd63a261c94cf4477c24474b112e8  packages/extensions/tool-cordis/tests/cordis-lifecycle.spec.ts
+# Frozen pre-patch vendor revisions (superseded when the Core drain patch landed in this worktree):
+# 750555b47603f88e7ef7a05d1a8d629b355c176a1185af411aac6e3e1e2b7ba3  vendor/cordis/src/fiber.ts
+# 6847b9781044023d65aebb5896a873b9f0a3d777eaf7fa0dd2a7a408eb6b74a6  vendor/cordis/src/reflect.ts
+# 34bbd60ae502b4f85201c204afb52a9acabde6878d9278493478c1b2183debd3  vendor/cordis/src/registry.ts
+f6504d0d866dd7a6811ec41c94c5d2da6d6c46ca7d1cc8b6d6be9461859bb720  vendor/cordis/src/fiber.ts
+eafeb58bc1cdabd706da10dded26c106f4ab6c8d08e55efc8482171fe35083d6  vendor/cordis/src/reflect.ts
+f7c6aa0885d186e0b69738cceedb7a04143664cc965762fef7349f2a80d1a35b  vendor/cordis/src/registry.ts
+f7c1e5be21250d6b391db8e7ee5b70f733aee642c8bb7dc2c375d17f62e0971d  cordis-drain-evidence/lint.log
+66d15caac01f0c9d5396cc944f4f35d09137f33cbf650e87e6eef33793270a39  cordis-drain-evidence/red.log
+aee06276216d56180a583e16f3d7b69849c5713855ecc2d1d5cff108e2bafd80  cordis-drain-evidence/source-types-failed.log
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  cordis-drain-evidence/types.log
+ab0d30cd4ac8f1d9edb537bf4bdab6b8355e7ad065dba774158f62a06a190dce  cordis-drain-evidence/tsconfig.json
+9754bc58d9af226c33bcb075efc8343dc387f0cd68e8668220101226de355fd4  cordis-drain-evidence/red2.log
+81bd7beff8040919f5d7ab50762ef98af7916c2b0c68c0721f26cc196e316f6f  cordis-drain-evidence/lint2.log
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  cordis-drain-evidence/types2.log
+2ac21309391e7cb43474ccf85278e55234d38cb5b5428aa4c43e01b26c1e6c3b  cordis-drain-evidence/RED.md

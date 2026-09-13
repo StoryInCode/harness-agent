@@ -136,7 +136,7 @@ export namespace Plugin {
   export interface Runtime {
     /** Display name copied from the first registered plugin shape. */
     name?: string
-    /** Every live fiber of this plugin (one per `ctx.plugin()` call). */
+    /** Fibers of this runtime, including terminal fibers until their cleanup settles. */
     fibers: DisposableList<Fiber>
     /** The executable entrypoint all fibers share (registry identity key). */
     callback: globalThis.Function
@@ -195,6 +195,8 @@ declare module './context.ts' {
 export class RegistryService {
   private _counter = 0
   private _internal = new Map<Function, Plugin.Runtime>()
+  // Deleted runtimes remain discoverable only for dependency cleanup joins.
+  readonly _draining = new Set<Plugin.Runtime>()
 
   constructor(public ctx: Context) {
     defineProperty(this, symbols.tracker, {
@@ -242,7 +244,7 @@ export class RegistryService {
    * Check whether a plugin has a registered runtime.
    *
    * @param plugin — any supported plugin shape.
-   * @returns `true` when at least one fiber of the plugin exists.
+   * @returns `true` when the plugin has a registered runtime, excluding deleted runtimes still draining.
    */
   has(plugin: Plugin) {
     const key = this.resolve(plugin)
@@ -250,7 +252,9 @@ export class RegistryService {
   }
 
   /**
-   * Dispose every running fiber for a plugin and remove its runtime record.
+   * Remove the runtime from public lookup synchronously and start fiber disposal.
+   * Cleanup remains joinable by affected service providers; this call does not
+   * await it. Re-registering the plugin creates an independent runtime.
    *
    * @param plugin — any supported plugin shape.
    * @returns the removed runtime, or `undefined` when none was registered.
@@ -260,6 +264,7 @@ export class RegistryService {
     const runtime = key && this._internal.get(key)
     if (!runtime) return
     this._internal.delete(key)
+    if (runtime.fibers.length) this._draining.add(runtime)
     for (const fiber of runtime.fibers) {
       fiber.dispose()
     }

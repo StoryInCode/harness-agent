@@ -50,6 +50,10 @@ Cordis fiber 是插件或子上下文被激活时创建的活跃实例。其状�
 
 vendor 中的 Cordis fiber 实现在任意 setup 或 `internal/plugin` 观察者运行之前就建立了所有权。可重入的卸载可以看到已启动的子 fiber 或 effect，拒绝卸载开始后添加的 effect，并通过一个公开的一次性 disposer 加入已启动的清理。拆除观察者被逐个隔离，因此一个回调无法阻止结构性清理。
 
+终结性 dispose 会立即将 `Fiber.uid` 设为 `null`，但 consumer 会保留在 `runtime.fibers` 中，直到其已有 inertia 完成。服务撤销会等待该清理，不会重新检查终态 fiber 的实现，也不会刷新其依赖 epoch。注册表删除会同步移除公开条目并返回 `Runtime | undefined`；`_draining` 仅为发现依赖清理而保留已退出公开注册表的 runtime。最终清理会移除确切的旧 runtime，并在删除公开条目前检查 runtime 对象身份，因此同一 callback 的新注册不会被旧清理删除。
+
+公开查询不存在与清理完成是两个不同的事实：过早让依赖发现忽略终态 consumer，会允许 provider 在 consumer 清理仍使用资源时关闭它。现有的 provide disposer 负责等待该清理；provider 在 `ctx.effect()` 内返回 `[cleanupEffect, provideDisposer]`，将两个 effect 的所有权转移给同一个逆序组合。用异步函数包装 provide disposer 会保留其原有所有权，无法建立该顺序。互不依赖的根级 effect 仍然并发执行，而不强制采用全局拆除顺序。
+
 这些是框架生命周期保证，而非 agent 特有的策略。Agent 创建依赖它们，因为 setup 可以激活任意插件并同步重入所有者的 dispose（资源释放）。
 
 ### Receiver 路由监听器；waterfall 组合决策
