@@ -3,7 +3,24 @@
 Colocated axioms governing everything under `plans/`. Machine-checkable axioms are fenced
 `axiom` blocks; prose axioms bind the model but are not mechanically evaluated.
 
+## Axiom categories
+
+Axioms come in two categories:
+
+- **Deterministic axioms** are machine-checkable. Each is a fenced `axiom` block with an id, an
+`applies_to` glob, and a shell `command`; CI or a local script enforces it and a violation is a
+build failure. Prose cannot override a failing deterministic check — fix the artifact or amend the
+axiom through its owning review.
+- **Meta axioms** are agent-driven checks. They are prose obligations the model must honor through
+judgment and review; no script evaluates them. They bind even where no gate exists, and a reviewer
+(or the agent itself) must treat a violated meta axiom as a defect.
+
+Many entries pair the two: prose states the obligation (meta) and a fenced block enforces its
+mechanically checkable core (deterministic). Each heading below declares its category.
+
 ## META AXIOM — Harness patterns are mandatory
+
+**Category:** both — the prose below binds the agent (meta), and the fenced `axiom` block(s) enforce it mechanically (deterministic) (R-harness-primitive-declared, R-piece-size, R-piece-required-sections).
 
 Every implementation produced from these plans MUST follow current DeepSeek Harness
 patterns. This overrides convenience, familiarity, and any pattern carried in from another
@@ -71,17 +88,42 @@ description: >-
 
 ## Axiom — no invented delegation or evidence
 
+**Category:** meta — agent-driven check; no machine gate.
+
 No document may claim an agent was invoked, a source was inspected, a benchmark exists, a
 model is available, or a verification ran, unless it actually happened. Reported findings
 carry the role and preset that produced them, and are distinguishable from direct inspection.
 
+## Axiom — current state carries no revision history
+
+**Category:** meta — agent-driven check; no machine gate.
+
+Current-state documentation describes only how the system works now. Revision
+narration — "the owner removed X", "this replaced Y", "previously we did Z" —
+does not belong in piece files, READMEs, or contracts. When a decision changes:
+
+- Rewrite the affected documents to state the current behavior directly.
+- Move the superseded history into a dedicated archive file (for example an
+  `ARCHIVE.md` beside the affected plan set) rather than deleting the record
+  outright, so prior decisions stay discoverable without polluting current
+  state.
+- Express any follow-up work the old assumption implied as an explicit todo
+  owned somewhere in the plan set, never as an inline "this used to" note.
+
+Evidence citations that name who reported a finding remain: they are
+provenance, not history, and stay honestly attributed.
+
 ## Axiom — specs are ingestion-sized
+
+**Category:** meta — agent-driven check; no machine gate.
 
 A specification is written to be consumed one component at a time. Large monolithic plan
 documents are a defect, not a style preference. The unit of review, approval, delegation and
 implementation is one piece.
 
 ## META AXIOM — every completed task is visible to the owner
+
+**Category:** both — the prose below binds the agent (meta), and the fenced `axiom` block(s) enforce it mechanically (deterministic) (R-piece-visible-result).
 
 A task is not done when the code works. It is done when the owner can SEE it working.
 
@@ -112,6 +154,8 @@ description: >-
 ```
 
 ## META AXIOM — teach while building
+
+**Category:** both — the prose below binds the agent (meta), and the fenced `axiom` block(s) enforce it mechanically (deterministic) (R-piece-teaches).
 
 Every unit of work teaches its owner, who is to be treated as a junior developer becoming a
 better developer by building this system. Never assume prior knowledge of the architecture,
@@ -208,6 +252,8 @@ description: >-
 
 ## META AXIOM — capture reusable knowledge, do not prematurely generalize
 
+**Category:** both — the prose below binds the agent (meta), and the fenced `axiom` block(s) enforce it mechanically (deterministic) (R-piece-reuse-capture, severity warning).
+
 Explanations, decisions, research findings, tests and debugging discoveries are inputs to a
 reusable engineering knowledge base. Solve the concrete problem first; leave behind enough
 structured evidence that a later Research/Utility agent can extract what is worth reusing.
@@ -268,12 +314,14 @@ description: >-
 
 ## META AXIOM — finished work moves to `done/`
 
+**Category:** both — the prose below binds the agent (meta), and the fenced `axiom` block(s) enforce it mechanically (deterministic) (R-done-pieces-moved, severity warning).
+
 A piece that is complete does not stay in the plan set. It moves to a `done/` folder, so the
 remaining plan is always the remaining work and progress is visible by looking at the tree.
 
 - Each set directory has a sibling `done/` subdirectory: `<set>/done/`.
 - A piece moves there after implementation passes the frozen tests, transfer to master, and
-  successful post-transfer tests. No separate Reviewer stage is required. Move it and update
+  successful post-transfer tests. The flow has no reviewer stage. Move it and update
   the index promptly, then commit the completed milestone; do not push without authorization.
 - The move preserves the filename and its id, so references from other pieces stay resolvable.
   A piece referring to a completed dependency looks in `<set>/done/` for it.
@@ -296,6 +344,8 @@ description: >-
 ```
 
 ## META AXIOM — verify the spec, do not follow it blindly
+
+**Category:** both — the prose below binds the agent (meta), and the fenced `axiom` block(s) enforce it mechanically (deterministic) (R-claims-verified).
 
 A design piece is a set of CLAIMS, not a set of orders. Whoever implements it is responsible for
 checking it before building on it. A piece was written by an agent working from evidence that may
@@ -341,6 +391,8 @@ description: >-
 
 ## META AXIOM — resources and citations of proof
 
+**Category:** meta — agent-driven check; no machine gate.
+
 Every piece carries a `## Resources and proof` section serving two audiences: the implementer who
 must trust it, and the owner who is learning from it.
 
@@ -360,6 +412,8 @@ Distinguish the specification from one implementation of it. Prefer a primary so
 of it, and say when only a summary was available. Version-pin anything that changes.
 
 ## META AXIOM — isolate with worktrees, never with branches
+
+**Category:** both — the prose below binds the agent (meta), and the fenced `axiom` block(s) enforce it mechanically (deterministic) (R-no-feature-branches).
 
 Parallel agents need isolated workspaces. They do not need branches, and branches are the wrong
 tool here: a branch is easy to forget, easy to leave behind, and it hides work from the owner who

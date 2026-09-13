@@ -25,7 +25,7 @@ The development loop is the execution engine that all future DeepSeek Harness wo
 
 ## Execution Protocol
 
-The owner removed the separate Reviewer stage. The implementation sequence is Test Writer → RED → Implementer gets tests green → transfer to master → final post-merge tests → move the completed piece into `done/` and update this index. Human approval remains part of the product; it is not the removed code-review stage.
+The implementation sequence is Test Writer → RED → Implementer gets tests green → transfer to master → final post-transfer tests → move the completed piece into `done/` and update this index. There is no reviewer stage. Human approval is part of the product, exercised at `00.03`, and is separate from any code-review process.
 
 1. **Intake & Validation**: Piece files under `plans/pieces/` are parsed and validated by `00.01` to enforce structure, the line ceiling (<=280), and primitive rules. A malformed piece is reported as a rejection alongside the valid ones, so one bad file never hides a set.
 2. **Approval Junction**: `00.03` presents Summary, Mechanism, BDD scenarios, the teaching section, and the References table to the user, pausing for Accept, Question, or Change.
