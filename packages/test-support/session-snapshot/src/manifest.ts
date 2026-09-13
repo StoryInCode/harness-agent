@@ -2,6 +2,7 @@
 
 import { isAbsolute } from 'node:path'
 import * as yaml from 'js-yaml'
+import { parseCommandSnapshotOperations, type CommandSnapshotOperation } from './command-operations.ts'
 
 /** Public `dsh` profile used to control a recorded-session scenario. */
 export type SnapshotProfile = 'headless' | 'sdk' | 'acp' | 'web'
@@ -67,6 +68,8 @@ export interface SnapshotInputManifest {
   task?: string
   /** Binary inputs keyed by the content-addressed ids retained in session JSONL. */
   attachments?: SnapshotInputAttachment[]
+  /** Web-only command ordinals and process restarts; command text stays in canonical Session JSONL. */
+  operations?: CommandSnapshotOperation[]
 }
 
 /** Optional reference to another scenario's canonical session. */
@@ -334,7 +337,14 @@ export function parseSnapshotManifest(source: string, path = 'snapshot.yml'): Sn
     let input: SnapshotInputManifest | undefined
     if (root.input !== undefined) {
       const value = record(root.input, 'manifest.input')
-      exactKeys(value, ['task', 'attachments'], 'manifest.input')
+      exactKeys(value, ['task', 'attachments', 'operations'], 'manifest.input')
+      let operations: CommandSnapshotOperation[] | undefined
+      if (value.operations !== undefined) {
+        if (root.profile !== 'web' || value.task !== undefined || value.attachments !== undefined) {
+          throw new Error('manifest.input.operations requires Web command-only input')
+        }
+        operations = parseCommandSnapshotOperations(value.operations)
+      }
       if (value.task !== undefined && (typeof value.task !== 'string' || value.task.trim() === '')) {
         throw new Error('manifest.input.task must be a non-empty string when present')
       }
@@ -361,12 +371,13 @@ export function parseSnapshotManifest(source: string, path = 'snapshot.yml'): Sn
           throw new Error('manifest.input.attachments must have unique ids')
         }
       }
-      if (value.task === undefined && attachments === undefined) {
-        throw new Error('manifest.input must declare task or attachments')
+      if (value.task === undefined && attachments === undefined && operations === undefined) {
+        throw new Error('manifest.input must declare task, attachments, or operations')
       }
       input = {
         ...(value.task === undefined ? {} : { task: value.task }),
         ...(attachments === undefined ? {} : { attachments }),
+        ...(operations === undefined ? {} : { operations }),
       }
     }
 

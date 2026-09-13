@@ -1,0 +1,10 @@
+version: 1
+scenario: command-status
+profile: web
+composition: web-command-only
+recording: live
+header:
+  class: no-model-requests
+  pin: true
+workspace:
+  final: true

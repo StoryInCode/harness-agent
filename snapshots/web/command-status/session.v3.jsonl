@@ -1,0 +1,6 @@
+{"type":"session","version":3,"id":"{{session:1}}","createdAt":0,"cwd":"{{cwd}}","isSeeded":false,"delegationDepth":0,"agentPreset":"standard"}
+{"type":"permission/preset","data":{"preset":"workspace-write"}}
+{"type":"sandbox/mode","data":{"mode":"workspace-write"}}
+{"type":"approval/policy","data":{"policy":"ask"}}
+{"type":"command/run","data":{"commandId":"{{command:1}}","name":"goal","args":"","source":{"kind":"user"}}}
+{"type":"command/done","data":{"commandId":"{{command:1}}","kind":"success","text":"No goal is currently set.\nUsage: /goal [<objective>|clear|edit <objective>|pause|resume]"}}

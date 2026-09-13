@@ -1,0 +1,8 @@
+- id: session-persistence-jsonl
+  config:
+    root: !!js dshHomePath('sessions')
+    compression: none
+- id: session-title-llm
+  disabled: true
+- id: session-telemetry-otel
+  disabled: true

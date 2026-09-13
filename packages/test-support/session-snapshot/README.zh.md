@@ -70,6 +70,8 @@ defineAcpSnapshotSuite({
 
 每个已记录 Session 目录携带封闭的 `snapshot.yml` manifest，以及规范 parent 与连续 child 角色。parent 文件名是 `session[.vN].jsonl`；child 是 `session.<ordinal>[.vN].jsonl`；v0 省略 `.v0`，正版本使用小写 `.vN`，且每个文件名与其 header 一致。一个角色可以保留旧 generation，但 harness 会选择数值最高的一项。拥有 fixture 的 manifest 可以声明 `sessionFormat.version` 与一个或多个封闭 `coverage` 名称，把该历史 generation 保留为显式迁移 fixture；省略此字段时跟随当前 writer。manifest 还会指名场景、随附 profile、组合／header 类别、录制来源，以及已完成 Session 无法重建的 replay、平台、权限、环境、workspace 或输入事实。存储保护检查每个选定 parent 与 child 角色的工具结果和可移植路径。提示词／schema 擦除、消息身份及提示词先于请求的顺序检查适用于当前 generation；保留的前代维持其历史表示。适配器注册预期输出、Session 日志与可选 `workspace.expected/` 比较；保护会拒绝遗留目录、缺失角色、非规范名称、绝对路径、格式错误的 manifest 与平台专用分隔符。
 
+Web 纯命令场景可以声明 `input.operations`：`{ kind: command, run: 0 }` 选择从零编号的规范 `command/run` 记录，`{ kind: restart }` 在关闭进程后使用相同私有主目录重新启动，并重新连接相同 Session 标识和 cwd。命令序号必须按递增顺序恰好覆盖规范日志一次；重启必须位于命令之间。未知字段、跳过或重复的序号，以及混合任务／附件输入都会在验证时失败。命令文本仅保留在 Session JSONL 中。
+
 `normalizeSessionSnapshot` 在规范化路径并擦除系统提示文本与工具 schema 后，会保留完整 Session header 与事件 payload，但从已提交 fixture 中省略顶层 `seq`/`time` envelope；它还会规范化嵌入式 stream clock 与历史 packed-row 的 `seq0`/`time0` envelope 与 catalog child 创建时钟。事件顺序与来源事件引用保持不变。Replay 只在内存中合成顶层 envelope，而运行时持久化仍写入完整日志。多 Session 比较会先通过严格的构建期静态 Session 格式目录校验预期日志与收集日志，再进行身份脱敏与规范化；来源文件名不能改变格式校验。保留的历史 replay 输入不是原生当前格式 writer 输出的比较基准：结构迁移保留请求含义，但可以产生不同的事件布局。归一化保留意外的 request-header 字段（包括 `system`），使回归保持可见。无版本的协议适配器单元测试 fixture 不属于已发布 Session 格式语料。[当前写入器格式](../../../docs/session-format-status.zh.md)的 fixture 每个事件占一行；保留的 v0/v1 fixture 可以使用规范 packed row。[临时仓库迁移器](../../../scripts/migrate-packed-session-fixtures.ts)（`pnpm run migrate:packed-session-fixtures`）会改写更旧的历史布局，由其[移除提案](../../../.agents/notes/proposed/process/2026-07-26-remove-packed-session-fixture-migrator.zh.md)负责删除该迁移器。
 
 spill 场景通过真实本地提供方保存到私有临时根目录。fixture 适配器提供固定长度的逻辑定位符，并仅将本次运行已保存的定位符映射回实际文件以供检索，在不写入共享逻辑路径的情况下保留预览预算。已知的快照 spill 路径会规范化为稳定的定位符 token，包括 JSON 省略通知中带引号、使用 JSON 转义 Windows 分隔符的路径。刷新提取会保留匹配路径的序列化写法，以便进行字面替换。规范化只改变定位符：保存字节数与省略计数仍作为比较证据。
@@ -116,19 +118,14 @@ spill 场景通过真实本地提供方保存到私有临时根目录。fixture 
 | [`src/launcher.ts`](src/launcher.ts) | 子进程/客户端启动器与关闭所有权 |
 | [`src/harness.ts`](src/harness.ts) | 脚本化场景驱动与会话日志收集 |
 | [`src/manifest.ts`](src/manifest.ts) | 封闭 `snapshot.yml` schema、收集与归属规则 |
+| [`src/command-operations.ts`](src/command-operations.ts) | 封闭的 Web 命令序号与重启验证 |
 | [`src/session-files.ts`](src/session-files.ts) | 规范 parent/child generation grammar、header 一致性与最高角色选择 |
 | [`src/identity.ts`](src/identity.ts) | 跨父子日志的类型化首次出现身份 token 化 |
 | [`src/normalize.ts`](src/normalize.ts) | 纯规范化器与擦除辅助 |
 | [`src/workspace.ts`](src/workspace.ts) | 场景 workspace 设置与完整预期状态比较 |
-| [`src/git-workspace.ts`](src/git-workspace.ts) | 可复现的私有 Git 输入与保留 worktree 的文件预期状态 |
-| [`src/roles-records.ts`](src/roles-records.ts) | 按类型识别委派／历史回执，不改写报告语义 |
 | [`src/suite.ts`](src/suite.ts) | 场景表套件工厂、fixture 保护、录制/刷新回写 |
 | [`src/index.ts`](src/index.ts) | 再导出四个层的包入口 |
 | — | 不发布运行时不变式伴生入口；该测试支持包不拥有任何生产事件流或可变数据；消费它的测试套件会检验该工具包。 |
-
-Roles 回执仅通过匹配的 `dev_loop_delegate` 或 `dev_loop_delegations` 调用及成功的工具结果 JSON 来识别。身份字段共享带类型的委派、worktree 和 Session token；仅将 `requestedAt` 与 `finishedAt` 时钟归零。报告文本、来源、限制、Git 基点提交，以及无关 JSON 或用户文字仍可用于检测回归。按父级上下文规范化 cwd 会保留子级分配的 worktree 后缀。
-
-开发循环 Git 设置以固定的作者、提交者、日期、分支和换行策略提交种子文件。其预期状态检查排除现有的 harness 所有运行时根目录、根 Git 数据库，以及精确的 `.worktrees/<piece>/.git` 指针文件；全部保留检出文件及意外写入仍然可见。场景拥有独立、完整的预期工作区，而不是从报告推导成功。
 
 ### 数据流
 

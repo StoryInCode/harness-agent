@@ -1,0 +1,31 @@
+- id: session-persistence-jsonl
+  config:
+    root: !!js dshHomePath('sessions')
+    compression: none
+- id: session-title-llm
+  disabled: true
+- id: session-telemetry-otel
+  disabled: true
+- insert:
+    - id: snapshot-dev-loop-directory
+      name: '@deepseek-ai/dsh-dev-loop-directory'
+      config:
+        root: !!js process.cwd() + '/workspace/plans/pieces'
+    - id: snapshot-dev-loop-persistence
+      name: '@deepseek-ai/dsh-dev-loop-persistence'
+      config:
+        repositoryRoot: !!js process.cwd() + '/workspace'
+        maxRecordBytes: 1048576
+        maxHistoryRecords: 100
+    - id: snapshot-dev-loop-lifecycle
+      name: '@deepseek-ai/dsh-dev-loop-lifecycle'
+      inject: [devLoopPersistence]
+      config:
+        durability: required
+    - id: snapshot-dev-loop-queue
+      name: '@deepseek-ai/dsh-dev-loop-queue'
+    - id: snapshot-dev-loop-recovery-command
+      name: '@deepseek-ai/dsh-dev-loop-persistence/command'
+      config:
+        maxInputBytes: 4096
+        maxOutputBytes: 65536

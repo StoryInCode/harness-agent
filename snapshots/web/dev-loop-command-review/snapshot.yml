@@ -1,0 +1,12 @@
+version: 1
+scenario: dev-loop-command-review
+profile: web
+composition: web-dev-loop-command
+recording: live
+header:
+  class: no-model-requests
+  pin: true
+  systemPromptSource: command-status
+  toolSchemasSource: command-status
+workspace:
+  final: true

@@ -1,0 +1,19 @@
+version: 1
+scenario: dev-loop-command-recovery
+profile: web
+composition: web-dev-loop-command-recovery
+recording: live
+header:
+  class: no-model-requests
+  pin: true
+  systemPromptSource: command-status
+  toolSchemasSource: command-status
+workspace:
+  final: true
+input:
+  operations:
+    - { kind: command, run: 0 }
+    - { kind: command, run: 1 }
+    - { kind: command, run: 2 }
+    - { kind: restart }
+    - { kind: command, run: 3 }

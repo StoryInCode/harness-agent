@@ -1,0 +1,5 @@
+8a1c29a82589a8116ccd53725cb54d2e4a42b1518bc85c7ed3e7a8a86041808f  cordis.patch.yml
+b99d0c939056f35bf6fdb025cda497b129ce6b7bbb16cc5bdb9b7adad590e7e2  session.v3.jsonl
+be7490d6f010c58dc4ef5b78b4b1be27b0b672f0603395754a8405a242b4a16b  snapshot.yml
+2395a56e4c1f3d7bb6304a7cdf2e171ca9536b965a7c6752ead3f20d807fdec2  workspace.expected/plans/pieces/00-command/00.12-recovery.md
+2395a56e4c1f3d7bb6304a7cdf2e171ca9536b965a7c6752ead3f20d807fdec2  workspace/plans/pieces/00-command/00.12-recovery.md

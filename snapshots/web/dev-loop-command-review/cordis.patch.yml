@@ -1,0 +1,17 @@
+- id: session-persistence-jsonl
+  config:
+    root: !!js dshHomePath('sessions')
+    compression: none
+- id: session-title-llm
+  disabled: true
+- id: session-telemetry-otel
+  disabled: true
+- insert:
+    - id: snapshot-dev-loop-directory
+      name: '@deepseek-ai/dsh-dev-loop-directory'
+      config:
+        root: !!js process.cwd() + '/workspace/plans/pieces'
+    - id: snapshot-dev-loop-lifecycle
+      name: '@deepseek-ai/dsh-dev-loop-lifecycle'
+    - id: snapshot-dev-loop-queue
+      name: '@deepseek-ai/dsh-dev-loop-queue'

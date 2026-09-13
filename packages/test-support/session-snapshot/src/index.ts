@@ -18,6 +18,12 @@
  */
 
 export {
+  parseCommandSnapshotOperations,
+  resolveCommandSnapshotOperations,
+  type CommandSnapshotOperation,
+} from './command-operations.ts'
+export { prepareDevLoopSnapshotWorkspace, captureDevLoopSnapshotWorkspace } from './git-workspace.ts'
+export {
   redactSessionSnapshotIds,
 } from './identity.ts'
 export {
@@ -105,7 +111,6 @@ export {
   type Scenario,
   type SnapshotSuiteOptions,
 } from './suite.ts'
-export { prepareDevLoopSnapshotWorkspace, captureDevLoopSnapshotWorkspace } from './git-workspace.ts'
 export {
   captureExpectedWorkspaceSnapshot,
   captureWorkspaceSnapshot,
