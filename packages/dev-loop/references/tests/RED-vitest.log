@@ -1,0 +1,1117 @@
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+
+ RUN  v4.1.8 /home/sic/harness-agent/.worktrees/references-tests
+
+ × |thread-safe| packages/dev-loop/references/tests/config.spec.ts > maxPieceBytes rejects non-positive, fractional and unsafe numeric policy 6ms
+   → missing positive safe-integer validation for maxPieceBytes=0: expected [Function] to throw an error
+ × |thread-safe| packages/dev-loop/references/tests/config.spec.ts > maxSourceBytes rejects non-positive, fractional and unsafe numeric policy 0ms
+   → missing positive safe-integer validation for maxSourceBytes=0: expected [Function] to throw an error
+ × |thread-safe| packages/dev-loop/references/tests/config.spec.ts > maxObservationBytes rejects non-positive, fractional and unsafe numeric policy 0ms
+   → missing positive safe-integer validation for maxObservationBytes=0: expected [Function] to throw an error
+ × |thread-safe| packages/dev-loop/references/tests/config.spec.ts > maxReferences rejects non-positive, fractional and unsafe numeric policy 0ms
+   → missing positive safe-integer validation for maxReferences=0: expected [Function] to throw an error
+ × |thread-safe| packages/dev-loop/references/tests/config.spec.ts > repositoryRoot rejects blank policy rather than selecting ambient cwd 0ms
+   → expected [Function] to throw an error
+ × |thread-safe| packages/dev-loop/references/tests/config.spec.ts > maxObservationBytes rejects a budget smaller than the minimum complete error envelope 1ms
+   → expected [Function] to throw an error
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > Loader consumer sees structural validity without elevating a direct inspection assertion 86ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > reopens the durable observation and refreshes exact piece and source fingerprints only on verification 93ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > code resolves from repositoryRoot while Markdown links resolve from the piece directory 89ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > detaches verification and query results including nested entry metadata 61ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > canonical five columns retain question, mode and usage with inline Markdown headings 64ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:1` reports resolved without interpreting confidence as structure 50ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:1-2` reports resolved without interpreting confidence as structure 53ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > refuses authoritative JSON with invalid fingerprint rather than skipping or replacing it 52ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > refuses authoritative JSON with invalid inspection claim rather than skipping or replacing it 50ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > authored three-column profile Source | Role/preset and provenance | Decision informed preserves absent canonical fields 63ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > authored three-column profile Source | Question answered | Provenance preserves absent canonical fields 46ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > authored three-column profile Source | Provenance | Decision informed preserves absent canonical fields 52ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:0` reports invalid without interpreting confidence as structure 45ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:2-1` reports invalid without interpreting confidence as structure 40ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:3` reports invalid without interpreting confidence as structure 40ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > refuses authoritative JSON with invalid entries rather than skipping or replacing it 53ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > rejects a backend write failure without publishing and preserves the prior observation on reopen 63ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > four-column authored profile retains role cell separately from provenance 60ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:-1` reports invalid without interpreting confidence as structure 50ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:1.5` reports invalid without interpreting confidence as structure 44ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:9007199254740992` reports invalid without interpreting confidence as structure 40ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > serializes verification through the durable write before reading the next piece version 59ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > honors pre-read cancellation without resolving files or publishing an observation 39ms
+   → expected [Function] to throw error matching /cancel before reading|abort/i but got 'Missing References behavior: parse, c…'
+ × |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > cancels at a source barrier without checking later sources or publishing 46ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > multiple links and escaped pipes in inline code expand locators without splitting prose 53ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > inline code in a link label is display text, not a second source locator 51ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `absent.txt` reports missing without interpreting confidence as structure 38ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `plans` reports invalid without interpreting confidence as structure 40ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `../outside.txt` reports invalid without interpreting confidence as structure 33ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > drains an admitted write despite cancellation and disposal before closing the domain 48ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > refuses verification and queries through a stale service after disposal 36ms
+   → expected [Function] to throw error matching /closed|dispos|stopp/i but got 'Missing References behavior: parse, c…'
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > plain None. is an explicit durable empty declaration 57ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > plain No references. is an explicit durable empty declaration 36ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure  is never accepted as empty 37ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator [unsupported](ftp://example.invalid/doc) reports invalid without interpreting confidence as structure 34ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator unmarked/path.txt reports invalid without interpreting confidence as structure 34ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator [query](../../../tracked.txt?revision=1) reports invalid without interpreting confidence as structure 33ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure Maybe none is never accepted as empty 33ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure `None.` is never accepted as empty 47ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure **None.** is never accepted as empty 40ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > line ranges are retained and decoded-text SHA-256 includes CRLF and multibyte characters 34ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > fragment is retained but no semantic symbol verification is claimed 34ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > absolute local paths reject even when inside repositoryRoot 34ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Source | Provenance | Decision informed |
+|---|---|---| is never accepted as empty 42ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Source | Provenance | Decision informed |
+|---|---|---|
+| `tracked.txt` | Parent | is never accepted as empty 35ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Source | Provenance | Decision informed |
+|---|---|---|
+| `tracked.txt` | Parent | reason | extra | is never accepted as empty 34ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > intermediate symlink escape rejects before reading outside content (POSIX symlink privilege) 53ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > HTTP and HTTPS sources remain not-checked and are never handed to filesystem resolution 53ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Source | Source | Provenance |
+|---|---|---|
+| `tracked.txt` | `tracked.txt` | Parent | is never accepted as empty 36ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Provenance | Source | Decision informed |
+|---|---|---|
+| Parent | `tracked.txt` | reason | is never accepted as empty 45ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Source | Author | Decision informed |
+|---|---|---|
+| `tracked.txt` | Parent | reason | is never accepted as empty 36ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > external reference checking makes no HTTP request to the cited server 53ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > maxSourceBytes 6 measures UTF-8 bytes inclusively 47ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > maxSourceBytes 5 measures UTF-8 bytes inclusively 46ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Thing | Provenance | Decision informed |
+|---|---|---|
+| `tracked.txt` | Parent | reason | is never accepted as empty 33ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure None.
+
+| Source | Provenance | Decision informed |
+|---|---|---|
+| `tracked.txt` | Parent direct inspection | Decision informed by source | is never accepted as empty 32ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > References inside a code fence is not a References section 41ms
+   → expected Error: Missing References behavior: parse… to match object { code: 'MISSING_REQUIRED_SECTION' }
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > maxPieceBytes rejects a multibyte piece without silently clipping retained evidence 51ms
+   → expected [Function] to throw error matching /maxPieceBytes|piece.*(byte|limit|lar…/i but got 'Missing References behavior: parse, c…'
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > maxReferences counts locators rather than source table rows 44ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > maxObservationBytes applies to the complete retained JSON and rejects rather than truncates 40ms
+   → expected [Function] to throw error matching /maxObservationBytes|observation.*(by…/i but got 'Missing References behavior: parse, c…'
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > real lying child report links exact identity but never verifies cited source inspection 5732ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > human prose naming a historical role does not select the newest report 35ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > exact id selects an older report rather than another latest record 38ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > visible identity mismatch role:Utility is contradicted independently of existing source 36ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > visible identity mismatch preset:requested-other is contradicted independently of existing source 35ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > an entire canonical role cell is a role assertion in the four-column profile 31ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > asserted preset with no actual preset is unavailable, not contradicted or filled from prose 29ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > partial failed report retains terminal status and limitations 35ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > partial aborted report retains terminal status and limitations 30ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > requested-only residue is not an executed report 33ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > settlement without actual child identity is not a linked report 33ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > unavailable id from other piece=false remains unverified without cross-piece enumeration 31ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > unavailable id from other piece=true remains unverified without cross-piece enumeration 32ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > malformed exact delegation id not-a-uuid fails parser rather than prefix-matching 33ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > malformed exact delegation id 123 fails parser rather than prefix-matching 31ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > malformed exact delegation id 00000000-0000-4000-8000-000000000000suffix fails parser rather than prefix-matching 29ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > malformed exact delegation id  fails parser rather than prefix-matching 32ms
+   → Missing References behavior: parse, check, and durably observe sources
+ × |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > missing source and linked report are independent observations, not proof of historical fabrication 29ms
+   → Missing References behavior: parse, check, and durably observe sources
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 84 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > real lying child report links exact identity but never verifies cited source inspection
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:27:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:22:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > human prose naming a historical role does not select the newest report
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:39:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:37:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > exact id selects an older report rather than another latest record
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:50:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:45:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > visible identity mismatch role:Utility is contradicted independently of existing source
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > visible identity mismatch preset:requested-other is contradicted independently of existing source
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:59:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:55:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > an entire canonical role cell is a role assertion in the four-column profile
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:70:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:66:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > asserted preset with no actual preset is unavailable, not contradicted or filled from prose
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:79:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:75:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > partial failed report retains terminal status and limitations
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > partial aborted report retains terminal status and limitations
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:89:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:85:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > requested-only residue is not an executed report
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:100:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:95:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > settlement without actual child identity is not a linked report
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:111:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:106:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > unavailable id from other piece=false remains unverified without cross-piece enumeration
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > unavailable id from other piece=true remains unverified without cross-piece enumeration
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:123:40
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:117:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > malformed exact delegation id not-a-uuid fails parser rather than prefix-matching
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > malformed exact delegation id 123 fails parser rather than prefix-matching
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > malformed exact delegation id 00000000-0000-4000-8000-000000000000suffix fails parser rather than prefix-matching
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > malformed exact delegation id  fails parser rather than prefix-matching
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:132:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:131:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/attribution.spec.ts > missing source and linked report are independent observations, not proof of historical fabrication
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:143:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/attribution.spec.ts:139:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/config.spec.ts > maxPieceBytes rejects non-positive, fractional and unsafe numeric policy
+AssertionError: missing positive safe-integer validation for maxPieceBytes=0: expected [Function] to throw an error
+ ❯ packages/dev-loop/references/tests/config.spec.ts:10:133
+      8| it.each(['maxPieceBytes', 'maxSourceBytes', 'maxObservationBytes', 'ma…
+      9|   for (const value of [0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1]) {
+     10|     expect(() => References.Config({ ...valid, [field]: value }), `mis…
+       |                                                                                                                                     ^
+     11|   }
+     12| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/config.spec.ts > maxSourceBytes rejects non-positive, fractional and unsafe numeric policy
+AssertionError: missing positive safe-integer validation for maxSourceBytes=0: expected [Function] to throw an error
+ ❯ packages/dev-loop/references/tests/config.spec.ts:10:133
+      8| it.each(['maxPieceBytes', 'maxSourceBytes', 'maxObservationBytes', 'ma…
+      9|   for (const value of [0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1]) {
+     10|     expect(() => References.Config({ ...valid, [field]: value }), `mis…
+       |                                                                                                                                     ^
+     11|   }
+     12| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/config.spec.ts > maxObservationBytes rejects non-positive, fractional and unsafe numeric policy
+AssertionError: missing positive safe-integer validation for maxObservationBytes=0: expected [Function] to throw an error
+ ❯ packages/dev-loop/references/tests/config.spec.ts:10:133
+      8| it.each(['maxPieceBytes', 'maxSourceBytes', 'maxObservationBytes', 'ma…
+      9|   for (const value of [0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1]) {
+     10|     expect(() => References.Config({ ...valid, [field]: value }), `mis…
+       |                                                                                                                                     ^
+     11|   }
+     12| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/config.spec.ts > maxReferences rejects non-positive, fractional and unsafe numeric policy
+AssertionError: missing positive safe-integer validation for maxReferences=0: expected [Function] to throw an error
+ ❯ packages/dev-loop/references/tests/config.spec.ts:10:133
+      8| it.each(['maxPieceBytes', 'maxSourceBytes', 'maxObservationBytes', 'ma…
+      9|   for (const value of [0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1]) {
+     10|     expect(() => References.Config({ ...valid, [field]: value }), `mis…
+       |                                                                                                                                     ^
+     11|   }
+     12| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/config.spec.ts > repositoryRoot rejects blank policy rather than selecting ambient cwd
+AssertionError: expected [Function] to throw an error
+ ❯ packages/dev-loop/references/tests/config.spec.ts:14:71
+     12| })
+     13| it('repositoryRoot rejects blank policy rather than selecting ambient …
+     14|   expect(() => References.Config({ ...valid, repositoryRoot: '  ' })).…
+       |                                                                       ^
+     15| })
+     16| it('maxObservationBytes rejects a budget smaller than the minimum comp…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/config.spec.ts > maxObservationBytes rejects a budget smaller than the minimum complete error envelope
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ packages/dev-loop/references/tests/config.spec.ts:17:73
+     15| })
+     16| it('maxObservationBytes rejects a budget smaller than the minimum comp…
+     17|   expect(() => References.Config({ ...valid, maxObservationBytes: 1 })…
+       |                                                                         ^
+     18| })
+     19|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > reopens the durable observation and refreshes exact piece and source fingerprints only on verification
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:27:39
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:24:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > detaches verification and query results including nested entry metadata
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:48:39
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:46:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > refuses authoritative JSON with invalid fingerprint rather than skipping or replacing it
+ FAIL  |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > refuses authoritative JSON with invalid inspection claim rather than skipping or replacing it
+ FAIL  |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > refuses authoritative JSON with invalid entries rather than skipping or replacing it
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:73:24
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:72:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > rejects a backend write failure without publishing and preserves the prior observation on reopen
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:95:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:94:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > serializes verification through the durable write before reading the next piece version
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:144:30
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:119:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > honors pre-read cancellation without resolving files or publishing an observation
+AssertionError: expected [Function] to throw error matching /cancel before reading|abort/i but got 'Missing References behavior: parse, c…'
+
+- Expected:
+/cancel before reading|abort/i
+
++ Received:
+"Missing References behavior: parse, check, and durably observe sources"
+
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:175:75
+    173|     const controller = new AbortController()
+    174|     controller.abort(new Error('cancel before reading References'))
+    175|     await expect(f.references.verifyReferences(pieceId, controller.sig…
+       |                                                                           ^
+    176|     expect(reads).toBe(0)
+    177|     expect(await f.references.getProvenance(pieceId)).toBeUndefined()
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:168:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > cancels at a source barrier without checking later sources or publishing
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:195:36
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:182:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > drains an admitted write despite cancellation and disposal before closing the domain
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:229:34
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:212:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/durability.spec.ts > refuses verification and queries through a stale service after disposal
+AssertionError: expected [Function] to throw error matching /closed|dispos|stopp/i but got 'Missing References behavior: parse, c…'
+
+- Expected:
+/closed|dispos|stopp/i
+
++ Received:
+"Missing References behavior: parse, check, and durably observe sources"
+
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:256:59
+    254|     const stale = f.references
+    255|     await f.ctx.fiber.dispose()
+    256|     await expect(stale.verifyReferences(pieceId, signal())).rejects.to…
+       |                                                           ^
+    257|     await expect(stale.getProvenance(pieceId)).rejects.toThrow(/closed…
+    258|   })
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/durability.spec.ts:253:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > Loader consumer sees structural validity without elevating a direct inspection assertion
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:10:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:8:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > canonical five columns retain question, mode and usage with inline Markdown headings
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:31:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:30:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > authored three-column profile Source | Role/preset and provenance | Decision informed preserves absent canonical fields
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > authored three-column profile Source | Question answered | Provenance preserves absent canonical fields
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > authored three-column profile Source | Provenance | Decision informed preserves absent canonical fields
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:44:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:43:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > four-column authored profile retains role cell separately from provenance
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:56:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:54:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[31/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > multiple links and escaped pipes in inline code expand locators without splitting prose
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:66:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:64:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[32/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > inline code in a link label is display text, not a second source locator
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:80:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:79:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[33/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > plain None. is an explicit durable empty declaration
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > plain No references. is an explicit durable empty declaration
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:88:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:87:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[34/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure  is never accepted as empty
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure Maybe none is never accepted as empty
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure `None.` is never accepted as empty
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure **None.** is never accepted as empty
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Source | Provenance | Decision informed |
+|---|---|---| is never accepted as empty
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Source | Provenance | Decision informed |
+|---|---|---|
+| `tracked.txt` | Parent | is never accepted as empty
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Source | Provenance | Decision informed |
+|---|---|---|
+| `tracked.txt` | Parent | reason | extra | is never accepted as empty
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Source | Source | Provenance |
+|---|---|---|
+| `tracked.txt` | `tracked.txt` | Parent | is never accepted as empty
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Provenance | Source | Decision informed |
+|---|---|---|
+| Parent | `tracked.txt` | reason | is never accepted as empty
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Source | Author | Decision informed |
+|---|---|---|
+| `tracked.txt` | Parent | reason | is never accepted as empty
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure | Thing | Provenance | Decision informed |
+|---|---|---|
+| `tracked.txt` | Parent | reason | is never accepted as empty
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > malformed structure None.
+
+| Source | Provenance | Decision informed |
+|---|---|---|
+| `tracked.txt` | Parent direct inspection | Decision informed by source | is never accepted as empty
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:109:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:108:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[35/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/parsing.spec.ts > References inside a code fence is not a References section
+AssertionError: expected Error: Missing References behavior: parse… to match object { code: 'MISSING_REQUIRED_SECTION' }
+
+- Expected
++ Received
+
+- {
+-   "code": "MISSING_REQUIRED_SECTION",
++ Error {
++   "message": "Missing References behavior: parse, check, and durably observe sources",
+  }
+
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:120:66
+    118|     const content = await f.setReferences('None.')
+    119|     await writeFile(f.filename, content.replace('## References\n\nNone…
+    120|     await expect(f.references.verifyReferences(pieceId, signal())).rej…
+       |                                                                  ^
+    121|     expect(await f.references.getProvenance(pieceId)).toBeUndefined()
+    122|   })
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/parsing.spec.ts:117:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[36/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > code resolves from repositoryRoot while Markdown links resolve from the piece directory
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:13:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:11:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[37/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:1` reports resolved without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:1-2` reports resolved without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:0` reports invalid without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:2-1` reports invalid without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:3` reports invalid without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:-1` reports invalid without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:1.5` reports invalid without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `tracked.txt:9007199254740992` reports invalid without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `absent.txt` reports missing without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `plans` reports invalid without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator `../outside.txt` reports invalid without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator [unsupported](ftp://example.invalid/doc) reports invalid without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator unmarked/path.txt reports invalid without interpreting confidence as structure
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > locator [query](../../../tracked.txt?revision=1) reports invalid without interpreting confidence as structure
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:36:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:34:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[38/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > line ranges are retained and decoded-text SHA-256 includes CRLF and multibyte characters
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:47:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:44:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > fragment is retained but no semantic symbol verification is claimed
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:54:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:53:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[40/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > absolute local paths reject even when inside repositoryRoot
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:63:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:61:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[41/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > intermediate symlink escape rejects before reading outside content (POSIX symlink privilege)
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:79:40
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:69:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[42/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > HTTP and HTTPS sources remain not-checked and are never handed to filesystem resolution
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:92:40
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:89:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[43/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > external reference checking makes no HTTP request to the cited server
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:108:40
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:107:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[44/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > maxSourceBytes 6 measures UTF-8 bytes inclusively
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > maxSourceBytes 5 measures UTF-8 bytes inclusively
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ maxSourceBytes.maxSourceBytes packages/dev-loop/references/tests/sources.spec.ts:123:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:5
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:121:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[45/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > maxPieceBytes rejects a multibyte piece without silently clipping retained evidence
+AssertionError: expected [Function] to throw error matching /maxPieceBytes|piece.*(byte|limit|lar…/i but got 'Missing References behavior: parse, c…'
+
+- Expected:
+/maxPieceBytes|piece.*(byte|limit|large)/i
+
++ Received:
+"Missing References behavior: parse, check, and durably observe sources"
+
+ ❯ maxPieceBytes packages/dev-loop/references/tests/sources.spec.ts:133:66
+    131| it('maxPieceBytes rejects a multibyte piece without silently clipping …
+    132|   await fixture(three('`tracked.txt`', 'Parent', '界'.repeat(2048)), as…
+    133|     await expect(f.references.verifyReferences(pieceId, signal())).rej…
+       |                                                                  ^
+    134|     expect(await f.references.getProvenance(pieceId)).toBeUndefined()
+    135|   }, { maxPieceBytes: 4096 })
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:132:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[46/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > maxReferences counts locators rather than source table rows
+Error: Missing References behavior: parse, check, and durably observe sources
+ ❯ Proxy.verifyReferences packages/dev-loop/references/src/index.ts:26:27
+     24|   verifyReferences(pieceId: string, signal: AbortSignal): Promise<Prov…
+     25|     void pieceId; void signal
+     26|     return Promise.reject(new Error('Missing References behavior: pars…
+       |                           ^
+     27|   }
+     28|   /**
+ ❯ Object.apply vendor/cordis/src/utils.ts:160:40
+ ❯ maxReferences packages/dev-loop/references/tests/sources.spec.ts:139:38
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:138:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[47/84]⎯
+
+ FAIL  |thread-safe| packages/dev-loop/references/tests/sources.spec.ts > maxObservationBytes applies to the complete retained JSON and rejects rather than truncates
+AssertionError: expected [Function] to throw error matching /maxObservationBytes|observation.*(by…/i but got 'Missing References behavior: parse, c…'
+
+- Expected:
+/maxObservationBytes|observation.*(byte|limit|large)/i
+
++ Received:
+"Missing References behavior: parse, check, and durably observe sources"
+
+ ❯ maxObservationBytes packages/dev-loop/references/tests/sources.spec.ts:146:66
+    144| it('maxObservationBytes applies to the complete retained JSON and reje…
+    145|   await fixture(three('`tracked.txt`', 'Parent', '界'.repeat(4096)), as…
+    146|     await expect(f.references.verifyReferences(pieceId, signal())).rej…
+       |                                                                  ^
+    147|     expect(await f.references.getProvenance(pieceId)).toBeUndefined()
+    148|   }, { maxObservationBytes: 4096 })
+ ❯ packages/dev-loop/references/tests/harness.ts:45:11
+ ❯ fixture packages/dev-loop/roles/tests/harness.ts:127:5
+ ❯ fixture packages/dev-loop/references/tests/harness.ts:24:3
+ ❯ packages/dev-loop/references/tests/sources.spec.ts:145:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[48/84]⎯
+
+
+ Test Files  5 failed (5)
+      Tests  84 failed (84)
+   Start at  08:38:32
+   Duration  7.85s (transform 4.66s, setup 1.18s, import 4.92s, tests 9.11s, environment 0ms)
+
+JSON report written to /home/sic/harness-agent/.worktrees/references-tests/packages/dev-loop/references/tests/RED-vitest.json

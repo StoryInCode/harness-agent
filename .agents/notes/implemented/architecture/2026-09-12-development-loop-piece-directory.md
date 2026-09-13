@@ -2,6 +2,8 @@
 
 Status: implemented
 
+English | [中文](2026-09-12-development-loop-piece-directory.zh.md)
+
 ## Problem
 
 The `plans/` specification corpus is 118 markdown files governed by machine-checkable `axiom` blocks in `plans/AGENTS.md`. Those axioms named four shell checkers — `check-piece-primitive.sh`, `check-piece-sections.sh`, `check-claim-citations.sh`, `check-done-pieces.sh` — none of which existed, so no axiom enforced anything. A document citing a script that is absent enforces nothing, and the corpus had drifted accordingly: one piece declared `Package:` without its bold markers, 233 section violations and 105 proof-table violations sat unnoticed, and the format authority `PIECE-FORMAT.md` disagreed with `plans/AGENTS.md` about the status vocabulary.

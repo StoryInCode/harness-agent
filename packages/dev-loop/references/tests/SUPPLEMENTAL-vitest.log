@@ -1,0 +1,33 @@
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+
+ RUN  v4.1.8 /home/sic/harness-agent/.worktrees/references-tests
+
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > multiple exact delegation tokens remain ambiguous instead of selecting one report 81ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > reference definitions resolve case-insensitively and the first duplicate definition supplies the URL 38ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > unresolved reference-style links remain unsupported prose rather than a guessed local path 34ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > image or HTML-only source ![display](../../../tracked.txt) never establishes a source locator 37ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > image or HTML-only source ![display][image] never establishes a source locator 34ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > image or HTML-only source ![](../../../tracked.txt) never establishes a source locator 34ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > image or HTML-only source <span></span> never establishes a source locator 31ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > inline HTML and image labels cannot add hidden locators beside an explicit code source 34ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > empty source= or attribution=Parent fails a populated table rather than becoming explicit empty 31ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > empty source=`tracked.txt` or attribution= fails a populated table rather than becoming explicit empty 36ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > authored empty or decoded control locator [empty]() rejects before filesystem lookup 33ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > authored empty or decoded control locator [fragment](#symbol) rejects before filesystem lookup 32ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > authored empty or decoded control locator [control](<tracked.txt&#x0A;other>) rejects before filesystem lookup 36ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > authored empty or decoded control locator [control](<tracked.txt&#x0D;other>) rejects before filesystem lookup 33ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > piece stream failure rejects without replacing the last durable observation 50ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > source stream failure rejects without replacing the last durable observation 46ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > fresh piece read observes missing References after Directory returns valid metadata 31ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > fresh piece read observes duplicate References after Directory returns valid metadata 32ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > fresh piece read observes end-of-document References after Directory returns valid metadata 30ms
+ ✓ |thread-safe| packages/dev-loop/references/tests/supplemental-observations.spec.ts > hard-break source syntax produces malformed authored table rows, not an invented AST break node 32ms
+
+ Test Files  1 passed (1)
+      Tests  20 passed (20)
+   Start at  09:02:21
+   Duration  2.03s (transform 901ms, setup 173ms, import 1.03s, tests 744ms, environment 0ms)
+
+JSON report written to /home/sic/harness-agent/.worktrees/references-tests/packages/dev-loop/references/tests/SUPPLEMENTAL-vitest.json

@@ -2,6 +2,8 @@
 
 Status: implemented
 
+English | [中文](2026-09-12-fork-local-gate-policy-and-upstream-sync.zh.md)
+
 ## Problem
 
 This checkout is a fork of `deepseek-ai/deepseek-harness`, and upstream moves fast: 4,023 commits in the 30 days before this note, with `tsconfig.host.json` alone taking 571 commits in 90 days, `tsconfig.base.json` 391, `verify-package-readme-model-experience.ts` 316, and `scripts/run-gates.ts` 251. Any fork change that edits one of those files conflicts on nearly every sync.

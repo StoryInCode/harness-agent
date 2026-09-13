@@ -1,0 +1,8 @@
+34955a93bc303fb347f8c6ad8ab3effcb7bfdeefb1942a93bf137196b4b28ebd  packages/dev-loop/roles/src/config.ts
+cae7dd431a696030d21327330bcafb3c6fd4a51d829d86e559079d4e6f702f31  packages/dev-loop/roles/src/index.ts
+5b62a00a191151d120631f44f50779e5082a41175ac0f6610b0d023b9611f732  packages/dev-loop/roles/src/records.ts
+70fe51fb126c43b9ee813aa94106338e2b9a980ed7b749bf8cca588e3250d850  packages/dev-loop/roles/src/tool.ts
+6af584cd5a94500cf6564d5b73449a4ed0b75007b8f112f7e23e2de1a5723fd4  packages/dev-loop/roles/src/types.ts
+d741257e523ebf49cb6e9f6922d439da03056dbbfb197bcf3bbd2bf71fa2e69e  packages/dev-loop/roles/tests/harness.ts
+f7c6075dde04333de47ec734117dd82c1037fba5e9e24cf0ea7d1370d0edd26d  packages/dev-loop/roles/package.json
+5d18c85691f1047105d9ab7b999280c92d054658fa6a63f38c73e8d8fd052246  packages/core/agent-loop/tests/mock-adapter.ts

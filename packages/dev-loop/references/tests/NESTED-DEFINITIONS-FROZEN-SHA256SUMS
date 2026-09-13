@@ -1,0 +1,5 @@
+4609fa7388d5fcf91a50e83f1b65ebbc60e785567811b468615d505104618dd6  packages/dev-loop/references/tests/nested-definitions.spec.ts
+2cc72ba89da702373d075b7f9646aad8f826a6aa7aa30a76b8e807a028a162fe  packages/dev-loop/references/tests/NESTED-DEFINITIONS-RED.md
+750418bd1525c5000e44621fa3f17ee6028618dece48adbb053f0cae30b097bd  packages/dev-loop/references/tests/NESTED-DEFINITIONS-RED-vitest.log
+b8abf8b9dbfc4a365e3ccb5fed190b8a9cba60502ee8a96fc1bd98bd1a08a32b  packages/dev-loop/references/tests/NESTED-DEFINITIONS-RED-vitest.json
+04f161a1bf16af2ac13f2962689fb09ebd6b07ea4f9dbdc79683577170fa284a  packages/dev-loop/references/tests/NESTED-DEFINITIONS-RED-SOURCE-SHA256SUMS
