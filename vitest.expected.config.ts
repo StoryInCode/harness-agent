@@ -11,6 +11,7 @@ export default defineConfig({
     setupFiles: ['./scripts/test-proxy-environment.ts', './scripts/test-invariants.ts'],
     include: [
       'apps/cli/tests/**/*.expected.e2e.ts',
+      'packages/dev-loop/persistence/tests/**/*.expected.e2e.ts',
     ],
     testTimeout: 120_000,
     hookTimeout: 30_000,
