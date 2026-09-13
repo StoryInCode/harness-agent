@@ -72,12 +72,23 @@ export class DevLoopPersistence extends Service {
     this.domain = await this.ctx.storageDomain.open(persistenceDomain)
     this.ctx.effect(() => async () => {
       this.draining = true
+      // A caller that never reaches finishTransition (for example, a consumer that
+      // drops the recording obligation after beginTransition) leaves an intent
+      // permanently unattempted; drain joins in-flight recording but terminates
+      // once a stable chain shows the same unresolved intents across a full pass,
+      // because any arriving attempt reassigns the chain.
+      let stalled: string | undefined
       for (;;) {
         const chain = this.chain
         await chain
         const pending = [...this.domain.table('transitions').entries()]
-          .some(([, row]) => row.terminal === undefined && !this.attempted.has(row.id))
-        if (this.chain === chain && !pending) break
+          .filter(([, row]) => row.terminal === undefined && !this.attempted.has(row.id))
+          .map(([, row]) => row.id)
+          .sort()
+          .join(',')
+        if (this.chain !== chain) { stalled = undefined; continue }
+        if (pending === '' || pending === stalled) break
+        stalled = pending
       }
       this.disposed = true
       await this.domain.close()
