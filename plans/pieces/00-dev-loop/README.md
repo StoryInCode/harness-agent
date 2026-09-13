@@ -15,7 +15,7 @@ The development loop is the execution engine that all future DeepSeek Harness wo
 | `00.05` | [Per-Piece Detached Git Worktree Allocation](done/00.05-worktree-assignment.md) | `@deepseek-ai/dsh-dev-loop-worktree` | `00.04` | 5 | done |
 | `00.06` | [Role Delegation Dispatcher and Record](done/00.06-role-delegation.md) | `@deepseek-ai/dsh-dev-loop-roles` | `00.04`, `00.05` | 6 | done |
 | `00.07` | [Research Capability Policy and Acceptance](done/00.07-research-guard.md) | `@deepseek-ai/dsh-dev-loop-roles` (shared owner) | `00.06` | 7 | done |
-| `00.08` | References Provenance Store and Verification | `@deepseek-ai/dsh-dev-loop-references` | `00.01`, `00.06` | 8 | todo |
+| `00.08` | [References Provenance Store and Verification](done/00.08-references-provenance.md) | `@deepseek-ai/dsh-dev-loop-references` | `00.01`, `00.06` | 8 | done |
 | `00.09` | BDD Scenario Extractor and Test Handoff | `@deepseek-ai/dsh-dev-loop-test-handoff` | `00.01`, `00.06`, `00.13` | 9 | todo |
 | `00.10` | Multi-Gate Verification Enforcer | `@deepseek-ai/dsh-dev-loop-gates` | `00.02`, `00.09` | 10 | todo |
 | `00.11` | Human Command Surface `/dev-loop` | `@deepseek-ai/dsh-dev-loop-command` | `00.01`, `00.02`, `00.04` | 11 | todo |
