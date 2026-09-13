@@ -20,7 +20,7 @@ The development loop is the execution engine that all future DeepSeek Harness wo
 | `00.10` | [Evidence-Bound Completion Gates](00.10-verification-gates.md) | `@deepseek-ai/dsh-dev-loop-gates` | `00.02`, `00.09` | 10 | todo |
 | `00.11` | [Human Command Surface `/dev-loop`](done/00.11-command-surface.md) | `@deepseek-ai/dsh-dev-loop-command` | `00.01`, `00.02`, `00.04` | 11 | done |
 | `00.12` | [Durable Lifecycle Integration and Reconciliation](done/00.12-loop-persistence.md) | `@deepseek-ai/dsh-dev-loop-persistence` | `00.02`, `00.04`, `00.06` | 12 | done |
-| `00.13` | [Revision-Bound Claim Verification](00.13-claim-verification.md) | `@deepseek-ai/dsh-dev-loop-claims` | `00.01`, `00.06`, `00.07`, `00.08` | 13 | todo |
+| `00.13` | [Revision-Bound Claim Verification](done/00.13-claim-verification.md) | `@deepseek-ai/dsh-dev-loop-claims` | `00.01`, `00.06`, `00.07`, `00.08` | 13 | done |
 | `00.14` | [Opt-In Host Assembly and Authored Brain Preset](00.14-composition-and-preset.md) | `@deepseek-ai/dsh-dev-loop-preset` | `00.01`-`00.13` | 14 | todo |
 
 ## Execution Protocol
