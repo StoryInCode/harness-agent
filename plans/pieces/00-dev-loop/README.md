@@ -11,7 +11,7 @@ The development loop is the execution engine that all future DeepSeek Harness wo
 | `00.01` | [Piece Directory and Specification Parser](done/00.01-piece-directory.md) | `@deepseek-ai/dsh-dev-loop-directory` | none | 1 | done |
 | `00.02` | [Piece Lifecycle State Machine](done/00.02-piece-lifecycle.md) | `@deepseek-ai/dsh-dev-loop-lifecycle` | `00.01` | 2 | done |
 | `00.03` | [Approval Junction and User Clarification](done/00.03-approval-junction.md) | `@deepseek-ai/dsh-dev-loop-approval` | `00.01`, `00.02` | 3 | done |
-| `00.04` | Dev Loop Dispatch Queue and Concurrency Guard | `@deepseek-ai/dsh-dev-loop-queue` | `00.02`, `00.03` | 4 | todo |
+| `00.04` | [Dev Loop Dispatch Queue and Concurrency Guard](done/00.04-concurrency-queue.md) | `@deepseek-ai/dsh-dev-loop-queue` | `00.01`, `00.02`, `00.03` | 4 | done |
 | `00.05` | Per-Piece Git Worktree Allocation | `@deepseek-ai/dsh-dev-loop-worktree` | `00.04` | 5 | todo |
 | `00.06` | Role Delegation Dispatcher and Record | `@deepseek-ai/dsh-dev-loop-roles` | `00.04`, `00.05` | 6 | todo |
 | `00.07` | Research Subagent Read-Only Guard | `@deepseek-ai/dsh-dev-loop-research-guard` | `00.06` | 7 | todo |

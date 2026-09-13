@@ -27,6 +27,7 @@ Choose the service by the operation it owns.
 | [`approval`](approval/README.md) | Present current source for Accept, Question, or Change; reject stale acceptance. |
 | [`directory`](directory/README.md) | Discover and validate piece specifications through the filesystem service. |
 | [`lifecycle`](lifecycle/README.md) | Guard status changes and promote tracked piece files into `done/`. |
+| [`queue`](queue/README.md) | Admit consumer-owned one-shot delegations and bound startup through complete cleanup. |
 
 <a id="related-documentation"></a>
 ## Related documentation

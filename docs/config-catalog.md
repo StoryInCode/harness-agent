@@ -582,6 +582,22 @@ export interface Config {
 
 Source: [`packages/dev-loop/lifecycle/src/index.ts:53`](../packages/dev-loop/lifecycle/src/index.ts)
 
+<a id="deepseek-aidsh-dev-loop-queue"></a>
+
+## `@deepseek-ai/dsh-dev-loop-queue`
+
+Requires: `agents` · `devLoopDirectory` · `devLoopLifecycle`
+
+```ts config-catalog
+/** Deployment-owned concurrency ceiling, defaulted and validated at mount. */
+export interface Config {
+  /** Integer in [1, 32]; defaults to 4. Counts startup through complete cleanup. */
+  maxConcurrency?: number
+}
+```
+
+Source: [`packages/dev-loop/queue/src/types.ts:7`](../packages/dev-loop/queue/src/types.ts)
+
 <a id="deepseek-aidsh-e2b"></a>
 
 ## `@deepseek-ai/dsh-e2b`

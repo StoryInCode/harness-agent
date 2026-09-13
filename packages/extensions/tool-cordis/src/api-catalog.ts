@@ -903,6 +903,37 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'devLoopQueue',
+    summary: 'One process-local concurrency limit for approved, explicitly submitted role requests.',
+    description: 'One process-local concurrency limit for approved, explicitly submitted role requests.',
+    methods: [
+      {
+        signature: 'readonly maxConcurrency: number',
+        description: 'Maximum startup, execution and cleanup reservations held simultaneously.',
+        parameters: [],
+      },
+      {
+        signature: 'async enqueue(request: QueueRequest): Promise<QueueTicket>',
+        description: 'Capture the exact live initiator and admit a canonical pending piece.',
+        parameters: [{ name: 'request', description: 'consumer-owned startup callback and cancellation signal.' }],
+        returns: 'an admission ticket, without waiting for capacity or worker completion.',
+        throws: ['if closed, cancelled, duplicated, not pending, missing a dependency, or lacking a live initiator.'],
+      },
+      {
+        signature: 'getActiveWorkers(): QueueEntry[]',
+        description: 'Inspect currently occupied capacity.',
+        parameters: [],
+        returns: 'detached scalar records for startup, execution and cleanup reservations.',
+      },
+      {
+        signature: 'getQueuedEntries(): QueueEntry[]',
+        description: 'Inspect requests awaiting dispatch.',
+        parameters: [],
+        returns: 'eligible or dependency-parked requests, in canonical priority and FIFO order.',
+      },
+    ],
+  },
+  {
     key: 'directoryPicker',
     summary: 'Abstract directory-picking service.',
     description: 'Abstract directory-picking service. Subclass, implement `capability()`, and load the subclass as a plugin — it registers as `ctx.directoryPicker` (one implementation per context; loading a second throws, cordis\' standard duplicate-service behavior). The capability object must be stable for the service lifetime: consumers may capture it across calls.',
@@ -5003,6 +5034,18 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'PtcDispatchLog',
     declaration: 'export interface PtcDispatchLog {\n    readonly exec: ToolExecution;\n    readonly agent?: Agent;\n    readonly subCallId: ToolCallId;\n    readonly name: string;\n    readonly isError: boolean;\n    readonly content: ContentBlock[];\n}',
+  },
+  {
+    name: 'QueueEntry',
+    declaration: 'export interface QueueEntry {\n    pieceId: string;\n    queueOrder: number;\n    enqueuedAt: number;\n    status: \'queued\' | \'starting\' | \'running\';\n    subagentId?: SessionId;\n}',
+  },
+  {
+    name: 'QueueRequest',
+    declaration: 'export interface QueueRequest {\n    pieceId: string;\n    signal: AbortSignal;\n    dispatch(agent: Agent, signal: AbortSignal): Promise<SubagentRun>;\n}',
+  },
+  {
+    name: 'QueueTicket',
+    declaration: 'export interface QueueTicket {\n    readonly pieceId: string;\n    readonly result: Promise<SubagentResult>;\n    cancel(reason?: unknown): Promise<void>;\n}',
   },
   {
     name: 'ReadFileLine',

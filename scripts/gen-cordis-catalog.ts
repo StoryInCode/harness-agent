@@ -78,6 +78,7 @@ export const SERVICE_PAGE: Record<string, string> = {
   // FORK-LOCAL: development-loop services own this English subsystem page.
   devLoopDirectory: 'development-loop.md',
   devLoopLifecycle: 'development-loop.md',
+  devLoopQueue: 'development-loop.md',
   dynamicCordisRunner: 'extensions.md',
   e2b: 'subprocess.md',
   fileUploads: 'attachment.md',
@@ -259,6 +260,9 @@ export const LINK_MAP: Readonly<Record<string, string>> = {
   StateTransitionEvent: 'development-loop.md',
   PieceCompletedEvent: 'development-loop.md',
   PiecePreCompleteEvent: 'development-loop.md',
+  QueueRequest: 'development-loop.md',
+  QueueTicket: 'development-loop.md',
+  QueueEntry: 'development-loop.md',
   Agent: 'core.md',
   AgentCancelCause: 'core.md',
   AgentFactory: 'core.md',

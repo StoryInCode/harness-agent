@@ -9,6 +9,7 @@ Discover development-loop piece specifications, inspect validation results, and 
 - [Directory values](#directory-values)
 - [Lifecycle state](#lifecycle-state)
 - [Human decisions](#human-decisions)
+- [Dispatch requests](#dispatch-requests)
 - [Completion and events](#completion-and-events)
 - [Failure and cancellation](#failure-and-cancellation)
 - [Cordis API](#cordis-surface)
@@ -41,6 +42,10 @@ The lifecycle service hydrates valid records once during mounting. `getStatus` r
 ## Human decisions
 
 The [approval result declarations](../../packages/dev-loop/approval/src/types.ts) define `ApprovalDecision` as `accept`, `question`, or `change`, and `PresentPieceResult` as the requested `pieceId`, explicit `decision`, and optional trimmed `feedback`. The [approval package](../../packages/dev-loop/approval/README.md) owns presentation, exact-choice validation, live-root calling requirements, and source-version checks. Only acceptance attempts `todo → pending`; it creates no durable authorization and does not restrict direct callers of the lifecycle service.
+
+## Dispatch requests
+
+The [queue declarations](../../packages/dev-loop/queue/src/types.ts) define `QueueRequest` as a piece id, caller cancellation signal, and startup callback receiving the captured Agent and combined signal. `QueueTicket` contains the piece id, result promise, and awaited cancellation method; it is an operational handle, not a JSON record. `QueueEntry` is a detached scalar snapshot of canonical priority, admission time, queued/starting/running status, and optional child SessionId. The [queue package](../../packages/dev-loop/queue/README.md) owns admission, ordering, dependency wakeups, reservation lifetime, and cleanup-failure semantics. It does not select providers or create requests from approval announcements.
 
 ## Completion and events
 
@@ -196,6 +201,36 @@ async transition(pieceId: string, expected: PieceStatus, to: PieceStatus, reason
 ```
 
 Source: [`packages/dev-loop/lifecycle/src/index.ts`](../../packages/dev-loop/lifecycle/src/index.ts)
+
+<a id="ctxdevloopqueue--devloopqueue"></a>
+
+### `ctx.devLoopQueue` — `DevLoopQueue`
+
+One process-local concurrency limit for approved, explicitly submitted role requests.
+
+```ts cordis-catalog
+/**
+ * Capture the exact live initiator and admit a canonical pending piece.
+ * @param request - consumer-owned startup callback and cancellation signal.
+ * @returns an admission ticket, without waiting for capacity or worker completion.
+ * @throws if closed, cancelled, duplicated, not pending, missing a dependency, or lacking a live initiator.
+ */
+async enqueue(request: QueueRequest): Promise<QueueTicket>
+
+/**
+ * Inspect currently occupied capacity.
+ * @returns detached scalar records for startup, execution and cleanup reservations.
+ */
+getActiveWorkers(): QueueEntry[]
+
+/**
+ * Inspect requests awaiting dispatch.
+ * @returns eligible or dependency-parked requests, in canonical priority and FIFO order.
+ */
+getQueuedEntries(): QueueEntry[]
+```
+
+Source: [`packages/dev-loop/queue/src/index.ts`](../../packages/dev-loop/queue/src/index.ts)
 
 <a id="piece-events"></a>
 

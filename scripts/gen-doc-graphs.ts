@@ -104,7 +104,7 @@ const SERVICE_ROLES: ServiceRole[] = [
     pkg: 'dev-loop-directory',
     title: 'Piece discovery and validation',
     mode: 'core',
-    consumers: ['dev-loop-lifecycle'],
+    consumers: ['dev-loop-lifecycle', 'dev-loop-approval', 'dev-loop-queue'],
     note: 'Reads the configured corpus through ctx.fs and returns validated records and independent file rejections.',
   },
   {
@@ -112,7 +112,15 @@ const SERVICE_ROLES: ServiceRole[] = [
     pkg: 'dev-loop-lifecycle',
     title: 'Guarded piece transitions',
     mode: 'core',
+    consumers: ['dev-loop-approval', 'dev-loop-queue'],
     note: 'Owns process-local status, transition claims, and compensating Git promotion through filesystem and subprocess services.',
+  },
+  {
+    key: 'devLoopQueue',
+    pkg: 'dev-loop-queue',
+    title: 'Bounded piece dispatch',
+    mode: 'core',
+    note: 'Admits consumer-owned one-shot callbacks and retains capacity through startup, result settlement, and cleanup.',
   },
   {
     key: 'attachments',
@@ -390,7 +398,7 @@ const SERVICE_ROLES: ServiceRole[] = [
     pkg: 'tools',
     title: 'Tool registry and guarded execution pipeline',
     mode: 'core',
-    consumers: ['agent-loop', 'tool-ask-user', 'tool-bash', 'tool-cordis', 'tool-fs', 'tool-terminal', 'tool-skill', 'tool-subagent', 'tool-todo', 'tool-web'],
+    consumers: ['agent-loop', 'tool-ask-user', 'tool-bash', 'tool-cordis', 'tool-fs', 'tool-terminal', 'tool-skill', 'tool-subagent', 'tool-todo', 'tool-web', 'dev-loop-approval'],
     note: 'Registers capabilities, owns PTC mode transport, and routes calls through pre-policy, monotonic guards, around dispatch, post-policy, and final-result observation.',
   },
   {
@@ -398,7 +406,7 @@ const SERVICE_ROLES: ServiceRole[] = [
     pkg: 'user-questions',
     title: 'Human question/answer seam',
     mode: 'seam',
-    consumers: ['tool-ask-user'],
+    consumers: ['tool-ask-user', 'dev-loop-approval'],
     note: 'UI front ends provide the active human-answer provider; tool-ask-user pauses a tool call on the provider-neutral ask() promise.',
   },
   {
@@ -452,7 +460,7 @@ const SERVICE_ROLES: ServiceRole[] = [
     pkg: 'agent',
     title: 'Agent service',
     mode: 'core',
-    consumers: ['agent-loop', 'acp', 'subagent-in-process-driver'],
+    consumers: ['agent-loop', 'acp', 'subagent-in-process-driver', 'dev-loop-queue'],
     note: 'Owns live Agent handles, the create/resume factory seam, and process-local initiator propagation.',
   },
   {
@@ -573,7 +581,7 @@ const SERVICE_ROLES: ServiceRole[] = [
     mode: 'seam',
     implementations: ['fs-local', 'fs-sandbox', 'fs-e2b'],
     // FORK-LOCAL: directory and lifecycle consume the filesystem service directly.
-    consumers: ['tool-fs', 'dev-loop-directory', 'dev-loop-lifecycle'],
+    consumers: ['tool-fs', 'dev-loop-directory', 'dev-loop-lifecycle', 'dev-loop-approval'],
     companions: ['fs-observation-policy'],
     note: 'tool-fs executes read/write/edit through ctx.fs; fs-sandbox fences mutations by the shared sandbox mode; fs-observation-policy contributes observed-state checks through the fs/* event gate.',
   },
