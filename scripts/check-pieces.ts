@@ -210,7 +210,11 @@ export function checkSetIndex(path: string, id: string, read: IndexReader = read
     // A set with no README has no index to disagree with the tree.
     return []
   }
-  const row = text.split('\n').find(line => line.startsWith('|') && line.includes(`\`${id}\``))
+  // Match the row whose first cell declares the id; a dependency column in an
+  // earlier row can also mention the id and must not shadow the piece's row.
+  const rows = text.split('\n').filter(line => line.startsWith('|'))
+  const row = rows.find(line => line.startsWith(`| \`${id}\``)) ??
+    rows.find(line => line.includes(`\`${id}\``))
   if (row === undefined) {
     return [{ path, message: `is done but ${relative(process.cwd(), readme)} lists no row for \`${id}\`` }]
   }
