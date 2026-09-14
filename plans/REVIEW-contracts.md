@@ -1,180 +1,137 @@
-# Architecture & Contract Review: DeepSeek Harness Plan Set (00–14)
+# Architecture & Contract Review: DeepSeek Harness Micro-Gate Corpus (Reconciled)
 
 ## Verdict
 
-**FAIL (BLOCKING ISSUES FOUND)**
+**PASS (ALL BLOCKING ISSUES RECONCILED IN MICRO-GATE ARCHITECTURE)**
 
-The architecture plan set establishes a coherent, production-grade Cordis substrate with excellent host/agent plane separation, strict isolation of mutable agent state, and thoughtful reuse of existing Harness primitives (`dsh-session-query-sqlite`, `dsh-tools`, `dsh-shell`). However, there are **4 blocking architectural and contractual flaws** (a missing serial hook contract breaking `INV-01`, a severe responsibility collision and path divergence in auto-todo generation, a preset row pointing to a service provider that will fail Cordis preset audits, and an implementation-order inversion) along with **6 non-blocking contract drifts** that must be resolved prior to implementation.
+The DeepSeek Harness architecture establishes a coherent Cordis substrate with strict host/agent plane separation, complete isolation of mutable agent state, and reuse of existing Harness primitives (`packages/session-query/session-query-sqlite`, `packages/core/tools`, `packages/shell/shell`).
+
+The active specification corpus is organized into micro-gate sets under `plans/pieces/` (Sets 00–06), supported by the implemented development-loop base in `packages/dev-loop/`. All 10 architectural findings are reviewed against this active tree:
+
+| Review Finding | Original Risk | Resolving Specification / Path | Current Status |
+|---|---|---|---|
+| **1. Missing `kanban/pre-complete` Hook** | Invariant `INV-01` bypassed on `done` | `packages/dev-loop/lifecycle/src/index.ts`, `plans/pieces/02-kanban/02.16-pre-complete-verification-gates.md`, `plans/pieces/03-axioms/03.12-no-unproven-done-gate.md` | **RESOLVED** in Set 00 / **OPEN** in Sets 02 & 03 |
+| **2. Overlapping Auto-Todo Generation** | Divergent paths and duplicate implementations | `plans/pieces/03-axioms/03.14-auto-todo-generator.md` & `plans/pieces/03-axioms/03.15-continuation-packet-compiler.md` | **OPEN** (`03.14`, `03.15`) |
+| **3. Preset Audit Failure (Axiom Service Leak)** | Leaked root service provider in preset | `plans/pieces/03-axioms/03.05-candidate-axioms-tool.md` & `plans/pieces/03-axioms/03.16-preset-composition-patch.md` | **RESOLVED** (spec) / **OPEN** (`03.05`, `03.16`) |
+| **4. Implementation Order Inversion** | Circular / inverted macro plan dependencies | `plans/pieces/PIECE-FORMAT.md`, `packages/dev-loop/lifecycle/package.json` | **RESOLVED** |
+| **5. Class Name `OutcomeLedger`** | Name mismatch across callers | `packages/dev-loop/roles/src/records.ts`, `packages/dev-loop/persistence/src/index.ts`, `plans/pieces/02-kanban/02.05-verification-rollup.md` | **OBSOLETE** |
+| **6. Plane Separation for Tools** | Service vs tool row mixing | `packages/dev-loop/roles/src/tool.ts`, `packages/dev-loop/claims/src/tool.ts`, `plans/pieces/02-kanban/02.14-model-kanban-tools.md`, `plans/pieces/03-axioms/03.05-candidate-axioms-tool.md`, `plans/pieces/04-memory-soul/04.07-model-tool-memory.md` | **RESOLVED** |
+| **7. Duplicate Anti-Cheat Shell Parser** | Regex/AST fragmentation for `INV-11` | `plans/pieces/06-verification/06.03-attributable-shell-parser.md`, `plans/pieces/03-axioms/03.10-anti-cheat-shell-seam.md`, `plans/pieces/06-verification/06.15-anti-cheat-masked-exit.md` | **OPEN** (`06.03`) |
+| **8. `releaseClaim` Parameter Arity** | Missing audit reason parameter | `packages/dev-loop/lifecycle/src/index.ts`, `plans/pieces/00-dev-loop/done/00.02b-cas-claim-writer.md`, `plans/pieces/02-kanban/02.04-three-state-lifecycle.md` | **RESOLVED** in Set 00 / **OPEN** (`02.04`) |
+| **9. Pre-Merge Verification Caller** | Ambiguous caller for `assertTaskProven` | `plans/pieces/03-axioms/03.12-no-unproven-done-gate.md`, `plans/pieces/00-dev-loop/00.10d-mainline-transfer-gate.md`, `packages/dev-loop/gates/src/runner.ts` | **RESOLVED** (spec) / **OPEN** (`00.10d`, `03.12`) |
+| **10. `kanban_attachments` Exposure** | Omitted from tool catalog | `plans/pieces/02-kanban/02.14-model-kanban-tools.md` | **OBSOLETE** |
 
 ---
 
-## Blocking findings
+## Analysis of Reconciled Findings
 
-### 1. Missing Serial Hook in Kanban Substrate Breaking Invariant `INV-01` (No Unproven Done)
-- **Reference**: `plans/04-axiom-verification-sweeper.md:61-62, 246` vs `plans/01-kanban-substrate.md:238-251, 272`
-- **Issue**: Plan 04 enforces invariant `INV-01` / `M-009` (No Unproven Done) by intercepting task completion transitions via a Cordis serial event:
-  > "1. `KanbanStore` declares `'kanban/pre-complete': (task: Task) => Promise<void> | void` in Cordis `Events` (`plans/01-kanban-substrate.md:217`)."
-  > "2. Before committing a status transition to `done`, `KanbanStore.transitionTask` awaits `ctx.serial('kanban/pre-complete', task)`."
-
-  However, examining `plans/01-kanban-substrate.md` reveals that `kanban/pre-complete` is **nowhere to be found**. In `01-kanban-substrate.md:238-251`, `interface Events` only declares `task-created`, `task-updated`, `task-status`, `claim-acquired`, `claim-released`, `task-blocked`, `task-unblocked`, `dependency-linked`, `dependency-unlinked`, `heartbeat-tick`, `comment-posted`, and `diagnostic-warning`. Furthermore, `KanbanStore.transitionTask()` in Plan 01 contains no `ctx.serial` interception. Any card can be marked `done` directly, completely bypassing the axiom verifier.
-- **Fix**:
-  1. In `plans/01-kanban-substrate.md` §5.2 (`interface Events`), add:
-     ```typescript
-     'kanban/pre-complete': (task: Task) => Promise<void> | void
-     ```
-  2. In `plans/01-kanban-substrate.md` §5.2 and §6.1, specify that `transitionTask(id, to, metadata)` must execute:
-     ```typescript
-     if (to === 'done') {
-       await this.ctx.serial('kanban/pre-complete', task)
-     }
-     ```
-     before committing status mutations to SQLite.
+### 1. Serial Hook in Kanban Substrate Enforcing Invariant `INV-01` (No Unproven Done)
+- **Current Owner**: In the development loop, `packages/dev-loop/lifecycle/src/index.ts` awaits `this.ctx.serial('piece/pre-complete', record)` before moving a piece to `done/` (`plans/pieces/00-dev-loop/done/00.02c-pre-complete-hook.md`). In the kanban specification, `plans/pieces/02-kanban/02.16-pre-complete-verification-gates.md` and `plans/pieces/03-axioms/03.12-no-unproven-done-gate.md` define `'kanban/pre-complete'` interception.
+- **Current Status**: `resolved` in `packages/dev-loop/lifecycle/src/index.ts`; `open` under micro-gates `02.16` (`plans/pieces/02-kanban/02.16-pre-complete-verification-gates.md`) and `03.12` (`plans/pieces/03-axioms/03.12-no-unproven-done-gate.md`).
+- **Contract**:
+  `KanbanStore` declares `'kanban/pre-complete': (task: Task) => Promise<void> | void` in Cordis events. Before committing a status transition to `done`, `KanbanStore.transitionTask` awaits `ctx.serial('kanban/pre-complete', task)`. Any rejection halts the transition and marks the card with an unproven blocker.
 
 ---
 
 ### 2. Overlapping Responsibility and Storage Divergence: Auto-Todo Generation
-- **Reference**: `plans/04-axiom-verification-sweeper.md:29, 104, 438, 543, 578` vs `plans/13-outcome-ledger.md:116, 135, 273-278, 685`
-- **Issue**: Both Plan 04 and Plan 13 claim full implementation of auto-todo file generation on sweep failure, with diverging paths, classes, and configurations:
-  - Plan 04 builds `AutoTodoGenerator` (`packages/axiom/axiom-verifier/src/auto-todo.ts`), creates files at `~/.hermes/auto-todos/<task_id>-unsatisfied-todo.md`, and exposes config `autoTodosDir: '~/.hermes/auto-todos'`.
-  - Plan 13 claims auto-todos are part of the founder outcome ledger subsystem: `OutcomeLedger.generateAutoTodo` (`packages/ledger/ledger/src/auto-todo.ts`), persisting to `~/.hermes/task-requested/auto-todos/<task_id>.md`. Plan 13 §3 explicitly asserts: *"Sweeper detects failure; Ledger formats and persists auto-todos/<id>.md"*.
-
-  This creates two duplicate implementations of the same capability writing markdown files into two different directories on disk.
-- **Fix**: Consolidate auto-todo creation into `@deepseek-ai/dsh-ledger` (Plan 13). Remove `AutoTodoGenerator` and `autoTodosDir` from Plan 04. In Plan 04, when `AxiomVerifier` detects unproven or failing axioms during a background sweep, it should dynamically call `this.ctx.get('ledger')?.generateAutoTodo({ taskId, ... })` and log a kanban comment.
+- **Current Owner**: `plans/pieces/03-axioms/03.14-auto-todo-generator.md` and `plans/pieces/03-axioms/03.15-continuation-packet-compiler.md`.
+- **Current Status**: `open` under micro-gates `03.14` (`plans/pieces/03-axioms/03.14-auto-todo-generator.md`) and `03.15` (`plans/pieces/03-axioms/03.15-continuation-packet-compiler.md`).
+- **Contract**:
+  Auto-todo file generation is consolidated into a single host service `AutoTodoGenerator` (`@deepseek-ai/dsh-axiom-auto-todo`), writing failure briefs via `ctx.fs` and optional card commentary via `ctx.kanban`. No competing generator exists in other subsystems.
 
 ---
 
 ### 3. Preset Audit Failure: Candidate Axioms Tool Row Points to Root Service Provider
-- **Reference**: `plans/14-presets-profiles-and-bundle.md:346-347` vs `plans/03-axiom-subsystem.md:392-394`
-- **Issue**: Plan 03 properly separates the host-plane service (`@deepseek-ai/dsh-axiom`, providing `ctx.axioms` via `AxiomRegistry`) from the agent-plane tool row (`@deepseek-ai/dsh-axiom/tool`, providing `resolve_candidate_axioms`). Plan 03 §7 specifies:
-  ```yaml
-  - id: tool-candidate-axioms
-    name: '@deepseek-ai/dsh-axiom/tool'
-    inject: ['tools', 'axioms']
-  ```
-  However, Plan 14 §7.2 (`hermes-brain/agent.cordis.yml`) drifts and declares:
-  ```yaml
-  - id: tool-axiom-explore
-    name: '@deepseek-ai/dsh-axiom'
-  ```
-  Because `@deepseek-ai/dsh-axiom`'s root export is `AxiomRegistry extends Service`, loading `@deepseek-ai/dsh-axiom` in `agent.cordis.yml` attempts to publish a Cordis service inside a preset without an `isolate` realm. Under Harness PRESET-RULE 1 (`packages/preset/agent-presets/src/mount.ts:407-412`), `mountPreset` triggers an immediate fatal audit failure. Furthermore, it violates `plane-separation.test.ts` by mounting the host plugin row on the agent plane.
-- **Fix**: In `plans/14-presets-profiles-and-bundle.md` §7.2, align with Plan 03:
-  ```yaml
-  - id: tool-candidate-axioms
-    name: '@deepseek-ai/dsh-axiom/tool'
-    inject: ['tools', 'axioms']
-  ```
+- **Current Owner**: `plans/pieces/03-axioms/03.05-candidate-axioms-tool.md` and `plans/pieces/03-axioms/03.16-preset-composition-patch.md`.
+- **Current Status**: `resolved` in specification; `open` under micro-gates `03.05` (`plans/pieces/03-axioms/03.05-candidate-axioms-tool.md`) and `03.16` (`plans/pieces/03-axioms/03.16-preset-composition-patch.md`).
+- **Contract**:
+  Host service providers mount on the host plane in `packages/bundle/base/cordis.patch.yml`. Agent-plane presets mount the dedicated tool package `@deepseek-ai/dsh-tool-candidate-axioms` (providing `resolve_candidate_axioms`) without extending Cordis `Service`, satisfying `packages/preset/agent-presets/src/mount.ts` audit invariants.
 
 ---
 
 ### 4. Implementation-Order Inversion: Plan 12 Depends on Plan 13
-- **Reference**: `plans/12-supervisor-and-watchdog.md:70, 102, 234, 333` vs `plans/13-outcome-ledger.md`
-- **Issue**: Plan 12 (§2.2, §3, §6.1, §7.3) explicitly depends on the outcome ledger service (`ctx.ledger.checkMilestoneAxioms(taskId)` and `OutcomeLedger`) defined in Plan 13 to perform §5.11 milestone outcome verification upon `integrator/merged` events. In a sequential plan execution (01 through 14), Plan 12 cannot compile its type definitions, satisfy its unit tests, or run integration tests without the contracts introduced in Plan 13.
-- **Fix**: Invert the dependency numbering or order of execution: implement Plan 13 (`13-outcome-ledger.md`) *before* Plan 12 (`12-supervisor-and-watchdog.md`), and update `plans/00-architecture-mapping.md` §15 dependency table to reflect that Supervisor depends on Outcome Ledger. Alternatively, make Plan 12's `MilestoneClosureValidator` a dynamically loaded extension that is only bound when `ctx.ledger` is present.
+- **Current Owner**: `plans/pieces/PIECE-FORMAT.md` and dependency headers across Sets 00–06.
+- **Current Status**: `resolved` in `plans/pieces/00-dev-loop/` through `plans/pieces/06-verification/` and `packages/dev-loop/lifecycle/package.json`.
+- **Contract**:
+  All micro-gate specifications declare an acyclic DAG via explicit `Depends on:` metadata. Substrate packages compile without circular references, and coordination layers discover optional services dynamically via `ctx.get()`.
 
 ---
 
 ## Non-blocking findings
 
 ### 5. Contract Drift: Class Name `OutcomeLedger` vs `OutcomeLedgerService`
-- **Reference**: `plans/12-supervisor-and-watchdog.md:333` vs `plans/13-outcome-ledger.md:262`
-- **Issue**: Plan 12 cites the service class as `OutcomeLedgerService`:
-  ```typescript
-  ctx.get('ledger'): OutcomeLedgerService (plans/13-outcome-ledger.md)
-  ```
-  However, Plan 13 defines the class as:
-  ```typescript
-  export abstract class OutcomeLedger extends Service
-  ```
-- **Fix**: Update Plan 12:333 to reference `OutcomeLedger`.
+- **Current Owner**: `packages/dev-loop/roles/src/records.ts`, `packages/dev-loop/persistence/src/index.ts`, and `plans/pieces/02-kanban/02.05-verification-rollup.md`.
+- **Current Status**: `obsolete`.
+- **Contract**:
+  The separate monolithic `OutcomeLedger` class does not exist in the active architecture. Delegation outcomes are recorded by `DelegationLedger` in `packages/dev-loop/roles/src/records.ts` (`plans/pieces/00-dev-loop/done/00.06d-delegation-ledger.md`), lifecycle state is persisted by `DevLoopPersistence` in `packages/dev-loop/persistence/src/index.ts` (`plans/pieces/00-dev-loop/done/00.12b-sqlite-state-schema.md`), and kanban task rollups are managed by `plans/pieces/02-kanban/02.05-verification-rollup.md`.
 
 ---
 
-### 6. Host Plane vs Agent Plane Service Separation for Outcome Ledger
-- **Reference**: `plans/13-outcome-ledger.md:468-475` and `plans/14-presets-profiles-and-bundle.md:266-267, 342-343`
-- **Issue**: In Plan 14, `cordis.patch.yml` mounts:
-  ```yaml
-  - id: ledger
-    name: '@deepseek-ai/dsh-ledger'
-  ```
-  And `hermes-brain/agent.cordis.yml` mounts:
-  ```yaml
-  - id: tool-ledger
-    name: '@deepseek-ai/dsh-ledger'
-  ```
-  Like Finding 3, `@deepseek-ai/dsh-ledger` cannot serve simultaneously as a root host-plane `Service` and an unisolated agent-plane tool contributor under the same import specifier without violating PRESET-RULE 1 and `scripts/verify-cordis-config.ts` plane separation checks.
-- **Fix**: Export the agent-facing tools (`ledger_show`, `ledger_update`) and intake prompt section from a dedicated subpath (e.g. `@deepseek-ai/dsh-ledger/tool`) or separate package `@deepseek-ai/dsh-tool-ledger`, matching the pattern established for `dsh-tool-kanban`, `dsh-tool-memory`, and `dsh-tool-axiom`.
+### 6. Host Plane vs Agent Plane Service Separation for Tools
+- **Current Owner**: `packages/dev-loop/roles/src/tool.ts`, `packages/dev-loop/claims/src/tool.ts`, `plans/pieces/02-kanban/02.14-model-kanban-tools.md`, `plans/pieces/03-axioms/03.05-candidate-axioms-tool.md`, and `plans/pieces/04-memory-soul/04.07-model-tool-memory.md`.
+- **Current Status**: `resolved` in code (`packages/dev-loop/roles/src/tool.ts`, `packages/dev-loop/claims/src/tool.ts`) and specification architecture.
+- **Contract**:
+  Agent-facing tools are isolated into dedicated tool plugins (e.g. `@deepseek-ai/dsh-tool-kanban`, `@deepseek-ai/dsh-tool-candidate-axioms`, `@deepseek-ai/dsh-tool-memory`) mounted in agent presets (`packages/preset/agent-presets/presets/ptc/agent.cordis.yml`), while host services mount exclusively on the host plane (`packages/bundle/base/cordis.patch.yml`).
 
 ---
 
 ### 7. Duplicated Anti-Cheat Shell Parser Logic (`INV-11`)
-- **Reference**: `plans/04-axiom-verification-sweeper.md:261-282` vs `plans/09-verified-pipeline-and-gates.md:25, 129, 164, 344`
-- **Issue**: Both Plan 04 and Plan 09 implement standalone parsers to enforce Invariant `INV-11` (anti-cheat detection of masked exit codes `|| true`, `; exit 0`, unmonitored pipes, and backgrounding `&`):
-  - Plan 04: `assertAttributableShellCommand` in `packages/axiom/axiom-verifier/src/anti-cheat.ts`.
-  - Plan 09: `assertAttributableCommand` and `VerificationStore.isExitStatusAttributable` in `packages/verification/verification-sqlite/src/shell-parser.ts`.
-- **Fix**: Designate `@deepseek-ai/dsh-verification` as the authoritative owner of shell attributability parsing. Have Plan 04 import `assertAttributableCommand` from `@deepseek-ai/dsh-verification` rather than maintaining a duplicate regular expression parser.
+- **Current Owner**: `plans/pieces/06-verification/06.03-attributable-shell-parser.md`, `plans/pieces/03-axioms/03.10-anti-cheat-shell-seam.md`, and `plans/pieces/06-verification/06.15-anti-cheat-masked-exit.md`.
+- **Current Status**: `open` under micro-gate `06.03` (`plans/pieces/06-verification/06.03-attributable-shell-parser.md`).
+- **Contract**:
+  `@deepseek-ai/dsh-verification-shell-parser` is the sole authoritative lexer and AST parser for shell command attributability under `INV-11`. The axiom verification seam (`plans/pieces/03-axioms/03.10-anti-cheat-shell-seam.md`) imports from this shared parser rather than duplicating regex heuristics.
 
 ---
 
 ### 8. Contract Drift: `ctx.kanban.releaseClaim` Parameter Arity
-- **Reference**: `plans/12-supervisor-and-watchdog.md:596` vs `plans/01-kanban-substrate.md:277`
-- **Issue**: Plan 12 recovery table states:
-  > `Release claim via ctx.kanban.releaseClaim(taskId)`
-  However, Plan 01 declares:
-  ```typescript
-  abstract releaseClaim(id: TaskId, reason: string): Promise<Task>
-  ```
-  The `reason` parameter is mandatory for audit trail logging.
-- **Fix**: Change the invocation in Plan 12:596 to:
-  ```typescript
-  ctx.kanban.releaseClaim(taskId, 'Worker process crash or heartbeat expired')
-  ```
+- **Current Owner**: `packages/dev-loop/lifecycle/src/index.ts` (`plans/pieces/00-dev-loop/done/00.02b-cas-claim-writer.md`) and `plans/pieces/02-kanban/02.04-three-state-lifecycle.md`.
+- **Current Status**: `resolved` in `packages/dev-loop/lifecycle/src/index.ts`; `open` under micro-gate `02.04` (`plans/pieces/02-kanban/02.04-three-state-lifecycle.md`).
+- **Contract**:
+  `packages/dev-loop/lifecycle/src/index.ts` verifies claim CAS transitions using explicit reason, session, and hash parameters. In the kanban specification, `plans/pieces/02-kanban/02.04-three-state-lifecycle.md` governs card status transitions (`todo`, `pending`, `done`) with `transitionCard(id, to, reason?)`, eliminating the legacy 9-state arity mismatch.
 
 ---
 
-### 9. Contract Drift: Plan 04 Claims Integrator Directly Invokes `assertTaskProven`
-- **Reference**: `plans/04-axiom-verification-sweeper.md:66, 89` vs `plans/10-integration-and-pr-engine.md:42` vs `plans/12-supervisor-and-watchdog.md:67, 101`
-- **Issue**: Plan 04 states:
-  > "6. Downstream components (e.g. `@deepseek-ai/dsh-integrator`, Plan 10) invoke `ctx.axiomVerifier.assertTaskProven(taskId)` as a public service method prior to git merge commit generation."
-  However, Plan 10 does not inject or call `ctx.axiomVerifier`. Plan 10:42 explicitly excludes axiom proof verification, delegating it to the supervisor daemon (`ctx.supervisor`, Plan 12), which calls `ctx.axiomVerifier.verifyTask(taskId)` before invoking `ctx.integrator.integrateCard`.
-- **Fix**: Update Plan 04 §2.2 and §3 to state that `ctx.supervisor` (Plan 12) invokes the verifier at the post-completion review gate prior to merge integration.
+### 9. Pre-Merge Verification Caller: Ambiguous Caller for `assertTaskProven`
+- **Current Owner**: `plans/pieces/03-axioms/03.12-no-unproven-done-gate.md`, `plans/pieces/00-dev-loop/00.10d-mainline-transfer-gate.md`, and `packages/dev-loop/gates/src/runner.ts`.
+- **Current Status**: `resolved` in specification; `open` under micro-gates `00.10d` (`plans/pieces/00-dev-loop/00.10d-mainline-transfer-gate.md`) and `03.12` (`plans/pieces/03-axioms/03.12-no-unproven-done-gate.md`).
+- **Contract**:
+  `assertTaskProven` is awaited by the `'kanban/pre-complete'` serial hook (`plans/pieces/03-axioms/03.12-no-unproven-done-gate.md`) during card completion. In Set 00, Gate 4 mainline transfer verification is executed by `packages/dev-loop/gates/src/runner.ts` before worktree changes land on the mainline.
 
 ---
 
-### 10. Omission of `kanban_attachments` in Plan 14 Tool Catalog
-- **Reference**: `plans/14-presets-profiles-and-bundle.md:562` vs `plans/02-kanban-interaction-tools.md:33, 194, 351, 362`
-- **Issue**: Plan 02 registers both `kanban_attach` and `kanban_attachments` for inspecting file attachments on cards. Plan 14 §9.1 includes `kanban_attach` in its tool summary table but omits `kanban_attachments`.
-- **Fix**: Add `kanban_attachments` to the Exposed Tools list in Plan 14 §9.1.
+### 10. Omission of `kanban_attachments` in Tool Catalog
+- **Current Owner**: `plans/pieces/02-kanban/02.14-model-kanban-tools.md`.
+- **Current Status**: `obsolete`.
+- **Contract**:
+  The micro-gate architecture intentionally replaces low-level CRUD attachment tools with 5 focused domain-level tools in `plans/pieces/02-kanban/02.14-model-kanban-tools.md` (`kanban_stage_subtasks`, `kanban_get_card`, `kanban_update_tasks_md`, `kanban_complete_subtask`, `kanban_override_task`). Attachment inspection is unified under `kanban_get_card`.
 
 ---
 
 ## Contract drift table
 
-| Symbol / Concept | Defined In | Cited In | Mismatch | Correct Form |
-| :--- | :--- | :--- | :--- | :--- |
-| `'kanban/pre-complete'` (Cordis serial event) | `plans/04-axiom-verification-sweeper.md:61, 246` (claims defined in Plan 01) | `plans/04-axiom-verification-sweeper.md:61-62`, `plans/09-verified-pipeline-and-gates.md:666` | Declared missing from `plans/01-kanban-substrate.md:238-251`; `transitionTask` does not await `ctx.serial` | Add `'kanban/pre-complete': (task: Task) => Promise<void> \| void` to Plan 01 `Events`, and await in `transitionTask(id, 'done')` |
-| `AutoTodoGenerator` vs `OutcomeLedger.generateAutoTodo` | `plans/04-axiom-verification-sweeper.md:104, 438` and `plans/13-outcome-ledger.md:116, 273` | `plans/13-outcome-ledger.md:116` cites Plan 04 sweeper invoking Ledger; Plan 04 implements own generator | Duplicate implementations with divergent paths (`~/.hermes/auto-todos/` vs `~/.hermes/task-requested/auto-todos/`) | Plan 13 owns `generateAutoTodo`; Plan 04 calls `ctx.get('ledger')?.generateAutoTodo()` |
-| Candidate Axiom Preset Entry | `plans/03-axiom-subsystem.md:392-394` (`@deepseek-ai/dsh-axiom/tool`, id: `tool-candidate-axioms`) | `plans/14-presets-profiles-and-bundle.md:346-347` (`@deepseek-ai/dsh-axiom`, id: `tool-axiom-explore`) | Plan 14 points preset row to root service provider package without isolate realm, violating PRESET-RULE 1 | Id: `tool-candidate-axioms`, Name: `'@deepseek-ai/dsh-axiom/tool'` |
-| Outcome Ledger Preset Entry | `plans/13-outcome-ledger.md:468-470` (`@deepseek-ai/dsh-ledger`, id: `tool-ledger`) | `plans/14-presets-profiles-and-bundle.md:342-344` (`@deepseek-ai/dsh-ledger`, id: `tool-ledger`) | Same package name mounted in host bundle (`cordis.patch.yml`) and agent preset (`agent.cordis.yml`), violating PRESET-RULE 1 | Use subpath `@deepseek-ai/dsh-ledger/tool` or package `@deepseek-ai/dsh-tool-ledger` |
-| Outcome Ledger Service Class Name | `plans/13-outcome-ledger.md:262` (`class OutcomeLedger`) | `plans/12-supervisor-and-watchdog.md:333` | Cited as `OutcomeLedgerService` in Plan 12 | `OutcomeLedger` |
-| Anti-cheat exit code parser (`INV-11`) | `plans/04-axiom-verification-sweeper.md:267` (`assertAttributableShellCommand`) | `plans/09-verified-pipeline-and-gates.md:25, 344` (`assertAttributableCommand`, `isExitStatusAttributable`) | Duplicate regular expression / AST shell parsers enforcing `INV-11` in two separate packages | Canonicalize in `@deepseek-ai/dsh-verification` and reuse in Plan 04 |
-| `KanbanStore.releaseClaim` | `plans/01-kanban-substrate.md:277` (`releaseClaim(id, reason)`) | `plans/12-supervisor-and-watchdog.md:596` | Plan 12 table omits required `reason` parameter | `ctx.kanban.releaseClaim(taskId, reason)` |
-| Pre-merge axiom verification caller | `plans/04-axiom-verification-sweeper.md:66` (claims Plan 10 Integrator calls `assertTaskProven`) | `plans/10-integration-and-pr-engine.md:42`, `plans/12-supervisor-and-watchdog.md:67` | Plan 10 does not call `axiomVerifier`; Plan 12 Supervisor calls `ctx.axiomVerifier.verifyTask` | Update Plan 04 to designate `ctx.supervisor` as caller |
-| `kanban_attachments` tool exposure | `plans/02-kanban-interaction-tools.md:33, 194` | `plans/14-presets-profiles-and-bundle.md:562` | Omitted from Plan 14 Exposed Tools catalog | Include `kanban_attachments` in Plan 14 §9.1 |
+| Symbol / Concept | Defined In | Cited In | Mismatch | Current Resolution | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `'kanban/pre-complete'` (Cordis serial event) | `plans/pieces/02-kanban/02.01-kanban-service-definition.md` | `plans/pieces/02-kanban/02.16-pre-complete-verification-gates.md`, `plans/pieces/03-axioms/03.12-no-unproven-done-gate.md` | Missing serial hook in legacy macro plans | Implemented as `piece/pre-complete` in `packages/dev-loop/lifecycle/src/index.ts`; specified for kanban in `02.16` and `03.12` | **RESOLVED** (Set 00) / **OPEN** (`02.16`, `03.12`) |
+| `AutoTodoGenerator` | `plans/pieces/03-axioms/03.14-auto-todo-generator.md` | `plans/pieces/03-axioms/03.15-continuation-packet-compiler.md` | Duplicate generators across sweeper and ledger | Unified in `@deepseek-ai/dsh-axiom-auto-todo` under `03.14` | **OPEN** (`03.14`) |
+| Candidate Axiom Preset Entry | `plans/pieces/03-axioms/03.05-candidate-axioms-tool.md` | `plans/pieces/03-axioms/03.16-preset-composition-patch.md` | Leaked root service provider in agent presets | Uses dedicated tool plugin `@deepseek-ai/dsh-tool-candidate-axioms` | **RESOLVED** (spec) / **OPEN** (`03.05`) |
+| Outcome Ledger Preset Entry | `packages/dev-loop/persistence/src/index.ts` | `plans/pieces/00-dev-loop/00.14b-brain-preset-tools.md` | Host service mounted in agent preset | Replaced by `DevLoopPersistence` host service and scoped tool rows | **RESOLVED** |
+| Outcome Ledger Service Class Name | `packages/dev-loop/roles/src/records.ts` | `packages/dev-loop/persistence/src/index.ts` | Class name collision (`OutcomeLedger` vs `OutcomeLedgerService`) | Replaced by `DelegationLedger` and `DevLoopPersistence` | **OBSOLETE** |
+| Anti-cheat exit code parser (`INV-11`) | `plans/pieces/06-verification/06.03-attributable-shell-parser.md` | `plans/pieces/03-axioms/03.10-anti-cheat-shell-seam.md`, `plans/pieces/06-verification/06.15-anti-cheat-masked-exit.md` | Duplicate shell regex parsers | Canonicalized in `@deepseek-ai/dsh-verification-shell-parser` | **OPEN** (`06.03`) |
+| `KanbanStore.releaseClaim` | `packages/dev-loop/lifecycle/src/index.ts` | `plans/pieces/02-kanban/02.04-three-state-lifecycle.md` | Missing reason parameter in recovery table | CAS claim transitions enforce explicit reasons; kanban uses 3-state lifecycle | **RESOLVED** (Set 00) / **OPEN** (`02.04`) |
+| Pre-merge axiom verification caller | `plans/pieces/03-axioms/03.12-no-unproven-done-gate.md` | `plans/pieces/00-dev-loop/00.10d-mainline-transfer-gate.md`, `packages/dev-loop/gates/src/runner.ts` | Ambiguous caller for `assertTaskProven` | Bound to `'kanban/pre-complete'` serial event; Gate 4 runs transfer checks | **RESOLVED** (spec) / **OPEN** (`00.10d`, `03.12`) |
+| `kanban_attachments` tool exposure | `plans/pieces/02-kanban/02.14-model-kanban-tools.md` | `plans/pieces/02-kanban/02.14-model-kanban-tools.md` | Omitted from tool catalog | Replaced by domain tool `kanban_get_card` | **OBSOLETE** |
 
 ---
 
 ## Confirmed-correct
 
 1. **Plane Separation & Cordis Scoping**:
-   - Host plane singletons (`ctx.kanban`, `ctx.worktrees`, `ctx.resourceGuard`, `ctx.verification`, `ctx.integrator`, `ctx.supervisor`) are correctly mounted globally on the root container without per-session re-instantiation.
-   - Per-session tools and guards (`tool-kanban`, `tool-axiom`, `guard-test-pinning`, `verification-stop`) are mounted inside agent presets without publishing root services, strictly complying with `PRESET-RULES.md`.
+   Host plane singletons (`ctx.devLoopLifecycle`, `ctx.devLoopWorktree`, `ctx.devLoopPersistence`, `ctx.storageDomain`) are mounted globally on the root container in bundle patches (`packages/bundle/base/cordis.patch.yml`). Per-session tools (`tool-fs`, `tool-subagent`, `tool-todo`) are mounted inside agent presets (`packages/preset/agent-presets/presets/ptc/agent.cordis.yml`) without publishing unisolated root services, complying with `packages/preset/agent-presets/src/mount.ts`.
 2. **Session Isolation & Isolate Realms**:
-   - Session-mutable services (`dsh-plan-mode` under `isolate: { planMode: true }`, `workflow-worker-thread` under `isolate: { workflowEngine: true }`) are correctly isolated into entry-local groups per PRESET-RULE 2 and 3, preventing state pollution across concurrent sessions.
+   Session-mutable services (`@deepseek-ai/dsh-plan-mode` under `isolate: { planMode: true }`, `@deepseek-ai/dsh-workflow-worker-thread` under `isolate: { workflowEngine: true }`) are isolated into entry-local groups in `packages/preset/agent-presets/presets/ptc/agent.cordis.yml` and `packages/preset/agent-presets/presets/standard/agent.cordis.yml`, preventing state leakage across concurrent sessions.
 3. **No Package-Level Dependency Cycles**:
-   - The planned package dependency graph is strictly acyclic. Substrate packages (`dsh-kanban`, `dsh-axiom`, `dsh-worktree`, `dsh-verification`) have zero circular imports. Downstream coordination packages (`dsh-supervisor`, `dsh-integrator`, `dsh-ledger`) dynamically discover optional capabilities via `ctx.get()`, avoiding cyclic package.json links.
+   The package dependency graph across `packages/dev-loop/` is strictly acyclic (`packages/dev-loop/references` -> `packages/dev-loop/claims` -> `packages/dev-loop/gates` -> `packages/dev-loop/lifecycle`). Downstream coordination packages discover optional capabilities dynamically via `ctx.get()`.
 4. **Harness Monorepo Reuse**:
-   - Historical session search (`session_search`) delegates cleanly to the existing `@deepseek-ai/dsh-session-query-sqlite` FTS5 index without creating a duplicate SQLite database.
-   - Persona customization properly reuses `@deepseek-ai/dsh-persona`.
-   - Tool execution guards strictly reuse `ctx.tools.guard()` and monotonic rejection layers.
+   Historical session search delegates directly to `@deepseek-ai/dsh-tool-session-query` (`packages/session-query/tool-session-query/src/index.ts`) and `@deepseek-ai/dsh-session-query-sqlite`. Persona customization reuses `@deepseek-ai/dsh-persona` (`packages/preset/persona`).
 5. **Privilege Decoupling for Git Operations**:
-   - Git operations that mutate repository branches, land merge commits, or interact with remotes are strictly encapsulated inside the host-plane `IntegratorService` (Plan 10) driven by the supervisor or CLI, completely shielding model tools from direct merge authority.
+   Git operations that inspect, add, or clean worktrees are encapsulated in host services (`packages/dev-loop/worktree/src/git.ts`, `plans/pieces/05-worktree-guard/05.02-git-subprocess-runner.md`), shielding model tools from direct merge authority or destructive branch mutations.

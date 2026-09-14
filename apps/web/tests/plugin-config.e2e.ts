@@ -14,6 +14,7 @@ import {
   assertFixtureInventory, captureStableAria, compareOrRefreshGolden,
   launchWebScaffold, watchConsole, webSnapshotMode, type WebScaffold,
 } from './scaffold.ts'
+import { NO_START_CAPABILITIES } from '@deepseek-ai/dsh-subagent'
 import { ZH_BROWSER_LOCALE, saveFailureShot } from './support.ts'
 
 const SNAPSHOT_DIR = fileURLToPath(new URL('./expected/plugin-config', import.meta.url))
@@ -126,6 +127,48 @@ describe('web e2e: plugin configuration section', () => {
     expect(await settingsDocument()).toContain('model:')
     await expandSubagent.click()
     await expect.poll(() => toggle.getAttribute('aria-checked'), { timeout: 5_000 }).toBe('false')
+    expect(tripwire.pageErrors).toEqual([])
+  }, 60_000)
+
+  it('shows a native subagent provider and retains its saved route after removal', async () => {
+    onTestFailed(() => saveFailureShot(page, 'web-e2e-plugin-config-subagent-native-model'))
+    // Deterministic native provider registered on the live scaffold host: the
+    // settings card discovers it through the subagent model catalog, which is
+    // separate from the parent Session model picker.
+    const disposeProvider = scaffold.ctx.subagents.registerProvider({
+      name: 'fixture-native',
+      capabilities: NO_START_CAPABILITIES,
+      inheritsParentContext: false,
+      async start() { throw new Error('fixture-native never starts') },
+      async listModels() {
+        return [{ id: 'fixture-native-model', name: 'Fixture Native Model' }]
+      },
+    })
+
+    const dialog = await openPlugins()
+    await dialog.getByText('Subagent', { exact: true }).click()
+    const toggle = dialog.getByRole('switch', { name: '允许 Agent 为 Subagent 选择模型' })
+    // The earlier scenario saved enabled: false with its routes retained.
+    if (await toggle.getAttribute('aria-checked') !== 'true') await toggle.click()
+    const models = dialog.getByRole('group', { name: 'Agent 可选择的模型' })
+    await models.waitFor({ timeout: 10_000 })
+    const nativeModel = models.getByRole('checkbox', { name: /fixture-native-model/ })
+    await nativeModel.waitFor({ timeout: 10_000 })
+    await nativeModel.check()
+    await dialog.getByRole('button', { name: '保存', exact: true }).click()
+
+    const expandSubagent = dialog.getByRole('button', { name: '展开设置: Subagent' })
+    await expandSubagent.waitFor({ timeout: 5_000 })
+    await expect.poll(async () => (await settingsDocument()).includes('subagent:fixture-native'), { timeout: 10_000 })
+      .toBe(true)
+
+    // Removing the provider reduces the offered catalog but never erases the
+    // saved authorization.
+    disposeProvider()
+    await expandSubagent.click()
+    await expect.poll(() => dialog.getByText('已保存但当前不可用', { exact: true }).count(), { timeout: 10_000 })
+      .toBe(1)
+    expect(await dialog.getByText('subagent:fixture-native/fixture-native-model').count()).toBe(1)
     expect(tripwire.pageErrors).toEqual([])
   }, 60_000)
 

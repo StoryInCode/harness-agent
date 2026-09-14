@@ -14,6 +14,7 @@ import {
 } from '@deepseek-ai/dsh-subagent'
 import { MAX_TIMER_DELAY_MS } from '@deepseek-ai/dsh-timeout'
 import { startAntigravityRun } from './run.ts'
+import { listAntigravityModels } from './models.ts'
 
 export const name = 'subagent-antigravity'
 export const inject = ['subagents', 'subprocess']
@@ -57,10 +58,33 @@ class AntigravityProvider implements SubagentProvider {
     this.name = config.providerName
   }
 
+  async listModels(signal: AbortSignal) {
+    const controller = new AbortController()
+    const result = listAntigravityModels(AbortSignal.any([signal, controller.signal]), {
+      ...this.config,
+      cwd: process.cwd(),
+      spawn: spec => this.ctx.subprocess.spawn(spec),
+    })
+    const dispose = this.ctx.effect(() => async () => {
+      controller.abort()
+      await result.then(() => undefined, () => undefined)
+    }, 'antigravity.modelDiscovery()')
+    try {
+      return await result
+    } finally {
+      await dispose()
+    }
+  }
+
   async start(request: ResolvedSubagentStartRequest) {
     const cwd = resolveChildCwd(name, undefined, request.parent.session.header.cwd, request.cwd)
+    const model = request.nativeModel ?? this.config.model
+    if (model !== undefined && model.trim().length === 0) {
+      throw new Error('subagent-antigravity: native model must not be empty')
+    }
     return startAntigravityRun(request, {
       ...this.config,
+      ...model === undefined ? {} : { model },
       cwd,
       spawn: spec => this.ctx.subprocess.spawn(spec),
     })

@@ -2580,7 +2580,7 @@ export interface Config {
 }
 ```
 
-Source: [`packages/subagent/subagent-antigravity/src/index.ts:22`](../packages/subagent/subagent-antigravity/src/index.ts)
+Source: [`packages/subagent/subagent-antigravity/src/index.ts:23`](../packages/subagent/subagent-antigravity/src/index.ts)
 
 <a id="deepseek-aidsh-subagent-claude-code"></a>
 
@@ -3192,9 +3192,12 @@ export interface Config {
    * a distinct name.
    */
   toolName?: string
+  /** Discovery tool name; defaults to `list_subagent_models`. Use distinct names for co-mounted selection tools. */
+  listModelsToolName?: string
   /**
    * Sample the Host `subagent-model-selection` setting for each new top-level
-   * Session and inherit that decision in its child Sessions.
+   * Session and inherit that decision in its child Sessions. Providers with
+   * `agentOptions` use LLM selection; otherwise `listModels` enables native selection.
    */
   modelSelectionSettings?: boolean
   /**
@@ -3244,7 +3247,7 @@ export interface Config {
 
 Depends on: [`AgentOptions`](subsystems/core.md)
 
-Source: [`packages/subagent/tool-subagent/src/index.ts:48`](../packages/subagent/tool-subagent/src/index.ts)
+Source: [`packages/subagent/tool-subagent/src/index.ts:49`](../packages/subagent/tool-subagent/src/index.ts)
 
 <a id="deepseek-aidsh-tool-terminal"></a>
 

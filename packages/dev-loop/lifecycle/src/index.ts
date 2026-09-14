@@ -39,7 +39,7 @@ export type { PieceCompletedEvent, PiecePreCompleteEvent, StateTransitionEvent }
  * Legal edges of the piece state machine.
  *
  * `done` has no outgoing edge: reopening is deliberately unspecified, because
- * `02.04` defines it as `done → todo` while `plans/12-supervisor-and-watchdog.md`
+ * `02.04` defines it as `done → todo` while `archive/plans/12-supervisor-and-watchdog.md`
  * defines it as `done → blocked`, and no piece may implement a transition two
  * others define differently.
  */

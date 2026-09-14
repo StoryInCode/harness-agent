@@ -6,44 +6,42 @@ The Worktree Management and Host Resource Admission subsystem establishes isolat
 
 *Completed pieces live in `05-worktree-guard/done/`.*
 
-| Piece ID | Title | Package | Depends on | Queue Order | Status |
-|---|---|---|---|---|---|
-| `05.01` | Worktree Service Definition and Domain Contracts | `@deepseek-ai/dsh-worktree` | none | 1 | todo |
-| `05.02` | Typed Git Subprocess Runner and Environment Scrubber | `@deepseek-ai/dsh-worktree-git` | `05.01` | 2 | todo |
-| `05.03` | Worktree Collision Detection and Path Fallback Resolver | `@deepseek-ai/dsh-worktree-collision` | `05.01`, `05.02` | 3 | todo |
-| `05.04` | Base Commit Pinning and Atomic Worktree Allocator | `@deepseek-ai/dsh-worktree-allocator` | `05.01`, `05.02`, `05.03` | 4 | todo |
-| `05.05` | Worktree Include Synchronizer and Path Traversal Guard | `@deepseek-ai/dsh-worktree-includes` | `05.01` | 5 | todo |
-| `05.06` | Administrative Worktree Lock and PID Liveness Manager | `@deepseek-ai/dsh-worktree-lock` | `05.01`, `05.02` | 6 | todo |
-| `05.07` | Upstream Patch Equivalence Cache | `@deepseek-ai/dsh-worktree-cherry-cache` | `05.01` | 7 | todo |
-| `05.08` | Multi-Tier Work Preservation Guard (INV-07) | `@deepseek-ai/dsh-worktree-preservation` | `05.01`, `05.02`, `05.07` | 8 | todo |
-| `05.09` | Safe Worktree Pruner and Branch Teardown | `@deepseek-ai/dsh-worktree-pruner` | `05.01`, `05.02`, `05.06`, `05.08` | 9 | todo |
-| `05.10` | Git Object Pack Sprawl Maintenance | `@deepseek-ai/dsh-worktree-maintenance` | `05.01`, `05.02` | 10 | todo |
-| `05.11` | Subagent Worktree Scoping and Sandbox Fencing (INV-06) | `@deepseek-ai/dsh-worktree-scoping` | `05.01`, `05.04` | 11 | todo |
-| `05.12` | Local Worktree Manager Host Service | `@deepseek-ai/dsh-worktree-local` | `05.01` through `05.10` | 12 | todo |
-| `05.13` | Memory Metrics Provider and Memoized TTL Cache | `@deepseek-ai/dsh-guard-memory-provider` | none | 13 | todo |
-| `05.14` | Systemd Cgroup v2 Slice Inspector | `@deepseek-ai/dsh-guard-cgroup-provider` | none | 14 | todo |
-| `05.15` | Tool Execution and Sovereign Path Classifier | `@deepseek-ai/dsh-guard-tool-classifier` | none | 15 | todo |
-| `05.16` | Dynamic Worker Admission Governor | `@deepseek-ai/dsh-guard-admission` | `05.13`, `05.14` | 16 | todo |
-| `05.17` | Monotonic Tool Execution Guard (INV-12 & INV-09) | `@deepseek-ai/dsh-guard-tool-guard` | `05.13`, `05.15`, `05.16` | 17 | todo |
-| `05.18` | Resource Guard Host Service and Schemastery Config | `@deepseek-ai/dsh-guard-resource` | `05.13` through `05.17` | 18 | todo |
-| `05.19` | Worktree and Resource Guard Host Patch Layer Composition | `@deepseek-ai/dsh-worktree-guard-presets` | `05.12`, `05.18` | 19 | todo |
+| ID | Title | Lead | Package | Depends on | Queue | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| `05.01` | [Worktree Service Definition and Domain Contracts](05.01-worktree-service-definition.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-worktree` | `none` | 1 | todo |
+| `05.02` | [Typed Git Subprocess Runner and Environment Scrubber](05.02-git-subprocess-runner.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-worktree-git` | `05.01` | 2 | todo |
+| `05.03` | [Worktree Collision Detection and Path Fallback Resolver](05.03-worktree-collision.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-worktree-collision` | `05.01, 05.02` | 3 | todo |
+| `05.04` | [Base Commit Pinning and Atomic Worktree Allocator](05.04-worktree-allocator.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-worktree-allocator` | `05.01, 05.02, 05.03` | 4 | todo |
+| `05.05` | [Worktree Include Synchronizer and Path Traversal Guard](05.05-worktree-includes.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-worktree-includes` | `05.01` | 5 | todo |
+| `05.06` | [Administrative Worktree Lock and PID Liveness Manager](05.06-worktree-lock.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-worktree-lock` | `05.01, 05.02` | 6 | todo |
+| `05.07` | [Upstream Patch Equivalence Cache](05.07-cherry-cache.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-worktree-cherry-cache` | `05.01` | 7 | todo |
+| `05.08` | [Multi-Tier Work Preservation Guard (INV-07)](05.08-worktree-preservation.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-worktree-preservation` | `05.01, 05.02, 05.07` | 8 | todo |
+| `05.09` | [Safe Worktree Pruner and Branch Teardown](05.09-worktree-pruner.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-worktree-pruner` | `05.01, 05.02, 05.06, 05.08` | 9 | todo |
+| `05.10` | [Git Object Pack Sprawl Maintenance](05.10-worktree-maintenance.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-worktree-maintenance` | `05.01, 05.02` | 10 | todo |
+| `05.11` | [Subagent Worktree Scoping and Sandbox Fencing (INV-06)](05.11-worktree-scoping.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-worktree-scoping` | `05.01, 05.04` | 11 | todo |
+| `05.12` | [Local Worktree Manager Host Service](05.12-worktree-local-service.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-worktree-local` | `05.01, 05.02, 05.03, 05.04, 05.05, 05.06, 05.08, 05.09, 05.10` | 12 | todo |
+| `05.13` | [Memory Metrics Provider and Memoized TTL Cache](05.13-memory-provider.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-guard-memory-provider` | `none` | 13 | todo |
+| `05.14` | [Systemd Cgroup v2 Slice Inspector](05.14-cgroup-provider.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-guard-cgroup-provider` | `none` | 14 | todo |
+| `05.15` | [Tool Execution and Sovereign Path Classifier](05.15-tool-classifier.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-guard-tool-classifier` | `none` | 15 | todo |
+| `05.16` | [Dynamic Worker Admission Governor](05.16-worker-admission-governor.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-guard-admission` | `05.13, 05.14` | 16 | todo |
+| `05.17` | [Monotonic Tool Execution Guard (INV-12 & INV-09)](05.17-monotonic-tool-guard.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-guard-tool-guard` | `05.13, 05.15, 05.16` | 17 | todo |
+| `05.18` | [Resource Guard Host Service and Schemastery Config](05.18-resource-guard-service.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-guard-resource` | `05.13, 05.14, 05.15, 05.16, 05.17` | 18 | todo |
+| `05.19` | [Worktree and Resource Guard Host Patch Layer Composition](05.19-worktree-guard-presets.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-worktree-guard-presets` | `05.12, 05.18` | 19 | todo |
 
-## Earlier Plan Overrides
+## Core Architectural Principles
 
-This piece set overrides specific legacy designs from `plans/07-worktree-management.md` and `plans/08-resource-guard-and-admission.md`:
-
-1. **Concrete Schemastery Schema for `LocalWorktreeConfig`**: Overrides Plan 07 (§5.3) raw TypeScript interface with runtime Schemastery validation (`export const LocalWorktreeConfig: z<LocalWorktreeConfig> = z.object(...)`), resolving the Review Lifecycle gap (`05.12`, `REVIEW-lifecycle.md:83-85`).
-2. **Elimination of Erroneous Worker Preset `$isolate` Realm**: Overrides Plan 07 (§7) invalid `$isolate: { name: true }` and `$path` syntax. Worker presets mount standard tools without isolate realms so they resolve host services (`ctx.kanban`, `ctx.axioms`) while inheriting `SessionHeader.cwd` (`05.11`, `05.19`, `REVIEW-seams.md:70-81`).
-3. **Monotonic Tool Guard over Waterfall Interceptors**: Overrides `tools/pre-execute` waterfall listeners with owner-level monotonic `ctx.tools.guard()` in `stagePreExecuteAndGuards`. Returning a denial string prevents downstream listeners or approval prompts from bypassing memory limits (`INV-12`) or SOUL file sovereignty (`INV-09`) (`05.17`).
-4. **Native Session Header & Sandbox Contracts over Custom Virtual FS**: Overrides bespoke path-rewriting and virtual filesystems with native `SessionHeader.cwd` and `SandboxedFileSystem.checkedTarget()` kernel fencing (`INV-06`) (`05.11`).
-5. **Discrete Subprocess Seam over Shell Strings**: Overrides shell execution with typed `ctx.subprocess.spawn` discrete `argv` arrays, non-interactive flags (`GIT_TERMINAL_PROMPT=0`), and case-insensitive API key scrubbing (`05.02`).
-6. **Disk-Memoized Cherry Cache**: Overrides unmemoized patch equivalence checks with atomic JSON persistence at `~/.hermes/cache/worktree_merge_verdicts.json` (`05.07`).
+1. **Concrete Schemastery Schema for `LocalWorktreeConfig`**: Runtime Schemastery validation (`export const LocalWorktreeConfig: z<LocalWorktreeConfig> = z.object(...)`) (`05.12`, `REVIEW-lifecycle.md:83-85`).
+2. **Worker Presets without Isolate Realms**: Worker presets mount standard tools without isolate realms so they resolve host services (`ctx.kanban`, `ctx.axioms`) while inheriting `SessionHeader.cwd` (`05.11`, `05.19`, `REVIEW-seams.md:70-81`).
+3. **Monotonic Tool Guard over Waterfall Interceptors**: Owner-level monotonic `ctx.tools.guard()` in `stagePreExecuteAndGuards`. Returning a denial string prevents downstream listeners or approval prompts from bypassing memory limits (`INV-12`) or SOUL file sovereignty (`INV-09`) (`05.17`).
+4. **Native Session Header & Sandbox Contracts over Custom Virtual FS**: Native `SessionHeader.cwd` and `SandboxedFileSystem.checkedTarget()` kernel fencing (`INV-06`) (`05.11`).
+5. **Discrete Subprocess Seam over Shell Strings**: Typed `ctx.subprocess.spawn` discrete `argv` arrays, non-interactive flags (`GIT_TERMINAL_PROMPT=0`), and case-insensitive API key scrubbing (`05.02`).
+6. **Disk-Memoized Cherry Cache**: Atomic JSON persistence at `.agents/cache/worktree_merge_verdicts.json` (`05.07`).
 
 ## Platform Specifics and Graceful Degradation
 
 | Platform / Environment | Memory Source | Cgroup Accounting | Headroom Guard (`INV-12`) | SOUL Sovereignty (`INV-09`) | Worktree Process Isolation |
 |---|---|---|---|---|---|
-| **Linux with systemd cgroups v2** | `/proc/meminfo` (`MemAvailable`) | Full (`hermes-work.slice` read via sysfs) | Authoritative (`available - reserved >= headroom`) | Full (Path & shell token analysis) | systemd transient scopes (`systemd-run --user --scope`) |
+| **Linux with systemd cgroups v2** | `/proc/meminfo` (`MemAvailable`) | Full (`dsh-work.slice` read via sysfs) | Authoritative (`available - reserved >= headroom`) | Full (Path & shell token analysis) | systemd transient scopes (`systemd-run --user --scope`) |
 | **Linux without cgroups / Container** | `/proc/meminfo` (`MemAvailable`) | Degraded (`cgroupAvailable = false`, reservations = 0) | Active (`available >= headroom`) | Full (Path & shell token analysis) | Process group signal propagation |
 | **macOS (Darwin)** | `node:os.freemem()` | Degraded (`cgroupAvailable = false`) | Active (`freemem >= headroom`) | Full (POSIX path normalization) | Process group signal propagation |
 | **Windows (win32)** | `node:os.freemem()` | Degraded (`cgroupAvailable = false`) | Active (`freemem >= headroom`) | Full (Windows `\` and `/` path normalization) | Windows Job Objects |

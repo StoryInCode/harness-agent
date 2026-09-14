@@ -70,7 +70,7 @@ it('bounds a pre-execution policy error through the real native error prefix pat
 
 it('bounds parsed-input validation errors carrying a large unknown field name', async () => {
   await fixture([], async (f) => {
-    const result = await toolRun(f, 4_096, { pieceId, [`dev_loop_${'未知'.repeat(400)}`]: true } satisfies { pieceId: string } & Record<string, boolean>)
+    const result = await toolRun(f, 4_096, { pieceId, [`dev_loop_${'未知'.repeat(400)}`]: true } satisfies { pieceId: string } & Record<string, unknown>)
     expect(result.isError).toBe(true)
     expect(bytes(result.content)).toBeLessThanOrEqual(4_096)
     const text = textOf(result)

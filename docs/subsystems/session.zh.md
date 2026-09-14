@@ -759,6 +759,13 @@ inspect( sessionId: SessionId, signal?: AbortSignal, ): Promise<SessionInspectio
 @Remote('modelCatalog') modelCatalog(): Promise<ModelCatalog>
 
 /**
+ * Describe LLM and native task-only routes for subagent authorization settings.
+ * @param signal - Caller lifetime forwarded to native model discovery.
+ * @returns Provider-grouped models with isolated discovery failures.
+ */
+@Remote('subagentModelCatalog') subagentModelCatalog(signal: AbortSignal): Promise<ModelCatalog>
+
+/**
  * Report whether this deployment can hand a Session workspace path to a native desktop.
  * @returns true when the matching open operation is available.
  */
@@ -1083,6 +1090,23 @@ One Agent changed running state.
 ```
 
 Types: [SessionId](core.zh.md)
+
+Source: [`packages/api/session-controller/src/types.ts`](../../packages/api/session-controller/src/types.ts)
+
+<a id="api-sessionsubagent-models-updated--emit"></a>
+
+#### `api-session/subagent-models-updated` — emit
+
+Native provider registration changed the subagent model directory.
+
+```ts cordis-catalog
+/**
+ * Native provider registration changed the subagent model directory.
+ * @mode emit
+ * @dshScopeScan unsupported - global catalog invalidation has no Session identity.
+ */
+'api-session/subagent-models-updated'(): void
+```
 
 Source: [`packages/api/session-controller/src/types.ts`](../../packages/api/session-controller/src/types.ts)
 

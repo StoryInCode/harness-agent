@@ -256,6 +256,24 @@ describe('Antigravity provider registration', () => {
     expect(spawn).toHaveBeenCalledOnce()
   })
 
+  it('uses a request native model without inheriting parent Agent options', async () => {
+    const ctx = await context()
+    const fake = child()
+    const spawn = vi.spyOn(ctx.subprocess, 'spawn').mockReturnValue(fake.handle)
+    await ctx.plugin(antigravity, { model: 'configured-model' })
+    const run = await ctx.subagents.start('antigravity', {
+      ...request(), nativeModel: 'claude-sonnet-4-6',
+    })
+    expect(spawn.mock.calls[0]?.[0].argv.slice(-2)).toEqual(['--model', 'claude-sonnet-4-6'])
+    fake.done.resolve({ exitCode: 0, signal: null })
+    fake.exited.resolve(true)
+    await run.result
+    await run.dispose()
+    await expect(ctx.subagents.start('antigravity', { ...request(), nativeModel: ' ' }))
+      .rejects.toThrow('native model must not be empty')
+    expect(spawn).toHaveBeenCalledOnce()
+  })
+
   it.each([
     { command: '' }, { providerName: '' }, { model: '' },
     { timeoutMs: 0 }, { timeoutMs: Number.NaN }, { timeoutMs: MAX_TIMER_DELAY_MS + 1 },

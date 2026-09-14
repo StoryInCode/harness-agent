@@ -28,7 +28,7 @@ export function parse(raw: string): Request {
       return { verb }
     case 'show': case 'approve': case 'reject':
       if (id === undefined) throw new Refusal(`Missing required id for ${verb}.`)
-      if (!/^\d{2}\.\d{2}$/u.test(id)) throw new Refusal('Invalid piece id; use NN.MM.')
+      if (!/^\d{2}\.\d{2}[a-z]?$/u.test(id)) throw new Refusal('Invalid piece id; use NN.MM or NN.MMx.')
       if (verb === 'show') {
         if (digest !== undefined) throw new Refusal('Unexpected arguments for show.')
         return { verb, id }

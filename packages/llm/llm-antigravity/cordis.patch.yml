@@ -1,0 +1,4 @@
+# Google Antigravity LLM provider adapter.
+- insert:
+    - id: llm-antigravity
+      name: '@deepseek-ai/dsh-llm-antigravity'

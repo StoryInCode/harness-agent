@@ -1,13 +1,13 @@
-/** Child LLM route selection for the subagent tool. */
+/** Child LLM and provider-native route selection for the subagent tool. */
 
 import { ReasoningEffortId } from '@deepseek-ai/dsh-llm'
 import type { LlmRuntime } from '@deepseek-ai/dsh-llm'
 import type { AgentOptions } from '@deepseek-ai/dsh-agent'
 import z from '@deepseek-ai/schemastery'
 
-/** One exact child LLM route authorized by a user setting. */
+/** One exact child LLM or provider-native route authorized by a user setting. */
 export interface AllowedModelRoute {
-  /** Registered LLM provider id. */
+  /** Registered LLM provider id, or `subagent:<provider>` for a native model. */
   readonly provider: string
   /** Provider-owned exact model id. */
   readonly model: string
@@ -113,6 +113,9 @@ export function requestedAgentOptions(
     throw new Error('child LLM `provider` and `model` must be supplied together')
   }
 
+  if (request.provider?.startsWith('subagent:')) {
+    throw new Error('native subagent routes cannot be selected by an LLM delegation tool')
+  }
   const baselineProvider = configured?.provider ?? parentOptions.provider
   const baselineModel = configured?.model ?? parentOptions.model
   const routeChanged = request.provider !== undefined
@@ -153,6 +156,35 @@ export function assertAllowedModelSelection(
 }
 
 /**
+ * Resolve an explicit native model without inheriting parent LLM values.
+ * @param provider - Subagent provider bound to the tool instance.
+ * @param request - Model-facing selection fields.
+ * @param policy - Session-owned exact-route allowlist; omission disables selection.
+ * @returns Selected native model id, or undefined to use provider defaults.
+ */
+export function requestedNativeModel(
+  provider: string,
+  request: DelegationModelRequest,
+  policy: ModelSelectionPolicy | undefined,
+): string | undefined {
+  if (!hasDelegationModelRequest(request)) return undefined
+  if (policy === undefined) throw new Error('child model selection is disabled for this tool instance')
+  if (request.reasoning_effort !== undefined) throw new Error('native subagent models do not accept reasoning_effort')
+  assertNonEmpty(request.provider, 'provider')
+  assertNonEmpty(request.model, 'model')
+  if (request.provider === undefined || request.model === undefined) {
+    throw new Error('native child `provider` and `model` must be supplied together')
+  }
+  if (request.provider !== `subagent:${provider}`) {
+    throw new Error(`this tool only accepts native provider "subagent:${provider}"`)
+  }
+  if (!policy.routes.some(route => route.provider === request.provider && route.model === request.model)) {
+    throw new Error(`native child route "${request.provider}/${request.model}" is not allowed for this Session`)
+  }
+  return request.model
+}
+
+/**
  * Whether configured Agent options require route validation before delegation.
  * @param options - Tool-instance child defaults.
  * @returns Whether configured provider, model, or effort values must be resolved.
@@ -184,6 +216,9 @@ export async function preflightChildLlmRoute(
   const model = requested?.model ?? parentOptions.model
   if (provider === undefined || model === undefined) {
     throw new Error('cannot select child LLM values without an effective provider and model')
+  }
+  if (provider.startsWith('subagent:')) {
+    throw new Error('native subagent routes cannot be selected by an LLM delegation tool')
   }
   const routeChanged = provider !== parentOptions.provider || model !== parentOptions.model
   const reasoningEffort = requested?.reasoningEffort

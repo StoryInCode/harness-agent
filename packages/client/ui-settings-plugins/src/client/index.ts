@@ -86,6 +86,10 @@ export function apply(ctx: ClientContext): void {
     'ui-settings-plugins: subagent adapter invalidations',
   )
   ctx.effect(
+    () => ctx.remote.$on('api-session/subagent-models-updated', () => { subagentModelSelection.refreshCatalog() }),
+    'ui-settings-plugins: native subagent invalidations',
+  )
+  ctx.effect(
     () => ctx.remote.$on('settings/document-updated', () => { subagentModelSelection.refreshCatalog() }),
     'ui-settings-plugins: subagent settings invalidations',
   )

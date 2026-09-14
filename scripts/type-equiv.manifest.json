@@ -1417,6 +1417,11 @@
       "source": "packages/subagent/subagent/src/types.ts"
     },
     {
+      "doc": "docs/subsystems/subagent.md",
+      "symbol": "SubagentModelInfo",
+      "source": "packages/subagent/subagent/src/types.ts"
+    },
+    {
       "doc": "docs/subsystems/web.md",
       "symbol": "WebSearchRequest",
       "source": "packages/web/web/src/types.ts"

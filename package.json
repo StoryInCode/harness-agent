@@ -191,6 +191,7 @@
     "@deepseek-ai/dsh-dev-loop-references": "workspace:^",
     "@deepseek-ai/dsh-dev-loop-roles": "workspace:^",
     "@deepseek-ai/dsh-dev-loop-worktree": "workspace:^",
+    "@deepseek-ai/dsh-llm-antigravity": "workspace:^",
     "@deepseek-ai/dsh-subagent-antigravity": "workspace:^",
     "@deepseek-ai/dsh-tool-session-query": "workspace:^",
     "@deepseek-ai/dsh-web-fetch-http": "workspace:^",

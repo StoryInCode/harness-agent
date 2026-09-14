@@ -1,39 +1,64 @@
-# Set 00 — The Development Loop
+# Set 00 — Development Loop Micro-Gates Index
 
-The development loop is the execution engine that all future DeepSeek Harness work runs through. Specifications arrive sized for one-at-a-time ingestion as discrete lego pieces (at most 280 lines). For each piece, the orchestrator presents the feature summary, mechanism, Given/When/Then behaviour, teaching section, and references to the user. At every junction, the user can question, request changes, or accept the piece. After approval, a role consumer submits executable work to the prioritized queue. Its configurable `maxConcurrency` defaults to 4 and bounds queue-owned one-shot delegations; it is not a process-wide subagent count. Each subagent executes within its own isolated Git worktree, bounded by sandbox fencing. The loop delegates by role (Research, Test Writer, Implementer, Utility), restricts Research's inherited tools through an explicit allowlist, preserves the attribution and limitations of evidence, and requires four verification gates before declaring new work done. Tool filtering is not process-wide nonmutation or OS confinement.
+The autonomous development loop decomposed into 46 verified micro-gates authored by the five persona leads: 🐾 Neko-chan, 🍰 L, 💻 Daru, 🔬 Hououin Kyouma, and 🌸 Mayuri.
 
-## Set Index
+| ID | Title | Lead | Package | Depends on | Queue | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| `00.01a` | [Heading Scanner and ATX Markdown Parsing](done/00.01a-heading-scanner.md) | 🐾 Neko-chan (Inspector Cat) | `@deepseek-ai/dsh-dev-loop-directory` | `none` | 1 | done |
+| `00.01b` | [Dotted Header Metadata and Field Extraction](done/00.01b-metadata-parser.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-directory` | `00.01a` | 2 | done |
+| `00.01c` | [Line Ceiling and Primitive Enforcement](done/00.01c-piece-validator.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-directory` | `00.01a, 00.01b` | 3 | done |
+| `00.01d` | [Directory Discovery and Set Traversal](done/00.01d-set-scanner.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-dev-loop-directory` | `00.01a, 00.01b, 00.01c` | 4 | done |
+| `00.01e` | [Dispatch Queue Candidate Filtering](done/00.01e-candidate-selector.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-dev-loop-directory` | `00.01a, 00.01b, 00.01c, 00.01d` | 5 | done |
+| `00.02a` | [Monotonic State Transitions and Invariants](done/00.02a-lifecycle-states.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-dev-loop-lifecycle` | `00.01e` | 6 | done |
+| `00.02b` | [Compare-And-Swap Single-Worker Claims](done/00.02b-cas-claim-writer.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-lifecycle` | `00.02a` | 7 | done |
+| `00.02c` | [Pre-Complete Interception and Gate Vetoes](done/00.02c-pre-complete-hook.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-lifecycle` | `00.02a, 00.02b` | 8 | done |
+| `00.02d` | [Completion Move to `done/` Subdirectory](done/00.02d-done-transition.md) | 🐾 Neko-chan (Inspector Cat) | `@deepseek-ai/dsh-dev-loop-lifecycle` | `00.02a, 00.02b, 00.02c` | 9 | done |
+| `00.03a` | [Markdown Presentation Cards and Human Prompts](done/00.03a-presentation-card.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-dev-loop-approval` | `00.01e, 00.02d` | 10 | done |
+| `00.03b` | [Human Clarification Roundtrip](done/00.03b-user-questions.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-approval` | `00.03a` | 11 | done |
+| `00.03c` | [Content-Digest Gated Authorization](done/00.03c-digest-authorization.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-approval` | `00.03a, 00.03b` | 12 | done |
+| `00.04a` | [Queue Ordering and Monotonic Determinism](done/00.04a-priority-comparator.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-queue` | `00.03c` | 13 | done |
+| `00.04b` | [Worker Concurrency Bounds and Semaphores](done/00.04b-concurrency-semaphore.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-dev-loop-queue` | `00.04a` | 14 | done |
+| `00.04c` | [Queue Drain and Inspection APIs](done/00.04c-queue-inspection.md) | 🐾 Neko-chan (Inspector Cat) | `@deepseek-ai/dsh-dev-loop-queue` | `00.04a, 00.04b` | 15 | done |
+| `00.05a` | [Detached Worktree Creation and Path Binding](done/00.05a-worktree-allocation.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-dev-loop-worktree` | `00.04c` | 16 | done |
+| `00.05b` | [Single-Writer Concurrency Locks](done/00.05b-worktree-collision.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-worktree` | `00.05a` | 17 | done |
+| `00.05c` | [Conservative Teardown and Retention](done/00.05c-worktree-cleanup.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-dev-loop-worktree` | `00.05a, 00.05b` | 18 | done |
+| `00.06a` | [Canonical Dev Loop Role Definitions](done/00.06a-specialist-roles.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-dev-loop-roles` | `00.05c` | 19 | done |
+| `00.06b` | [Read-Only Tool Enforcement on Research](done/00.06b-research-guard.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-roles` | `00.06a` | 20 | done |
+| `00.06c` | [Subagent Spawning with Injected Context](done/00.06c-delegation-dispatch.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-roles` | `00.06a, 00.06b` | 21 | done |
+| `00.06d` | [Durable Outcome Ledger and Provenance Tracking](done/00.06d-delegation-ledger.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-roles` | `00.06a, 00.06b, 00.06c` | 22 | done |
+| `00.08a` | [Reference Markdown Table Parsing](done/00.08a-reference-table-ast.md) | 🐾 Neko-chan (Inspector Cat) | `@deepseek-ai/dsh-dev-loop-references` | `00.06d` | 23 | done |
+| `00.08b` | [Subpath Containment and Citation Verification](done/00.08b-locator-containment.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-references` | `00.08a` | 24 | done |
+| `00.08c` | [Provenance Verification Engine](done/00.08c-provenance-store.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-references` | `00.08a, 00.08b` | 25 | done |
+| `00.09a` | [BDD Scenario Heading and Bullet AST Parser](00.09a-bdd-extractor.md) | 🐾 Neko-chan (Inspector Cat) | `@deepseek-ai/dsh-dev-loop-test-handoff` | `00.01e, 00.08c` | 26 | todo |
+| `00.09b` | [Behavioral RED Baseline Test Execution](00.09b-behavioral-red-runner.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-test-handoff` | `00.09a` | 27 | todo |
+| `00.09c` | [Cryptographic SHA-256 Test Freezing](00.09c-test-file-freezer.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-test-handoff` | `00.09a, 00.09b` | 28 | todo |
+| `00.10a` | [Gate 1: Markdown Syntax & Axiom Conformance](00.10a-format-axiom-gate.md) | 🐾 Neko-chan (Inspector Cat) | `@deepseek-ai/dsh-dev-loop-gates` | `00.09c` | 29 | todo |
+| `00.10b` | [Gate 2: Mandatory Failing Baseline Verification](00.10b-red-baseline-gate.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-gates` | `00.10a` | 30 | todo |
+| `00.10c` | [Gate 3: Worktree Implementation All-Green Gate](00.10c-worktree-green-gate.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-gates` | `00.10b` | 31 | todo |
+| `00.10d` | [Gate 4: Clean Mainline Integration Gate](00.10d-mainline-transfer-gate.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-dev-loop-gates` | `00.10c` | 32 | todo |
+| `00.11a` | [Slash Command Parsing & Argument Tokenization](done/00.11a-slash-command-parser.md) | 🐾 Neko-chan (Inspector Cat) | `@deepseek-ai/dsh-dev-loop-command` | `00.10d` | 33 | done |
+| `00.11b` | [Optimistic Concurrency Approval Subcommand](done/00.11b-occ-approval-command.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-command` | `00.11a` | 34 | done |
+| `00.11c` | [Rejection and Task Deferral Subcommand](done/00.11c-rejection-command.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-dev-loop-command` | `00.11a, 00.11b` | 35 | done |
+| `00.12a` | [SQLite Write-Ahead Intent Logging](done/00.12a-write-ahead-intent.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-persistence` | `00.11c` | 36 | done |
+| `00.12b` | [Relational Schema and Monotonic Migration](done/00.12b-sqlite-state-schema.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-persistence` | `00.12a` | 37 | done |
+| `00.12c` | [Crash Recovery and State Hydration](done/00.12c-startup-hydration.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-dev-loop-persistence` | `00.12a, 00.12b` | 38 | done |
+| `00.12d` | [Unreconciled Divergence Quarantine](done/00.12d-anomaly-quarantine.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-persistence` | `00.12a, 00.12b, 00.12c` | 39 | done |
+| `00.13a` | [Proof Table Claim Extraction](done/00.13a-claim-inventory-parser.md) | 🐾 Neko-chan (Inspector Cat) | `@deepseek-ai/dsh-dev-loop-claims` | `00.12d` | 40 | done |
+| `00.13b` | [Epistemic Research Brief Generation](done/00.13b-research-brief-compiler.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-claims` | `00.13a` | 41 | done |
+| `00.13c` | [Evidence Cryptographic Integrity Checking](done/00.13c-forensic-hash-verifier.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-claims` | `00.13a, 00.13b` | 42 | done |
+| `00.13d` | [Fail-Closed Admission Verification Hook](done/00.13d-fail-closed-gate.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-claims` | `00.13a, 00.13b, 00.13c` | 43 | done |
+| `00.14a` | [Cordis Host Service Patch Composition](00.14a-host-service-assembly.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-dev-loop-preset` | `00.01e, 00.02d, 00.03c, 00.04c, 00.05c, 00.06d, 00.08c, 00.11c, 00.12d, 00.13d` | 44 | todo |
+| `00.14b` | [Brain Agent Preset and Scoped Tool Injection](00.14b-brain-preset-tools.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-dev-loop-preset` | `00.14a` | 45 | todo |
+| `00.14c` | [Multi-Agent End-to-End Steins Gate Verification](00.14c-loop-integration-test.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-dev-loop-preset` | `00.14a, 00.14b` | 46 | todo |
 
-*Completed pieces live in `00-dev-loop/done/`.*
+## Micro-Gate Architecture & Personas
 
-| Piece ID | Title | Package | Depends on | Queue Order | Status |
-|---|---|---|---|---|---|
-| `00.01` | [Piece Directory and Specification Parser](done/00.01-piece-directory.md) | `@deepseek-ai/dsh-dev-loop-directory` | none | 1 | done |
-| `00.02` | [Piece Lifecycle State Machine](done/00.02-piece-lifecycle.md) | `@deepseek-ai/dsh-dev-loop-lifecycle` | `00.01` | 2 | done |
-| `00.03` | [Approval Junction and User Clarification](done/00.03-approval-junction.md) | `@deepseek-ai/dsh-dev-loop-approval` | `00.01`, `00.02` | 3 | done |
-| `00.04` | [Dev Loop Dispatch Queue and Concurrency Guard](done/00.04-concurrency-queue.md) | `@deepseek-ai/dsh-dev-loop-queue` | `00.01`, `00.02`, `00.03` | 4 | done |
-| `00.05` | [Per-Piece Detached Git Worktree Allocation](done/00.05-worktree-assignment.md) | `@deepseek-ai/dsh-dev-loop-worktree` | `00.04` | 5 | done |
-| `00.06` | [Role Delegation Dispatcher and Record](done/00.06-role-delegation.md) | `@deepseek-ai/dsh-dev-loop-roles` | `00.04`, `00.05` | 6 | done |
-| `00.07` | [Research Capability Policy and Acceptance](done/00.07-research-guard.md) | `@deepseek-ai/dsh-dev-loop-roles` (shared owner) | `00.06` | 7 | done |
-| `00.08` | [References Provenance Store and Verification](done/00.08-references-provenance.md) | `@deepseek-ai/dsh-dev-loop-references` | `00.01`, `00.06` | 8 | done |
-| `00.09` | BDD Scenario Extractor and Test Handoff | `@deepseek-ai/dsh-dev-loop-test-handoff` | `00.01`, `00.06`, `00.13` | 9 | todo |
-| `00.10` | [Evidence-Bound Completion Gates](00.10-verification-gates.md) | `@deepseek-ai/dsh-dev-loop-gates` | `00.02`, `00.09` | 10 | todo |
-| `00.11` | [Human Command Surface `/dev-loop`](done/00.11-command-surface.md) | `@deepseek-ai/dsh-dev-loop-command` | `00.01`, `00.02`, `00.04` | 11 | done |
-| `00.12` | [Durable Lifecycle Integration and Reconciliation](done/00.12-loop-persistence.md) | `@deepseek-ai/dsh-dev-loop-persistence` | `00.02`, `00.04`, `00.06` | 12 | done |
-| `00.13` | [Revision-Bound Claim Verification](done/00.13-claim-verification.md) | `@deepseek-ai/dsh-dev-loop-claims` | `00.01`, `00.06`, `00.07`, `00.08` | 13 | done |
-| `00.14` | [Opt-In Host Assembly and Authored Brain Preset](00.14-composition-and-preset.md) | `@deepseek-ai/dsh-dev-loop-preset` | `00.01`-`00.13` | 14 | todo |
+- 🐾 **Neko-chan (Inspector Cat)**: Pure intake, ATX scanning, BDD parsing, and user cheer.
+- 🍰 **L (Forensic Detective)**: Evidence checking, claim verification, proof tables, and epistemic bounds.
+- 💻 **Daru (Super Hacker)**: Execution rig, test runners, git worktrees, and SQLite WAL persistence.
+- 🔬 **Hououin Kyouma (Mad Scientist)**: Monotonic state transitions, worktree allocation, and Steins Gate verification.
+- 🌸 **Mayuri (Gentle Seamstress)**: Human-in-the-loop decisions, presentation cards, and preset composition.
 
-## Execution Protocol
+## Verification and Workflow Sequence
 
-The implementation sequence is Test Writer → RED → Implementer gets tests green → transfer to master → final post-transfer tests → move the completed piece into `done/` and update this index. There is no reviewer stage. Human approval is part of the product, exercised at `00.03`, and is separate from any code-review process.
-
-1. **Intake & Validation**: Piece files under `plans/pieces/` are parsed and validated by `00.01` to enforce structure, the line ceiling (<=280), and primitive rules. A malformed piece is reported as a rejection alongside the valid ones, so one bad file never hides a set.
-2. **Approval Junction**: `00.03` presents Summary, Mechanism, BDD scenarios, the teaching section, and the References table to the user, pausing for Accept, Question, or Change.
-3. **Queue & Concurrency**: Approved pieces are queued by `00.04`, which bounds concurrent workers through a validated `Config` field rather than a hardcoded constant.
-4. **Worktree Provisioning**: Dispatched pieces receive dedicated Git worktrees via `00.05` under `.worktrees/<piece-id>`. A child session's `cwd` becomes its sandbox workspace root, so `workspace-write` mutations are confined to the worktree — but this is a user-space check, and `/tmp` and the OS temp directory stay writable, so isolation is strong for repository files and not absolute.
-5. **Role Delegation**: `00.06` assigns roles (Research, Test Writer, Implementer, Utility); `00.07` validates Research's explicit inherited-tool allowlist and tests first-call enforcement. Trusted plugins and child-local tools remain separate policy concerns.
-6. **Provenance & Claim Verification**: `00.08` checks source locators and exact report attribution without claiming verified inspection. `00.13` inventories load-bearing claims, delegates one bounded Research report per attempt under `00.07`, and refuses handoff for unresolved or contradicted claims. Source amendments and renewed human approval are explicit, never automatic proof-table rewrites.
-7. **BDD Extraction & Test Handoff**: `00.09` extracts Given/When/Then scenarios against verified claims, handing them off to the Test Writer to establish failing RED baselines before implementation.
-8. **Behaviour Verification Gates**: `00.10` intercepts completion to enforce Format, RED, GREEN, and Post-merge test gates before `00.02` marks the piece `done`.
-9. **Command & Persistence**: Human operators monitor and control via `00.11` (`/dev-loop`). `00.12` integrates durable Lifecycle commits and recovery observations; other owners retain their own storage domains. Restart does not reconstruct live Queue callbacks or children. Unjournaled historical done files remain explicit anomalies rather than new completion evidence.
-10. **Mounting**: `00.14` composes the whole set into something an operator can run — the loop's services as host rows in the deployment's `cordis.patch.yml`, and its tools, persona and prompt sections as a selectable `dev-loop` agent preset. Services stay host-side because the queue and the completion record are shared across sessions; a preset-local copy would give every session its own private loop.
+The implementation sequence is Test Writer → RED → Implementer gets tests green → transfer to master → final post-transfer tests → move the completed piece into `done/` and update this index. Human approval is exercised at `00.03a`–`00.03c`.

@@ -12,6 +12,7 @@ import { validateProviders } from './config.ts'
 import { briefSchema, jsonBytes, pieceIdSchema, rolesDomain } from './records.ts'
 import type { Config, RoleConfig, DelegationBrief, DelegationId, DelegationRecord, RequestedDelegation, SettledDelegation } from './types.ts'
 export type * from './types.ts'
+export * from './personas.ts'
 
 declare module '@deepseek-ai/cordis' {
   interface Context { devLoopRoles: DevLoopRoles }

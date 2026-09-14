@@ -82,6 +82,12 @@ interface SubagentStartRequest {
    */
   readonly agentOptions?: AgentOptions
   /**
+   * Exact model id interpreted by the native subagent provider, independent of
+   * Host Agent options. Requires the provider's optional `listModels` method;
+   * omission preserves its configured or native default. One-shot only.
+   */
+  readonly nativeModel?: string
+  /**
    * Object-rooted JSON Schema within `assertObjectJsonSchema`'s enforced subset. Start rejects
    * unsupported schemas or providers without the capability. Data must be plain host-realm JSON;
    * a successful child returns the matching value as {@link SubagentResult.structured}.
@@ -402,6 +408,20 @@ A local one-shot run MUST publish an ordinary child agent/session before `start(
 
 Each provider is a named child-agent transport, and multiple providers may coexist. The service validates requested start-time capabilities before `start()`, and rejects a continuable start on a provider without `prepareContinuable`. `inheritsParentContext` describes only conversation seeding (`fork`: true; `spawn` and `acp`: false), allowing consumers to generate accurate model-facing wording without implying inherited tools, services, or authority. A provider whose one-shot route has static provider-owned defaults publishes optional immutable `agentRouteDefaults`, allowing a Consumer to merge model/tool overrides against the correct baseline before preflight.
 
+Native providers expose optional `listModels(signal)` to advertise selection support without claiming Host `agentOptions`. The returned ids belong to the native product, not `ctx.llm`. A one-shot `nativeModel` request selects an exact id independently of the parent route; the provider validates it and owns bounded discovery cleanup. Unsupported requests and continuable native model selection reject before startup.
+
+```ts type-equiv
+/** One model advertised by a native subagent provider, not a Host LLM adapter. */
+interface SubagentModelInfo {
+  /** Native provider-owned model id. */
+  readonly id: string
+  /** Native provider-owned display name. */
+  readonly name: string
+  /** Optional provider-owned description. */
+  readonly description?: string
+}
+```
+
 ```ts type-equiv
 /**
  * One registered transport for running child agents. Providers are trusted
@@ -429,6 +449,15 @@ interface SubagentProvider {
    * is detached immutable data and requires `agentOptions` support.
    */
   readonly agentRouteDefaults?: Readonly<{ provider: string; model: string }>
+  /**
+   * Advertise native models without starting a conversation. Method presence
+   * enables one-shot `nativeModel` requests, independently of `agentOptions`.
+   * Catalog membership is advisory; the native product validates exact ids at
+   * startup. Each query owns bounded resources and cleans them before settling.
+   * @param signal - caller cancellation for this discovery operation.
+   * @returns detached native model metadata; rejects when discovery fails.
+   */
+  listModels?(signal: AbortSignal): Promise<readonly SubagentModelInfo[]>
   /**
    * Establish a ONE-SHOT child and return its handle after publication.
    * The service has already validated that every requested start-time

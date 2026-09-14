@@ -31,6 +31,7 @@ import {
   hasDelegationModelRequest,
   preflightChildLlmRoute,
   requestedAgentOptions,
+  requestedNativeModel,
 } from './model-selection.ts'
 import type { DelegationModelRequest, ModelSelectionPolicy } from './model-selection.ts'
 import { registerListSubagentModels } from './list-models.ts'
@@ -53,9 +54,12 @@ export interface Config {
    * a distinct name.
    */
   toolName?: string
+  /** Discovery tool name; defaults to `list_subagent_models`. Use distinct names for co-mounted selection tools. */
+  listModelsToolName?: string
   /**
    * Sample the Host `subagent-model-selection` setting for each new top-level
-   * Session and inherit that decision in its child Sessions.
+   * Session and inherit that decision in its child Sessions. Providers with
+   * `agentOptions` use LLM selection; otherwise `listModels` enables native selection.
    */
   modelSelectionSettings?: boolean
   /**
@@ -105,6 +109,7 @@ export interface Config {
 export const Config: z<Config> = z.object({
   provider: z.string().required(),
   toolName: z.string().default('subagent'),
+  listModelsToolName: z.string().min(1).default('list_subagent_models'),
   modelSelectionSettings: z.boolean().default(false),
   enableRunInBackground: z.boolean().default(true),
   backgroundMode: z.union(['one-shot', 'continuable'] as const).default('one-shot'),
@@ -337,7 +342,7 @@ export function apply(ctx: Context, config: Config, session?: Session): void {
         `tool-subagent: provider "${subagentProvider.name}" does not support child agentOptions`,
       )
     }
-    if (modelSelectionCapable && !subagentProvider.capabilities.agentOptions) {
+    if (modelSelectionCapable && !subagentProvider.capabilities.agentOptions && subagentProvider.listModels === undefined) {
       throw new Error(
         `tool-subagent: provider "${subagentProvider.name}" does not support child model selection`,
       )
@@ -359,20 +364,24 @@ export function apply(ctx: Context, config: Config, session?: Session): void {
 
   const install = (runtimeCtx: Context, modelSelectionPolicy: ModelSelectionPolicy | undefined): void => {
     const modelSelectionEnabled = modelSelectionPolicy !== undefined
-    if (modelSelectionPolicy !== undefined) registerListSubagentModels(runtimeCtx, modelSelectionPolicy)
+    const discoveryName = config.listModelsToolName ?? 'list_subagent_models'
+    if (modelSelectionPolicy !== undefined) registerListSubagentModels(runtimeCtx, modelSelectionPolicy, discoveryName)
     // Load order and HMR replacement can change provider availability while
     // this fiber remains active.
     let mounted: { subagentProvider: SubagentProvider; disposeTool: () => void } | undefined
     const mount = (subagentProvider: SubagentProvider): void => {
       assertSubagentProviderConfiguration(subagentProvider)
       const wording = providerWording(subagentProvider.inheritsParentContext)
+      const nativeSelection = subagentProvider.listModels !== undefined && !subagentProvider.capabilities.agentOptions
       const providerRouteDefaults = subagentProvider.agentRouteDefaults
       const selectionDescription = providerRouteDefaults !== undefined
         ? ' Child LLM selection is optional. Omit `provider`, `model`, and `reasoning_effort` to use configured child defaults and this provider\'s route defaults. Supply `provider` and `model` together after using `list_subagent_models` to inspect advertised routes and efforts. Changing the effective route without naming an effort uses the selected model\'s default effort.'
         : ' Child LLM selection is optional. Omit `provider`, `model`, and `reasoning_effort` to use configured child defaults and inherit compatible missing values from the parent Agent. Supply `provider` and `model` together after using `list_subagent_models` to inspect advertised routes and efforts. Changing the effective route without naming an effort uses the selected model\'s default effort.'
       const choiceDescription = !modelSelectionEnabled
         ? ''
-        : selectionDescription
+        : nativeSelection
+          ? ` Native model selection is optional. Omit provider and model to use the subagent provider's defaults; parent LLM values are not inherited. Use ${discoveryName} to inspect allowed models, then supply provider \`subagent:${config.provider}\` and model together. Native models do not accept reasoning_effort.`
+          : selectionDescription.replaceAll('list_subagent_models', discoveryName)
           + (subagentProvider.inheritsParentContext
             ? ' Changing the route can prevent provider-side reuse of the inherited conversation prefix.'
             : '')
@@ -400,22 +409,26 @@ export function apply(ctx: Context, config: Config, session?: Session): void {
           ...modelSelectionEnabled ? {
             provider: {
               type: 'string' as const,
-              description: providerRouteDefaults !== undefined
-                ? 'LLM provider route for the child. Supply together with model; omit both to use configured child defaults or this provider\'s route defaults.'
-                : 'LLM provider route for the child. Supply together with model; omit both to use configured child defaults or inherit the parent route.',
+              description: nativeSelection
+                ? `Native provider route. Supply subagent:${config.provider} together with model; omit both to use provider defaults.`
+                : providerRouteDefaults !== undefined
+                  ? 'LLM provider route for the child. Supply together with model; omit both to use configured child defaults or this provider\'s route defaults.'
+                  : 'LLM provider route for the child. Supply together with model; omit both to use configured child defaults or inherit the parent route.',
             },
             model: {
               type: 'string' as const,
-              description: providerRouteDefaults !== undefined
-                ? 'Model id interpreted by provider. Supply together with provider; omit both to use configured child defaults or this provider\'s route defaults.'
-                : 'Model id interpreted by provider. Supply together with provider; omit both to use configured child defaults or inherit the parent route.',
+              description: nativeSelection
+                ? 'Native model id. Supply together with provider; omit both to use provider defaults.'
+                : providerRouteDefaults !== undefined
+                  ? 'Model id interpreted by provider. Supply together with provider; omit both to use configured child defaults or this provider\'s route defaults.'
+                  : 'Model id interpreted by provider. Supply together with provider; omit both to use configured child defaults or inherit the parent route.',
             },
-            reasoning_effort: {
+            ...nativeSelection ? {} : { reasoning_effort: {
               type: 'string' as const,
               description: providerRouteDefaults !== undefined
                 ? 'Adapter-owned reasoning effort for the effective child route. Omit to use a compatible configured effort or the selected model\'s default.'
                 : 'Adapter-owned reasoning effort for the effective child route. Omit to inherit a compatible configured/parent effort or use a newly selected model\'s default.',
-            },
+            } },
           } : {},
           ...backgroundEnabled ? {
             run_in_background: {
@@ -476,19 +489,20 @@ export function apply(ctx: Context, config: Config, session?: Session): void {
           }
 
           const modelRequest = args as DelegationModelRequest
-          const parentOptions = parentAgentOptionsForDelegation(parent)
-          const requiresRoutePreflight = hasDelegationModelRequest(modelRequest)
-            || hasConfiguredLlmSelection(config.agentOptions)
+          const nativeModel = nativeSelection ? requestedNativeModel(config.provider, modelRequest, modelSelectionPolicy) : undefined
+          const parentOptions = nativeSelection ? {} : parentAgentOptionsForDelegation(parent)
+          const requiresRoutePreflight = !nativeSelection && (hasDelegationModelRequest(modelRequest)
+            || hasConfiguredLlmSelection(config.agentOptions))
           const configuredChildAgentOptions = requiresRoutePreflight && providerRouteDefaults !== undefined
             ? { ...providerRouteDefaults, ...config.agentOptions }
             : config.agentOptions
-          const requestedChildAgentOptions = requestedAgentOptions(
+          const requestedChildAgentOptions = nativeSelection ? undefined : requestedAgentOptions(
             parentOptions,
             configuredChildAgentOptions,
             modelRequest,
             modelSelectionEnabled,
           )
-          assertAllowedModelSelection(
+          if (!nativeSelection) assertAllowedModelSelection(
             modelSelectionPolicy,
             parentOptions,
             requestedChildAgentOptions,
@@ -517,6 +531,7 @@ export function apply(ctx: Context, config: Config, session?: Session): void {
             prompt: [{ type: 'text', text: args.prompt }] as ContentBlock[],
             parent,
             ...requestedChildAgentOptions !== undefined ? { agentOptions: requestedChildAgentOptions } : {},
+            ...nativeModel !== undefined ? { nativeModel } : {},
             ...config.persona !== undefined ? { persona: config.persona } : {},
             ...config.toolFilter !== undefined ? { toolFilter: config.toolFilter } : {},
             ...maxDepth !== undefined ? { maxDepth } : {},

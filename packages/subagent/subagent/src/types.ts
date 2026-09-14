@@ -177,6 +177,12 @@ export interface SubagentStartRequest {
    */
   readonly agentOptions?: AgentOptions
   /**
+   * Exact model id interpreted by the native subagent provider, independent of
+   * Host Agent options. Requires the provider's optional `listModels` method;
+   * omission preserves its configured or native default. One-shot only.
+   */
+  readonly nativeModel?: string
+  /**
    * Object-rooted JSON Schema within `assertObjectJsonSchema`'s enforced subset. Start rejects
    * unsupported schemas or providers without the capability. Data must be plain host-realm JSON;
    * a successful child returns the matching value as {@link SubagentResult.structured}.
@@ -341,6 +347,16 @@ export interface SubagentRun {
   dispose(): Promise<void>
 }
 
+/** One model advertised by a native subagent provider, not a Host LLM adapter. */
+export interface SubagentModelInfo {
+  /** Native provider-owned model id. */
+  readonly id: string
+  /** Native provider-owned display name. */
+  readonly name: string
+  /** Optional provider-owned description. */
+  readonly description?: string
+}
+
 /**
  * One registered transport for running child agents. Providers are trusted
  * same-process implementations; callers treat descriptors and returned values
@@ -367,6 +383,15 @@ export interface SubagentProvider {
    * is detached immutable data and requires `agentOptions` support.
    */
   readonly agentRouteDefaults?: Readonly<{ provider: string; model: string }>
+  /**
+   * Advertise native models without starting a conversation. Method presence
+   * enables one-shot `nativeModel` requests, independently of `agentOptions`.
+   * Catalog membership is advisory; the native product validates exact ids at
+   * startup. Each query owns bounded resources and cleans them before settling.
+   * @param signal - caller cancellation for this discovery operation.
+   * @returns detached native model metadata; rejects when discovery fails.
+   */
+  listModels?(signal: AbortSignal): Promise<readonly SubagentModelInfo[]>
   /**
    * Establish a ONE-SHOT child and return its handle after publication.
    * The service has already validated that every requested start-time

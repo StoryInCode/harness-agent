@@ -21,6 +21,7 @@ export const API_REMOTE_FORWARDED_EVENTS = [
   { event: 'api-session/error', mode: 'emit' },
   { event: 'api-session/removed', mode: 'emit' },
   { event: 'api-session/status', mode: 'emit' },
+  { event: 'api-session/subagent-models-updated', mode: 'emit' },
   { event: 'commands/change', mode: 'emit' },
   { event: 'credentials/reference-updated', mode: 'emit' },
   { event: 'goal/activation-changed', mode: 'emit' },

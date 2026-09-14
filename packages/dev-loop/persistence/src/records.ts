@@ -59,7 +59,7 @@ function acknowledgment(value: unknown, id: unknown): void {
 }
 function parseTransition(value: unknown): TransitionRecord {
   const row = object(value)
-  matching(row.id, transitionId); matching(row.repositoryId, digest); matching(row.pieceId, /^\d{2}\.\d{2}$/)
+  matching(row.id, transitionId); matching(row.repositoryId, digest); matching(row.pieceId, /^\d{2}\.\d{2}[a-z]?$/)
   for (const key of ['expected', 'from', 'to']) member(row[key], ['todo', 'pending', 'blocked', 'done'])
   if (row.expected !== row.from || !['todo:pending', 'pending:blocked', 'pending:done', 'blocked:todo'].includes(`${String(row.from)}:${String(row.to)}`)) throw new Error('invalid record transition edge')
   source(row.source); text(row.destinationPath); integer(row.sequence, 1); integer(row.startedAt)
@@ -91,7 +91,7 @@ function parseTransition(value: unknown): TransitionRecord {
 }
 function parseAnomaly(value: unknown): ReconciliationAnomaly {
   const row = object(value)
-  matching(row.id, anomalyId); matching(row.repositoryId, digest); matching(row.pieceId, /^\d{2}\.\d{2}$/)
+  matching(row.id, anomalyId); matching(row.repositoryId, digest); matching(row.pieceId, /^\d{2}\.\d{2}[a-z]?$/)
   member(row.kind, ['unresolved-intent', 'missing-source', 'duplicate-source', 'unjournaled-done', 'source-changed', 'unknown-piece', 'status-path-mismatch', 'uncertain-effect'])
   if (row.transitionId !== undefined) matching(row.transitionId, transitionId)
   sources(row.observations); integer(row.observedAt)

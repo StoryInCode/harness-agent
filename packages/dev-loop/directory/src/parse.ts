@@ -146,10 +146,10 @@ const FIELD_PREFIX = '**'
 const FIELD_SEPARATOR = ':**'
 
 /** Dotted piece id as the title line and the filename both spell it. */
-const PIECE_ID = /^\d{2}\.\d{2}$/
+const PIECE_ID = /^\d{2}\.\d{2}[a-z]?$/
 
-/** `NN.MM-<kebab-slug>.md`, the only basename `scanSet` reads. */
-const PIECE_FILENAME = /^\d{2}\.\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/
+/** `NN.MM[a-z]-<kebab-slug>.md`, the only basename `scanSet` reads. */
+const PIECE_FILENAME = /^\d{2}\.\d{2}[a-z]?-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/
 
 /** Value the `**Depends on:**` field carries when a piece depends on no other piece. */
 const NO_DEPENDENCIES = 'none'
@@ -163,7 +163,7 @@ const WHEN_MARKER = ' **When** '
 const THEN_MARKER = ' **Then** '
 
 /** Opening or closing marker of a fenced code block. */
-interface FenceMarker {
+export interface FenceMarker {
   /** The fence character, so a tilde run never closes a backtick fence. */
   readonly char: string
   /** Run length, so a closer may be longer than its opener but never shorter. */
@@ -191,7 +191,7 @@ interface SectionSpan {
  * @param line - one physical line, without its terminator.
  * @returns the marker, or `undefined` when the line carries no fence run.
  */
-function fenceMarkerAt(line: string): FenceMarker | undefined {
+export function fenceMarkerAt(line: string): FenceMarker | undefined {
   let start = 0
   while (line[start] === ' ') start += 1
   if (start > MAX_FENCE_INDENT) return undefined
@@ -422,7 +422,8 @@ export function isPieceFilename(name: string): boolean {
  */
 export function pieceIdFromPath(path: string): string {
   const nameAt = path.lastIndexOf('/') + 1
-  return path.slice(nameAt, nameAt + PIECE_ID_LENGTH)
+  const match = path.slice(nameAt).match(/^\d{2}\.\d{2}[a-z]?/)
+  return match ? match[0] : path.slice(nameAt, nameAt + PIECE_ID_LENGTH)
 }
 
 /**

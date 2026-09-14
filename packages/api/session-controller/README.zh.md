@@ -24,6 +24,8 @@ kind: "package-reference"
 <a id="use-this-package"></a>
 ## 使用本包
 
+`session.modelCatalog()` 只提供父级 LLM 路由。`session.subagentModelCatalog()` 从可选 subagent 提供方发现仅用于原生任务的模型，并以 `subagent:antigravity` 等精确路由 id 加入目录。两者均返回 `ModelCatalog`，隔离各提供方的失败并省略空分组。subagent 目录将 `subagent:` 保留给原生提供方，并排除使用该前缀的 LLM 条目。原生发现接收调用方的中止信号。提供方注册与移除会发出不含载荷的 `api-session/subagent-models-updated` 失效通知；实时提供方对象不会跨越 Remote。
+
 历史页与 follow opening 快照为每个持久 Session 事件携带一条 `{ type: 'event', event: SessionWireEvent }` record。Client 把每条已接受 record 保留为一个持久 `SessionEventLikeEntry`；Assistant token 边界保留在 `assistant/message` 或 `assistant/attempt` 的紧凑流内。工具参数、结果内容、失败信息和 `tool/result.data.meta` 原样通过；控制器不解析工具定义、不运行展示转换器，也不附加 UI 数据。
 
 Client journal 在发布 follow 快照、live entry 或历史页之前验证精确的 V3 事件 envelope。它复用浏览器安全的 Session validator，检查必需的 surface marker、精确的 replacement endpoint、更早且唯一的 source seq、内嵌 Assistant 来源、request header 可选字段的省略规则以及工具错误一致性。无效 record 直接失败，不删除字段或归一化；范围成员与来源存在性仍由 Host 的持久日志检查。

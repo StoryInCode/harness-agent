@@ -2,15 +2,14 @@
 /** External native CLI fixture: validate argv, workspace, stdin framing, and EOF. */
 
 import assert from 'node:assert/strict'
-import { dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
-assert.equal(process.cwd(), dirname(fileURLToPath(import.meta.url)))
+// Replay runs the Session in a temporary directory, so this fixture validates
+// argv and stdin framing only; the Loader composition e2e owns cwd evidence.
 assert.deepEqual(process.argv.slice(2), [
   '--input-format', 'stream-json',
   '--output-format', 'stream-json',
   '--print-timeout', '30000ms',
-  '--model', 'fixture-native-model',
+  '--model', 'fixture-selected-model',
 ])
 let input = ''
 for await (const chunk of process.stdin) input += chunk

@@ -23,7 +23,7 @@ class Refusal extends Error {}
 
 async function execute(ctx: Context, invocation: CommandInvocation): Promise<string> {
   const input = invocation.rawInput.trim()
-  const inspect = /^inspect\s+(\d{2}\.\d{2})$/u.exec(input)
+  const inspect = /^inspect\s+(\d{2}\.\d{2}[a-z]?)$/u.exec(input)
   const pieceId = inspect?.[1]
   if (pieceId !== undefined) {
     const history = await ctx.devLoopPersistence.getHistory(pieceId)

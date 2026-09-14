@@ -42,10 +42,11 @@ export {
   PIECE_MAX_LINES,
   PIECE_ROOT,
   PieceParseError,
+  fenceMarkerAt,
   isPieceFilename,
   parsePiece,
 } from './parse.ts'
-export type { PieceParseOptions } from './parse.ts'
+export type { FenceMarker, PieceParseOptions } from './parse.ts'
 export type {
   PieceFinding,
   PieceFindingCode,

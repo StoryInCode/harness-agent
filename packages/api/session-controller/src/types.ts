@@ -574,6 +574,12 @@ export type SessionControlFrame =
 declare module '@deepseek-ai/cordis' {
   interface Events {
     /**
+     * Native provider registration changed the subagent model directory.
+     * @mode emit
+     * @dshScopeScan unsupported - global catalog invalidation has no Session identity.
+     */
+    'api-session/subagent-models-updated'(): void
+    /**
      * A Session became visible to Session list consumers.
      * @mode emit
      * @param summary - initial list row for the Session.

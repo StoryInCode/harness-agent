@@ -82,6 +82,12 @@ interface SubagentStartRequest {
    */
   readonly agentOptions?: AgentOptions
   /**
+   * Exact model id interpreted by the native subagent provider, independent of
+   * Host Agent options. Requires the provider's optional `listModels` method;
+   * omission preserves its configured or native default. One-shot only.
+   */
+  readonly nativeModel?: string
+  /**
    * Object-rooted JSON Schema within `assertObjectJsonSchema`'s enforced subset. Start rejects
    * unsupported schemas or providers without the capability. Data must be plain host-realm JSON;
    * a successful child returns the matching value as {@link SubagentResult.structured}.
@@ -406,6 +412,20 @@ interface SubagentRun {
 
 每个提供方都是一个具名的子 agent 传输层，多个提供方可以共存。服务在 `start()` 之前校验请求的启动时能力，并拒绝在没有 `prepareContinuable` 的提供方上发起可继续 start。`inheritsParentContext` 仅描述对话种子注入（`fork`：true；`spawn` 和 `acp`：false），使消费方能生成准确的面向模型措辞，而不暗示继承了工具、服务或权限。如果某个提供方的一次性路由拥有静态的提供方自有默认值，它会公开可选且不可变的 `agentRouteDefaults`，使 Consumer 能够在预检前以正确基线合并模型与工具覆盖。
 
+原生提供者通过可选的 `listModels(signal)` 公布选择能力，不声明支持 Host 的 `agentOptions`。返回的标识属于原生产​​品，而非 `ctx.llm`。一次性请求的 `nativeModel` 独立于父级路由选择精确标识；提供者负责校验及有界发现资源的清理。不支持的请求和可继续原生模型选择都会在启动前拒绝。
+
+```ts type-equiv
+/** One model advertised by a native subagent provider, not a Host LLM adapter. */
+interface SubagentModelInfo {
+  /** Native provider-owned model id. */
+  readonly id: string
+  /** Native provider-owned display name. */
+  readonly name: string
+  /** Optional provider-owned description. */
+  readonly description?: string
+}
+```
+
 ```ts type-equiv
 /**
  * One registered transport for running child agents. Providers are trusted
@@ -433,6 +453,15 @@ interface SubagentProvider {
    * is detached immutable data and requires `agentOptions` support.
    */
   readonly agentRouteDefaults?: Readonly<{ provider: string; model: string }>
+  /**
+   * Advertise native models without starting a conversation. Method presence
+   * enables one-shot `nativeModel` requests, independently of `agentOptions`.
+   * Catalog membership is advisory; the native product validates exact ids at
+   * startup. Each query owns bounded resources and cleans them before settling.
+   * @param signal - caller cancellation for this discovery operation.
+   * @returns detached native model metadata; rejects when discovery fails.
+   */
+  listModels?(signal: AbortSignal): Promise<readonly SubagentModelInfo[]>
   /**
    * Establish a ONE-SHOT child and return its handle after publication.
    * The service has already validated that every requested start-time

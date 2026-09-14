@@ -43,6 +43,7 @@ try {
       name: provider.name,
       capabilities: provider.capabilities,
       inheritsParentContext: provider.inheritsParentContext,
+      nativeModelSelection: provider.listModels !== undefined,
     },
     tool: {
       name: tool.name,

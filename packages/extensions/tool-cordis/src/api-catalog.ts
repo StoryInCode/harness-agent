@@ -1654,6 +1654,12 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
         returns: 'provider-grouped models, the deployment default, and isolated provider failures.',
       },
       {
+        signature: '@Remote(\'subagentModelCatalog\') subagentModelCatalog(signal: AbortSignal): Promise<ModelCatalog>',
+        description: 'Describe LLM and native task-only routes for subagent authorization settings.',
+        parameters: [{ name: 'signal', description: 'Caller lifetime forwarded to native model discovery.' }],
+        returns: 'Provider-grouped models with isolated discovery failures.',
+      },
+      {
         signature: '@Remote canOpenWorkspacePath(): boolean',
         description: 'Report whether this deployment can hand a Session workspace path to a native desktop.',
         parameters: [],
@@ -3343,6 +3349,14 @@ export const EVENT_API: readonly EventApiEntry[] = [
     summary: 'One Agent changed running state.',
     description: 'One Agent changed running state.',
     parameters: [{ name: 'sessionId', description: 'Agent and Session identity.' }, { name: 'running', description: 'whether the Agent is running.' }],
+  },
+  {
+    name: 'api-session/subagent-models-updated',
+    mode: 'emit',
+    signature: '\'api-session/subagent-models-updated\'(): void',
+    summary: 'Native provider registration changed the subagent model directory.',
+    description: 'Native provider registration changed the subagent model directory.',
+    parameters: [],
   },
   {
     name: 'approval/request',
@@ -6049,6 +6063,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export type SubagentListEntry = {\n    readonly kind: \'child\';\n    readonly id: SessionId;\n    readonly activity: \'running\' | \'inactive\';\n    readonly hasChildren: boolean;\n} & ({\n    readonly mode: \'one-shot\';\n    readonly label?: string;\n} | {\n    readonly mode: \'continuable\';\n    readonly label: string;\n}) | {\n    readonly kind: \'diagnostic\';\n    readonly id: SessionId;\n    readonly reason: \'corrupt\' | \'unsupported\' | \'unavailable\';\n};',
   },
   {
+    name: 'SubagentModelInfo',
+    declaration: 'export interface SubagentModelInfo {\n    readonly id: string;\n    readonly name: string;\n    readonly description?: string;\n}',
+  },
+  {
     name: 'SubagentPromptReceipt',
     declaration: 'export interface SubagentPromptReceipt {\n    readonly messageId: MessageId;\n}',
   },
@@ -6062,7 +6080,7 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   },
   {
     name: 'SubagentProvider',
-    declaration: 'export interface SubagentProvider {\n    readonly name: string;\n    readonly capabilities: SubagentCapabilities;\n    readonly inheritsParentContext: boolean;\n    readonly agentRouteDefaults?: Readonly<{\n        provider: string;\n        model: string;\n    }>;\n    start(request: ResolvedSubagentStartRequest): Promise<SubagentRun>;\n    prepareContinuable?(request: ContinuableCreateRequest): Promise<ContinuableCreateSpec>;\n}',
+    declaration: 'export interface SubagentProvider {\n    readonly name: string;\n    readonly capabilities: SubagentCapabilities;\n    readonly inheritsParentContext: boolean;\n    readonly agentRouteDefaults?: Readonly<{\n        provider: string;\n        model: string;\n    }>;\n    listModels?(signal: AbortSignal): Promise<readonly SubagentModelInfo[]>;\n    start(request: ResolvedSubagentStartRequest): Promise<SubagentRun>;\n    prepareContinuable?(request: ContinuableCreateRequest): Promise<ContinuableCreateSpec>;\n}',
   },
   {
     name: 'SubagentResult',
@@ -6094,7 +6112,7 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   },
   {
     name: 'SubagentStartRequest',
-    declaration: 'export interface SubagentStartRequest {\n    readonly cwd?: string;\n    readonly label?: string;\n    readonly prompt: ContentBlock[];\n    readonly parent: Agent;\n    readonly signal: AbortSignal;\n    readonly agentOptions?: AgentOptions;\n    readonly outputSchema?: ObjectJsonSchema;\n    readonly maxDepth?: number;\n    readonly toolFilter?: ToolRestriction;\n    readonly persona?: string;\n}',
+    declaration: 'export interface SubagentStartRequest {\n    readonly cwd?: string;\n    readonly label?: string;\n    readonly prompt: ContentBlock[];\n    readonly parent: Agent;\n    readonly signal: AbortSignal;\n    readonly agentOptions?: AgentOptions;\n    readonly nativeModel?: string;\n    readonly outputSchema?: ObjectJsonSchema;\n    readonly maxDepth?: number;\n    readonly toolFilter?: ToolRestriction;\n    readonly persona?: string;\n}',
   },
   {
     name: 'SubagentStopReason',

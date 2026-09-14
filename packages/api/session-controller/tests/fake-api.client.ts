@@ -9,6 +9,7 @@ import type {
 } from '@deepseek-ai/dsh-api-remotes/client'
 import type {
   SessionAddress,
+  ModelCatalog,
   SessionAssistantStreamBaseline,
   SessionControlBaseline,
   SessionControlFrame,
@@ -124,6 +125,13 @@ export class FakeApiClient {
   onList: (payload: unknown) => Promise<RemoteResult<{ items: never[] }>> = () => Promise.resolve(ok({ items: [] }))
   onSearch: (payload: unknown) => Promise<RemoteResult<{ items: SessionSearchItem[]; hasMore: boolean }>> =
     () => Promise.resolve(ok({ items: [], hasMore: false }))
+  onSubagentModelCatalog: (signal: AbortSignal | undefined) => Promise<RemoteResult<ModelCatalog>> =
+    () => Promise.resolve(ok({
+      default: { provider: 'fixture', model: 'fixture' },
+      routableProviders: [],
+      groups: [],
+      failures: [],
+    }))
   onCreate: (payload: unknown) => Promise<RemoteResult<{ sessionId: SessionId }>> = () => Promise.resolve(ok({ sessionId: 'fk-new' as SessionId }))
   onSelectModel: (payload: SessionSelectModelRequest) => Promise<RemoteResult<SessionSelectModelValue>> =
     payload => Promise.resolve(ok({
@@ -215,6 +223,9 @@ export class FakeApiClient {
             failures: [],
           },
         }),
+        subagentModelCatalog: signal => Promise.resolve(this.record(
+          'session.subagentModelCatalog', undefined, this.onSubagentModelCatalog(signal),
+        )),
         search: (payload, signal) => {
           this.lastSearchSignal = signal
           return this.record('session.search', payload, this.onSearch(payload))

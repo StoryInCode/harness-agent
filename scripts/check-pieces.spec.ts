@@ -13,9 +13,11 @@ import { describe, expect, it } from 'vitest'
 import {
   checkClaimCitations,
   checkDonePlacement,
-  checkSetIndex,
+  checkNoBranches,
   checkPrimitive,
   checkSections,
+  checkSetIndex,
+  runCheck,
   tableCells,
 } from './check-pieces.ts'
 
@@ -197,3 +199,95 @@ describe('done placement', () => {
     expect(checkDonePlacement('plans/pieces/00-dev-loop/00.01-a.md', '# not a piece\n')).toEqual([])
   })
 })
+
+describe('no feature branches', () => {
+  it('flags git checkout -b inside a fenced code block', () => {
+    const text = piece({ extra: { Summary: ['```bash', 'git checkout -b feature', '```'] } })
+    const violations = checkNoBranches('plans/pieces/00-dev-loop/00.01-a.md', text)
+    expect(violations).toHaveLength(1)
+    expect(violations[0]?.message).toContain('instructs creating a git branch')
+  })
+
+  it('flags git checkout --branch inside a fenced code block', () => {
+    const text = piece({ extra: { Summary: ['```bash', 'git checkout --branch feature', '```'] } })
+    const violations = checkNoBranches('plans/pieces/00-dev-loop/00.01-a.md', text)
+    expect(violations).toHaveLength(1)
+    expect(violations[0]?.message).toContain('instructs creating a git branch')
+  })
+
+  it('flags git switch -c inside an inline code span', () => {
+    const text = piece({ extra: { Summary: ['Run `git switch -c feature` to allocate.'] } })
+    const violations = checkNoBranches('plans/pieces/00-dev-loop/00.01-a.md', text)
+    expect(violations).toHaveLength(1)
+    expect(violations[0]?.message).toContain('instructs creating a git branch')
+  })
+
+  it('flags git switch --create inside an inline code span', () => {
+    const text = piece({ extra: { Summary: ['Run `git switch --create feature` to allocate.'] } })
+    const violations = checkNoBranches('plans/pieces/00-dev-loop/00.01-a.md', text)
+    expect(violations).toHaveLength(1)
+    expect(violations[0]?.message).toContain('instructs creating a git branch')
+  })
+
+  it('flags git worktree add -b', () => {
+    const text = piece({ extra: { Summary: ['`git worktree add -b feature .worktrees/feature HEAD`'] } })
+    const violations = checkNoBranches('plans/pieces/00-dev-loop/00.01-a.md', text)
+    expect(violations).toHaveLength(1)
+    expect(violations[0]?.message).toContain('instructs creating a git branch')
+  })
+
+  it('flags git branch <name>', () => {
+    const text = piece({ extra: { Summary: ['`git branch feature-1`'] } })
+    const violations = checkNoBranches('plans/pieces/00-dev-loop/00.01-a.md', text)
+    expect(violations).toHaveLength(1)
+    expect(violations[0]?.message).toContain('instructs creating a git branch')
+  })
+
+  it('does not flag a prose sentence that mentions creating a branch while explaining why it is forbidden', () => {
+    const text = piece({
+      extra: {
+        Summary: [
+          'No piece creates a git branch using git checkout -b or git switch -c because branches are forbidden.',
+        ],
+      },
+    })
+    expect(checkNoBranches('plans/pieces/00-dev-loop/00.01-a.md', text)).toEqual([])
+  })
+
+  it('does not flag git branch -d, git branch --show-current, or git worktree add --detach', () => {
+    const text = piece({
+      extra: {
+        Summary: [
+          'Safe operations: `git branch -d old-feat`, `git branch --show-current`, and `git worktree add --detach .worktrees/foo HEAD`.',
+          '```bash',
+          'git branch -d old-feat',
+          'git branch --show-current',
+          'git worktree add --detach .worktrees/foo HEAD',
+          '```',
+        ],
+      },
+    })
+    expect(checkNoBranches('plans/pieces/00-dev-loop/00.01-a.md', text)).toEqual([])
+  })
+
+  it('does not flag git branch -a, bare git branch, or git checkout <ref>', () => {
+    const text = piece({
+      extra: {
+        Summary: [
+          'Run `git branch -a` to inspect, `git branch` to list, and `git checkout main` or `git checkout .` to restore.',
+        ],
+      },
+    })
+    expect(checkNoBranches('plans/pieces/00-dev-loop/00.01-a.md', text)).toEqual([])
+  })
+
+  it('does not flag git log --branch', () => {
+    const text = piece({ extra: { Summary: ['Inspect commit history via `git log --branch`.'] } })
+    expect(checkNoBranches('plans/pieces/00-dev-loop/00.01-a.md', text)).toEqual([])
+  })
+
+  it('does not flag a non-piece file path via runCheck', () => {
+    expect(runCheck('branches', ['plans/pieces/00-dev-loop/README.md'])).toEqual([])
+  })
+})
+

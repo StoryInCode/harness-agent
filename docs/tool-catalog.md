@@ -1709,7 +1709,7 @@ The five read-only tools hide provider cursors and authorize every result from t
 
 ### `list_subagent_models`
 
-Discover LLM routes for subagents without changing the current Agent. Call with no arguments to list registered providers, with `provider` to list its advertised models, or with `provider` and `model` to inspect that exact model and its reasoning efforts. Catalog membership is advisory: an adapter may accept an unlisted model id. Use the returned ids with a delegation tool's `provider`, `model`, and `reasoning_effort` fields.
+Discover LLM routes for subagents without changing the current Agent. Call with no arguments to list registered providers, with `provider` to list its advertised models, or with `provider` and `model` to inspect that exact model and its reasoning efforts. Catalog membership is advisory: an adapter may accept an unlisted model id. Use the returned ids with a delegation tool's `provider`, `model`, and `reasoning_effort` fields. Native routes use provider ids prefixed with `subagent:` and expose no reasoning efforts; use them only with the delegation tool bound to that subagent provider.
 
 ```json
 {
@@ -1717,7 +1717,7 @@ Discover LLM routes for subagents without changing the current Agent. Call with 
   "properties": {
     "provider": {
       "type": "string",
-      "description": "Registered LLM provider id. Omit to list providers."
+      "description": "LLM provider id or subagent:<provider> for native models. Omit to list providers."
     },
     "model": {
       "type": "string",

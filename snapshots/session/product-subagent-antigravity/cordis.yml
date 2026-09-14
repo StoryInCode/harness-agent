@@ -13,10 +13,13 @@
         model: fixture-native-model
         timeoutMs: 30000
 
-    - id: tool-subagent-antigravity
-      name: '@deepseek-ai/dsh-tool-subagent'
+    - id: subagent-model-selection-settings
+      name: '@deepseek-ai/dsh-tool-subagent/model-selection-settings'
       config:
-        provider: antigravity
-        toolName: subagent_antigravity
-        backgroundMode: one-shot
-        maxDepth: provider-managed
+        enabled: true
+        allowedModels:
+          - provider: subagent:antigravity
+            model: fixture-selected-model
+
+    - id: tool-subagent-antigravity
+      name: '../../../packages/subagent/subagent-antigravity/tests/fixtures/loader/scoped-tool.ts'

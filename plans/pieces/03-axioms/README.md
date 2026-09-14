@@ -1,38 +1,36 @@
 # Set 03 — Colocated Axiom Subsystem, Candidate Discovery, and Verification Sweeper
 
-The Colocated Axiom subsystem establishes the normative constraint and objective verification layer for DeepSeek Harness. Per the binding colocation directive, system axioms live in `AGENTS.md` files next to the code they govern, discovered through the existing `dsh-agent-instructions` chain, completely replacing the obsolete central truth tree (`.hermes/truth/`). Machine-checkable axioms are declared as fenced YAML code blocks (` ```axiom `), enforcing a strict architectural demarcation between automated predicate checks and model-binding prose guidance. Planners can resolve the applicable instruction and constraint chain for candidate paths before touching files using `resolve_candidate_axioms`. Card-level definition-of-done contracts and proof records are persisted via `ctx.storageDomain` under the `task_axioms` domain. A deterministic predicate sweeper evaluates 9 AST, filesystem, and shell conditions, rejects exit-status masking (`INV-11`), enforces anti-self-grading reversion (`INV-10`), and gates card completion on `'kanban/pre-complete'` on verified proof (`INV-01`).
+The Colocated Axiom subsystem establishes the normative constraint and objective verification layer for DeepSeek Harness. Per the binding colocation directive, system axioms live in `AGENTS.md` files next to the code they govern, discovered through the existing `dsh-agent-instructions` chain. Machine-checkable axioms are declared as fenced YAML code blocks (` ```axiom `), enforcing a strict architectural demarcation between automated predicate checks and model-binding prose guidance. Planners can resolve the applicable instruction and constraint chain for candidate paths before touching files using `resolve_candidate_axioms`. Card-level definition-of-done contracts and proof records are persisted via `ctx.storageDomain` under the `task_axioms` domain. A deterministic predicate sweeper evaluates 9 AST, filesystem, and shell conditions, rejects exit-status masking (`INV-11`), enforces anti-self-grading reversion (`INV-10`), and gates card completion on `'kanban/pre-complete'` on verified proof (`INV-01`).
 
 ## Set Index
 
 *Completed pieces live in `03-axioms/done/`.*
 
-| Piece ID | Title | Package | Depends on | Queue Order | Status |
-|---|---|---|---|---|---|
-| `03.01` | Axiom Service Definition and Core Entity Contracts | `@deepseek-ai/dsh-axiom` | none | 1 | todo |
-| `03.02` | Fenced Axiom Block Parser and Prose Demarcator | `@deepseek-ai/dsh-axiom-parser` | `03.01` | 2 | todo |
-| `03.03` | Task Axiom Storage Domain and Lifecycle Store | `@deepseek-ai/dsh-axiom-store` | `03.01` | 3 | todo |
-| `03.04` | Planning-Time Candidate Path Resolver | `@deepseek-ai/dsh-axiom-candidate-resolver` | `03.01`, `03.02` | 4 | todo |
-| `03.05` | Model-Facing Candidate Axiom Resolution Tool | `@deepseek-ai/dsh-tool-candidate-axioms` | `03.01`, `03.04` | 5 | todo |
-| `03.06` | Git Diff Impact Analyzer | `@deepseek-ai/dsh-axiom-diff-analyzer` | `03.01`, `03.02` | 6 | todo |
-| `03.07` | Hierarchical Scope Consistency and Contradiction Analyzer | `@deepseek-ai/dsh-axiom-consistency` | `03.01`, `03.02` | 7 | todo |
-| `03.08` | Task Axiom Promotion Writer | `@deepseek-ai/dsh-axiom-promoter` | `03.01`, `03.02`, `03.03` | 8 | todo |
-| `03.09` | Declarative Predicate Sweeper Engine | `@deepseek-ai/dsh-axiom-predicates` | `03.01` | 9 | todo |
-| `03.10` | Anti-Cheat Attributable Shell Seam | `@deepseek-ai/dsh-axiom-anti-cheat` | `03.01`, `03.09` | 10 | todo |
-| `03.11` | Axiom Verifier Host Service and Anti-Self-Grading Sweeper | `@deepseek-ai/dsh-axiom-verifier` | `03.01`, `03.03`, `03.09`, `03.10` | 11 | todo |
-| `03.12` | No Unproven Done Completion Gate Hook | `@deepseek-ai/dsh-axiom-completion-gate` | `03.01`, `03.11`, `02.01`, `02.16` | 12 | todo |
-| `03.13` | Model-Facing Task Axiom Proof Tools | `@deepseek-ai/dsh-tool-axiom` | `03.01`, `03.03`, `03.11` | 13 | todo |
-| `03.14` | Automated Auto-Todo Generator on Sweep Failure | `@deepseek-ai/dsh-axiom-auto-todo` | `03.01`, `03.11`, `02.01` | 14 | todo |
-| `03.15` | Task Continuation Packet Compiler | `@deepseek-ai/dsh-axiom-continuation` | `03.01`, `03.03`, `03.11` | 15 | todo |
-| `03.16` | Axioms Host Bundle Patch and Preset Composition | `@deepseek-ai/dsh-axiom-presets` | `03.01`, `03.05`, `03.11`, `03.13` | 16 | todo |
+| ID | Title | Lead | Package | Depends on | Queue | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| `03.01` | [Axiom Service Definition and Core Entity Contracts](03.01-axiom-service-definition.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-axiom` | `none` | 1 | todo |
+| `03.02` | [Fenced Axiom Block Parser and Prose Demarcator](03.02-fenced-axiom-parser.md) | 🐾 Neko-chan (Inspector Cat) | `@deepseek-ai/dsh-axiom-parser` | `03.01` | 2 | todo |
+| `03.03` | [Task Axiom Storage Domain and Lifecycle Store](03.03-task-axiom-store.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-axiom-store` | `03.01` | 3 | todo |
+| `03.04` | [Planning-Time Candidate Path Resolver](03.04-candidate-path-resolver.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-axiom-candidate-resolver` | `03.01, 03.02` | 4 | todo |
+| `03.05` | [Model-Facing Candidate Axiom Resolution Tool](03.05-candidate-axioms-tool.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-tool-candidate-axioms` | `03.01, 03.04` | 5 | todo |
+| `03.06` | [Git Diff Impact Analyzer](03.06-git-diff-impact-analyzer.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-axiom-diff-analyzer` | `03.01, 03.02` | 6 | todo |
+| `03.07` | [Hierarchical Scope Consistency and Contradiction Analyzer](03.07-hierarchy-consistency-analyzer.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-axiom-consistency` | `03.01, 03.02` | 7 | todo |
+| `03.08` | [Task Axiom Promotion Writer](03.08-task-axiom-promoter.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-axiom-promoter` | `03.01, 03.02, 03.03` | 8 | todo |
+| `03.09` | [Declarative Predicate Sweeper Engine](03.09-predicate-evaluators.md) | 🐾 Neko-chan (Inspector Cat) | `@deepseek-ai/dsh-axiom-predicates` | `03.01` | 9 | todo |
+| `03.10` | [Anti-Cheat Attributable Shell Seam](03.10-anti-cheat-shell-seam.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-axiom-anti-cheat` | `03.01, 03.09` | 10 | todo |
+| `03.11` | [Axiom Verifier Host Service and Anti-Self-Grading Sweeper](03.11-axiom-verifier-service.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-axiom-verifier` | `03.01, 03.03, 03.09, 03.10` | 11 | todo |
+| `03.12` | [No Unproven Done Completion Gate Hook](03.12-no-unproven-done-gate.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-axiom-completion-gate` | `03.01, 03.11, 02.01, 02.16` | 12 | todo |
+| `03.13` | [Model-Facing Task Axiom Proof Tools](03.13-model-proof-tools.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-tool-axiom` | `03.01, 03.03, 03.11` | 13 | todo |
+| `03.14` | [Automated Auto-Todo Generator on Sweep Failure](03.14-auto-todo-generator.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-axiom-auto-todo` | `03.01, 03.11, 02.01` | 14 | todo |
+| `03.15` | [Task Continuation Packet Compiler](03.15-continuation-packet-compiler.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-axiom-continuation` | `03.01, 03.03, 03.11` | 15 | todo |
+| `03.16` | [Axioms Host Bundle Patch and Preset Composition](03.16-preset-composition-patch.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-axiom-presets` | `03.01, 03.05, 03.11, 03.13` | 16 | todo |
 
-## Earlier Plan Overrides
+## Core Architectural Principles
 
-This piece set overrides legacy designs from `plans/03-axiom-subsystem.md` and `plans/04-axiom-verification-sweeper.md`:
-
-1. **Colocated `AGENTS.md` over Central Truth Tree**: Overrides central `.hermes/truth/` registry, compiler, and tree-blindness guards (`INV-02`) with colocated `AGENTS.md` files governed by directory containment (`03.01`, `03.02`).
+1. **Colocated `AGENTS.md` over Central Truth Tree**: Colocated `AGENTS.md` files governed by directory containment (`03.01`, `03.02`).
 2. **Elimination of `dsh-axiom-context` & Collapsing `dsh-axiom-local`**: Native `dsh-agent-instructions` handles runtime prompt injection; storage and service definition collapse into `@deepseek-ai/dsh-axiom` (`03.01`).
-3. **`ctx.storageDomain` over Bespoke File Store**: Replaces `~/.hermes/task-axioms/<id>.json` file management with `ctx.storageDomain` (`task_axioms` domain, version 1) providing synchronous cached reads and atomic durability (`03.03`).
-4. **Planning-Time Tool over Core Modification**: Replaces invasive changes to `dsh-agent-instructions` with model-facing `resolve_candidate_axioms` tool registered in `hermes-brain` (`03.04`, `03.05`).
+3. **`ctx.storageDomain` for Task Axiom Persistence**: `ctx.storageDomain` (`task_axioms` domain, version 1) provides synchronous cached reads and atomic durability (`03.03`).
+4. **Planning-Time Candidate Tool**: Model-facing `resolve_candidate_axioms` tool registered in the Brain preset (`03.04`, `03.05`).
 5. **Decoupled Serial Gating over Database Coupling**: Intercepts card completion strictly via published Cordis serial hook `'kanban/pre-complete'` without SQLite table coupling (`03.12`).
 
 ## Execution Protocol

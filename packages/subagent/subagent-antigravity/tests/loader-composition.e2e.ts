@@ -47,6 +47,7 @@ describe('Antigravity provider public Loader composition', () => {
           persona: false,
         },
         inheritsParentContext: false,
+        nativeModelSelection: true,
       },
       tool: {
         name: 'subagent_antigravity',

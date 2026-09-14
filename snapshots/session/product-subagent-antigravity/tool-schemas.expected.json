@@ -261,6 +261,23 @@
       }
     },
     {
+      "name": "list_subagent_models",
+      "description": "Discover LLM routes for subagents without changing the current Agent. Call with no arguments to list registered providers, with `provider` to list its advertised models, or with `provider` and `model` to inspect that exact model and its reasoning efforts. Catalog membership is advisory: an adapter may accept an unlisted model id. Use the returned ids with a delegation tool's `provider`, `model`, and `reasoning_effort` fields. Native routes use provider ids prefixed with `subagent:` and expose no reasoning efforts; use them only with the delegation tool bound to that subagent provider.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "description": "LLM provider id or subagent:<provider> for native models. Omit to list providers."
+          },
+          "model": {
+            "type": "string",
+            "description": "Exact model id to inspect. Requires provider; omit to list that provider's advertised models."
+          }
+        }
+      }
+    },
+    {
       "name": "ralph",
       "description": "Run a foreground fresh-agent Ralph loop toward one immutable objective. Use only when the direct human explicitly asks for Ralph or fresh-agent iteration. Each round opens a new child with no parent conversation or prior child session; the shared workspace is long-term memory, and only a bounded structured report crosses rounds. The call returns when a worker reports completion or a concrete blocker, or at the round limit. Ordinary long-running same-session work belongs to goal tools.",
       "parameters": {
@@ -384,7 +401,7 @@
     },
     {
       "name": "subagent_antigravity",
-      "description": "Delegate a self-contained task to a subagent (a separate agent that works in its own context) to offload focused, independent work — research, a scoped implementation, an analysis — so it does not consume this conversation's context. The subagent returns its result, not its intermediate steps. Give it a complete, standalone prompt: it does not see this conversation. This call waits for the result by default. Set `run_in_background: true` to return a job id; collect with `job_output` and stop with `job_kill`.",
+      "description": "Delegate a self-contained task to a subagent (a separate agent that works in its own context) to offload focused, independent work — research, a scoped implementation, an analysis — so it does not consume this conversation's context. The subagent returns its result, not its intermediate steps. Give it a complete, standalone prompt: it does not see this conversation. This call waits for the result by default. Set `run_in_background: true` to return a job id; collect with `job_output` and stop with `job_kill`. Native model selection is optional. Omit provider and model to use the subagent provider's defaults; parent LLM values are not inherited. Use list_subagent_models to inspect allowed models, then supply provider `subagent:antigravity` and model together. Native models do not accept reasoning_effort.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -395,6 +412,14 @@
           "prompt": {
             "type": "string",
             "description": "The complete, self-contained task for the subagent. It does not share this conversation's context, so include everything it needs."
+          },
+          "provider": {
+            "type": "string",
+            "description": "Native provider route. Supply subagent:antigravity together with model; omit both to use provider defaults."
+          },
+          "model": {
+            "type": "string",
+            "description": "Native model id. Supply together with provider; omit both to use provider defaults."
           },
           "run_in_background": {
             "type": "boolean",

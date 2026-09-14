@@ -6,26 +6,26 @@ The Agent Pool subsystem replaces static one-size-fits-all model defaults with a
 
 *Completed pieces live in `01-agent-pool/done/`.*
 
-| Piece ID | Title | Package | Depends on | Queue Order | Status |
-|---|---|---|---|---|---|
-| `01.01` | Access Declaration and Policy Enforcer | `@deepseek-ai/dsh-agent-pool-access` | none | 1 | todo |
-| `01.02` | Catalog Discovery and Route Reconciliation | `@deepseek-ai/dsh-agent-pool-discovery` | `01.01` | 2 | todo |
-| `01.03` | Curator Research Engine and Evidence Evaluator | `@deepseek-ai/dsh-agent-pool-curator` | `01.02` | 3 | todo |
-| `01.04` | Agent-Pool Storage Domain and Preset Store | `@deepseek-ai/dsh-agent-pool-store` | `01.01`, `01.02` | 4 | todo |
-| `01.05` | Role Pool Definitions and Accountability Guards | `@deepseek-ai/dsh-agent-pool-roles` | `01.04` | 5 | todo |
-| `01.06` | Model Eligibility and Fallback Selector | `@deepseek-ai/dsh-agent-pool-selector` | `01.04`, `01.05` | 6 | todo |
-| `01.07` | Manual Pinning and Strict Pin Failure Guard | `@deepseek-ai/dsh-agent-pool-pinning` | `01.05`, `01.06` | 7 | todo |
-| `01.08` | Catalog Refresh Scheduler and Topology Reconciler | `@deepseek-ai/dsh-agent-pool-refresh` | `01.02`, `01.03`, `01.04` | 8 | todo |
-| `01.09` | Quota Scope and Route Availability Tracker | `@deepseek-ai/dsh-agent-pool-quota` | `01.04` | 9 | todo |
-| `01.10` | Quota Exhaustion Classifier and Error Taxonomy | `@deepseek-ai/dsh-agent-pool-exhaustion` | `01.09` | 10 | todo |
-| `01.11` | Hourly Heartbeat and Reset Probe Coordinator | `@deepseek-ai/dsh-agent-pool-heartbeat` | `01.09`, `01.10` | 11 | todo |
-| `01.12` | Agent Request Route Interceptor | `@deepseek-ai/dsh-agent-pool-router` | `01.06`, `01.07`, `01.09` | 12 | todo |
-| `01.13` | Automatic Takeover Controller | `@deepseek-ai/dsh-agent-pool-takeover` | `01.06`, `01.10`, `01.12` | 13 | todo |
-| `01.14` | Takeover State Transfer and Session Projection | `@deepseek-ai/dsh-agent-pool-state` | `01.13` | 14 | todo |
-| `01.15` | Curator Researcher Subagent Preset Composition | `@deepseek-ai/dsh-agent-pool-curator-preset` | `01.03` | 15 | todo |
-| `01.16` | Model-Facing Pool Inspection Tool | `@deepseek-ai/dsh-agent-pool-tool` | `01.05`, `01.06` | 16 | todo |
-| `01.17` | Human Command Surface `/agent-pool` | `@deepseek-ai/dsh-agent-pool-command` | `01.06`, `01.07`, `01.08` | 17 | todo |
-| `01.18` | Agent Pool Management and Inspection UI Extension | `@deepseek-ai/dsh-agent-pool-ui` | `01.04`, `01.09`, `01.17` | 18 | todo |
+| ID | Title | Lead | Package | Depends on | Queue | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| `01.01` | [Access Declaration and Policy Enforcer](01.01-access-policy.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-agent-pool-access` | `none` | 1 | todo |
+| `01.02` | [Catalog Discovery and Route Reconciliation](01.02-catalog-discovery.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-agent-pool-discovery` | `01.01` | 2 | todo |
+| `01.03` | [Curator Research Engine and Evidence Evaluator](01.03-curator-research.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-agent-pool-curator` | `01.02` | 3 | todo |
+| `01.04` | [Agent-Pool Storage Domain and Preset Store](01.04-preset-store.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-agent-pool-store` | `01.01, 01.02` | 4 | todo |
+| `01.05` | [Role Pool Definitions and Accountability Guards](01.05-role-pools.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-agent-pool-roles` | `01.04` | 5 | todo |
+| `01.06` | [Model Eligibility and Fallback Selector](01.06-model-selector.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-agent-pool-selector` | `01.04, 01.05` | 6 | todo |
+| `01.07` | [Manual Pinning and Strict Pin Failure Guard](01.07-manual-pinning.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-agent-pool-pinning` | `01.05, 01.06` | 7 | todo |
+| `01.08` | [Catalog Refresh Scheduler and Topology Reconciler](01.08-refresh-scheduler.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-agent-pool-refresh` | `01.02, 01.03, 01.04` | 8 | todo |
+| `01.09` | [Quota Scope and Route Availability Tracker](01.09-quota-tracker.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-agent-pool-quota` | `01.04` | 9 | todo |
+| `01.10` | [Quota Exhaustion Classifier and Error Taxonomy](01.10-exhaustion-classifier.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-agent-pool-exhaustion` | `01.09` | 10 | todo |
+| `01.11` | [Hourly Heartbeat and Reset Probe Coordinator](01.11-heartbeat-prober.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-agent-pool-heartbeat` | `01.09, 01.10` | 11 | todo |
+| `01.12` | [Agent Request Route Interceptor](01.12-request-router.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-agent-pool-router` | `01.06, 01.07, 01.09` | 12 | todo |
+| `01.13` | [Automatic Takeover Controller](01.13-automatic-takeover.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-agent-pool-takeover` | `01.06, 01.10, 01.12` | 13 | todo |
+| `01.14` | [Takeover State Transfer and Session Projection](01.14-state-transfer.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-agent-pool-state` | `01.13` | 14 | todo |
+| `01.15` | [Curator Researcher Subagent Preset Composition](01.15-curator-preset.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-agent-pool-curator-preset` | `01.03` | 15 | todo |
+| `01.16` | [Model-Facing Pool Inspection Tool](01.16-model-tool.md) | 🐾 Neko-chan (Inspector Cat) | `@deepseek-ai/dsh-agent-pool-tool` | `01.05, 01.06` | 16 | todo |
+| `01.17` | [Human Command Surface `/agent-pool`](01.17-command-surface.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-agent-pool-command` | `01.06, 01.07, 01.08` | 17 | todo |
+| `01.18` | [Agent Pool Management and Inspection UI Extension](01.18-client-ui.md) | 🌸 Mayuri (Gentle Seamstress) | `@deepseek-ai/dsh-agent-pool-ui` | `01.04, 01.09, 01.17` | 18 | todo |
 
 ## Execution Protocol
 

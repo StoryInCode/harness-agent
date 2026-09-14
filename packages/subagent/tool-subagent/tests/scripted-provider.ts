@@ -36,6 +36,8 @@ export interface Config {
   inheritsParentContext?: boolean
   /** Provider-owned child route defaults. */
   agentRouteDefaults?: Readonly<{ provider: string; model: string }>
+  /** Optional native model discovery. */
+  listModels?: NonNullable<SubagentProvider['listModels']>
   /** Structured value returned when the request asks for one. */
   structured?: unknown
   /** Observes each start; the child's result additionally waits for the returned promise. */
@@ -113,6 +115,7 @@ export function mountScriptedProvider(ctx: Context, config: Config) {
     inject: ['subagents'],
     apply(pluginCtx: Context): void {
       const provider = new ScriptedSubagentProvider(config.name, config)
+      if (config.listModels !== undefined) Object.assign(provider, { listModels: config.listModels })
       pluginCtx.subagents.registerProvider(config.agentRouteDefaults === undefined
         ? provider
         : Object.assign(provider, { agentRouteDefaults: config.agentRouteDefaults }))

@@ -1,6 +1,7 @@
-/** Shared projection of the live LLM registry into the browser model catalog. */
+/** Browser catalogs for parent LLM routes and task-only subagent routes. */
 
 import type { Context } from '@deepseek-ai/cordis'
+import type {} from '@deepseek-ai/dsh-subagent'
 import type {
   ModelCatalog,
   ModelReasoning,
@@ -63,5 +64,52 @@ export async function buildModelCatalog(
     groups: catalog.flatMap(item => item.kind === 'group' ? [item.group] : [])
       .filter(group => group.models.length > 0),
     failures: catalog.flatMap(item => item.kind === 'failure' ? [item.failure] : []),
+  }
+}
+
+/**
+ * Describe LLM and native task routes without changing the parent model catalog.
+ * @param ctx - Host context carrying the LLM and optional subagent registries.
+ * @param signal - Caller lifetime forwarded to native model discovery.
+ * @returns Combined groups with provider-local discovery failures isolated.
+ */
+export async function buildSubagentModelCatalog(ctx: Context, signal: AbortSignal): Promise<ModelCatalog> {
+  const subagents = ctx.get('subagents')
+  const providers = (subagents?.list() ?? []).flatMap((name) => {
+    const provider = subagents?.getProvider(name)
+    const listModels = provider?.listModels?.bind(provider)
+    return provider === undefined || listModels === undefined ? [] : [{ name: provider.name, listModels }]
+  })
+  const [llm, native] = await Promise.all([
+    buildModelCatalog(ctx),
+    Promise.all(providers.map(async (provider) => {
+      const id = `subagent:${provider.name}`
+      const name = provider.name
+      try {
+        const models = await provider.listModels(signal)
+        return {
+          kind: 'group' as const,
+          group: { id, name, models: models.map(model => ({
+            id: model.id,
+            name: model.name,
+            ...(model.description === undefined ? {} : { description: model.description }),
+          })) },
+        }
+      } catch (error) {
+        return {
+          kind: 'failure' as const,
+          failure: { id, name, message: error instanceof Error ? error.message : String(error) },
+        }
+      }
+    })),
+  ])
+  return {
+    ...llm,
+    routableProviders: [...llm.routableProviders.filter(id => !id.startsWith('subagent:')),
+      ...providers.map(provider => `subagent:${provider.name}`)],
+    groups: [...llm.groups.filter(group => !group.id.startsWith('subagent:')), ...native.flatMap(item => item.kind === 'group' && item.group.models.length > 0
+      ? [item.group] : [])],
+    failures: [...llm.failures.filter(failure => !failure.id.startsWith('subagent:')),
+      ...native.flatMap(item => item.kind === 'failure' ? [item.failure] : [])],
   }
 }

@@ -189,6 +189,7 @@ describe('SubagentRuntime', () => {
     ['depthLimit', { maxDepth: 1 }],
     ['toolFilter', { toolFilter: { deny: ['bash'] } }],
     ['persona', { persona: 'reviewer' }],
+    ['nativeModel', { nativeModel: 'native-model' }],
   ] as const)('rejects unsupported %s before provider startup', async (_capability, override) => {
     const { subagents } = await service()
     const provider = new StubProvider('weak', NO_CAPS)
@@ -196,6 +197,26 @@ describe('SubagentRuntime', () => {
     await expect(subagents.start('weak', baseRequest(override)))
       .rejects.toMatchObject({ code: 'UNSUPPORTED_CAPABILITY' })
     expect(provider.startCount).toBe(0)
+  })
+
+  it('forwards native model selection only to one-shot providers advertising discovery', async () => {
+    const { ctx, subagents } = await service()
+    onTestFinished(() => ctx.fiber.dispose())
+    const provider = new class extends StubProvider {
+      listModels = vi.fn(async () => [{ id: 'advertised', name: 'Advertised model' }])
+    }('native', NO_CAPS)
+    subagents.registerProvider(provider)
+    const run = await subagents.start('native', baseRequest({ nativeModel: 'unlisted' }))
+    onTestFinished(() => run.dispose())
+    expect(provider.lastRequest?.nativeModel).toBe('unlisted')
+    expect(provider.lastRequest?.agentOptions).toBeUndefined()
+    expect(provider.listModels).not.toHaveBeenCalled()
+    await expect(subagents.startContinuable({
+      provider: 'native', label: 'native child',
+      request: baseRequest({ nativeModel: 'advertised' }),
+      signal: new AbortController().signal,
+    })).rejects.toMatchObject({ code: 'UNSUPPORTED_CAPABILITY' })
+    expect(provider.startCount).toBe(1)
   })
 
   it('validates depth and schema semantics before provider startup', async () => {

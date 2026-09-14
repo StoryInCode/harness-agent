@@ -48,7 +48,7 @@ async function bench(served?: string[]) {
     }))
   const remote = new TestRemote(ctx, {
     credentials: { describe: describeCredentials, set: vi.fn() },
-    session: { modelCatalog: models },
+    session: { subagentModelCatalog: models },
     settings: { describe: describeSettings },
   })
   await ctx.plugin({ inject: [...settingsInject], apply: settingsApply }).await()
@@ -204,6 +204,8 @@ describe('ui-settings-plugins apply', () => {
     expect(refresh).toHaveBeenCalledTimes(1)
     remote.emit('settings/document-updated', ['llm-deepseek', 1])
     expect(refresh).toHaveBeenCalledTimes(2)
+    remote.emit('api-session/subagent-models-updated', [])
+    expect(refresh).toHaveBeenCalledTimes(3)
     ctx.emit('connection/reset')
     expect(reset).toHaveBeenCalledTimes(1)
   })

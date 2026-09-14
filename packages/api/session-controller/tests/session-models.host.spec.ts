@@ -386,6 +386,78 @@ describe('Web session model selection', () => {
     await ctx.fiber.dispose()
   })
 
+  it('keeps native task models separate from parent routes and isolates discovery failures', async () => {
+    const { ctx } = await harness()
+    const signal = new AbortController().signal
+    const listModels = vi.fn(() => Promise.resolve([
+      { id: 'gemini', name: 'Gemini', description: 'Native task model' },
+      { id: 'claude', name: 'Claude' },
+    ]))
+    const providers = [
+      { name: 'antigravity', listModels },
+      { name: 'spawn' },
+      { name: 'empty', listModels: () => Promise.resolve([]) },
+      { name: 'offline', listModels: () => Promise.reject(new Error('offline')) },
+      // oxlint-disable-next-line typescript/prefer-promise-reject-errors -- provider failure normalization.
+      { name: 'string-failure', listModels: () => Promise.reject('unavailable') },
+    ]
+    ctx.provide('subagents', {
+      list: () => providers.map(provider => provider.name),
+      getProvider: (name: string) => providers.find(provider => provider.name === name),
+    } as never)
+    const remote = createSessionTestRemote(ctx, {
+      defaultModelSelection: () => ({ provider: 'deepseek-official', model: 'deepseek-chat' }), cwd: '/tmp',
+    })
+    const parent = expectValue(await remote.modelCatalog())
+    const catalog = expectValue(await remote.subagentModelCatalog(signal))
+    expect(listModels).toHaveBeenCalledWith(signal)
+    expect(catalog.default).toEqual(parent.default)
+    expect(catalog.groups).toEqual([...parent.groups, {
+      id: 'subagent:antigravity', name: 'antigravity', models: [
+        { id: 'gemini', name: 'Gemini', description: 'Native task model' },
+        { id: 'claude', name: 'Claude' },
+      ],
+    }])
+    expect(catalog.routableProviders).toEqual([...parent.routableProviders,
+      'subagent:antigravity', 'subagent:empty', 'subagent:offline', 'subagent:string-failure'])
+    expect(catalog.failures).toEqual([...parent.failures,
+      { id: 'subagent:offline', name: 'offline', message: 'offline' },
+      { id: 'subagent:string-failure', name: 'string-failure', message: 'unavailable' },
+    ])
+    expect(parent.groups.every(group => !group.id.startsWith('subagent:'))).toBe(true)
+    await ctx.fiber.dispose()
+  })
+
+  it('reserves native route ids in the child catalog without changing parent models', async () => {
+    const { ctx } = await harness()
+    ctx.llm.registerAdapter(['subagent:antigravity'], new CatalogAdapter('LLM collision', [
+      { provider: 'subagent:antigravity', id: 'fake', name: 'Fake' },
+    ]))
+    const remote = createSessionTestRemote(ctx, {
+      defaultModelSelection: () => ({ provider: 'deepseek-official', model: 'deepseek-chat' }), cwd: '/tmp',
+    })
+    expect(expectValue(await remote.modelCatalog()).groups.map(group => group.id))
+      .toContain('subagent:antigravity')
+    const catalog = expectValue(await remote.subagentModelCatalog())
+    expect(catalog.groups.map(group => group.id)).not.toContain('subagent:antigravity')
+    expect(catalog.routableProviders).not.toContain('subagent:antigravity')
+    await ctx.fiber.dispose()
+  })
+
+  it('returns the LLM catalog when no subagent registry is mounted', async () => {
+    const { ctx } = await harness()
+    const remote = createSessionTestRemote(ctx, {
+      defaultModelSelection: () => ({ provider: 'deepseek-official', model: 'deepseek-chat' }), cwd: '/tmp',
+    })
+    expect(await remote.subagentModelCatalog()).toEqual(await remote.modelCatalog())
+    const invalidated = vi.fn()
+    ctx.on('api-session/subagent-models-updated', invalidated)
+    ctx.emit('subagent/provider-added', { name: 'antigravity' } as never)
+    ctx.emit('subagent/provider-removed', 'antigravity')
+    expect(invalidated.mock.calls).toEqual([[], []])
+    await ctx.fiber.dispose()
+  })
+
   it('preserves optional catalog metadata and string provider failures', async () => {
     const { ctx } = await harness()
     ctx.llm.registerAdapter(['plain'], new CatalogAdapter('Plain', [

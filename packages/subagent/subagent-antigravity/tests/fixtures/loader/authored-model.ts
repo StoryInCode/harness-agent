@@ -13,6 +13,8 @@ class NativeDelegationModel extends LlmAdapter {
       const args = JSON.stringify({
         description: 'Verify native delegation',
         prompt: 'Return the native delegation marker.',
+        provider: 'subagent:antigravity',
+        model: 'fixture-selected-model',
       })
       yield { type: 'block-start', index: 0, blockType: 'tool-call' }
       yield { type: 'tool-call-delta', index: 0, id, name, argumentsDelta: args }

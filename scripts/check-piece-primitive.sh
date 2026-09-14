@@ -5,4 +5,8 @@
 # With no argument it checks the whole corpus; "$FILE" checks one piece.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-exec npx tsx scripts/check-pieces.ts primitive "$@"
+TARGETS=()
+if [ -n "${FILE:-}" ]; then
+  TARGETS+=("$FILE")
+fi
+exec npx tsx scripts/check-pieces.ts primitive "${TARGETS[@]}" "$@"

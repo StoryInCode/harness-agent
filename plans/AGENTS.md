@@ -113,13 +113,63 @@ does not belong in piece files, READMEs, or contracts. When a decision changes:
 Evidence citations that name who reported a finding remain: they are
 provenance, not history, and stay honestly attributed.
 
-## Axiom — specs are ingestion-sized
+## META AXIOM — specs are atomic micro-gates (non-reliance on frontier models)
 
 **Category:** meta — agent-driven check; no machine gate.
 
-A specification is written to be consumed one component at a time. Large monolithic plan
-documents are a defect, not a style preference. The unit of review, approval, delegation and
-implementation is one piece.
+A specification is written to be consumed one atomic component at a time. Large monolithic plan documents are a defect, not a style preference. The unit of review, approval, delegation, and implementation is one micro-gate.
+
+To eliminate reliance on expensive frontier reasoning models (e.g. Claude Opus, GPT-5, Gemini Flash-High), micro-gates must be bounded so that **Index 2 (Balanced / Core Engineering) models** (e.g. Gemini 3.8 Flash-Medium, Claude Sonnet, GPT-5-mini, GLM-Flash) can implement and test them deterministically in a single pass without cognitive collapse or hallucination:
+
+1. **Single Behavioral Target**: Each micro-gate owns exactly ONE pure function, one type contract, or one isolated service method (target: $\le 50$ lines of production code). Never bundle parsing, validation, filesystem I/O, error recovery, and CLI surfaces into a single piece.
+2. **2–4 Crisp BDD Assertions**: Scenarios in `## Behaviour` must be small, unambiguous `Given/When/Then` specifications requiring $\le 35$ lines of test code.
+3. **Pre-Decided Architecture**: Include an explicit `### Human Decision Point: Option A vs Option B` in `## Summary`. An implementer subagent must never be forced to invent architecture or guess trade-offs.
+4. **Complete Compilable Contracts**: The `## Contracts` section must carry the complete TypeScript interface/type signature.
+5. **Strict Line Ceiling (`R-piece-size`)**: Max 280 lines per markdown piece. If a piece exceeds 280 lines, it must be decomposed into sequential micro-gates (`a`, `b`, `c`).
+
+## META AXIOM — the five specialist personas of the dev loop
+
+**Category:** meta — agent-driven check; no machine gate.
+
+Every micro-gate is authored and championed by one of the 5 specialist developer personas from the harness roster (`packages/dev-loop/roles/src/personas.ts`):
+- 🐾 **Neko-chan (Inspector Cat / Pure Intake)**: Markdown AST extraction, heading scanning, metadata parsing, BDD parsing, formatting axioms (`R-piece-size`, `R-piece-required-sections`), sensory metaphors (Kitty Bakery, Bento Boxes, Treat Baskets), warm encouragement (*Nya~*).
+- 🍰 **L (Forensic Detective / Epistemic Auditor)**: Proof tables (`R-claims-verified`), citation verification, cryptographic SHA-256 tokens, CAS claim verification, fail-closed policy gates, deductive rigor (*with tea & cake 🍰*).
+- 💻 **Daru (Super Hacker / Subprocesses & Plumbing)**: Hands-on implementation, CLI scripts, test harnesses, SQLite schemas, write-ahead logging (WAL), git worktree rigs (`bouncer.exe`, zero-BS pragmatism 💻).
+- 🔬 **Hououin Kyouma (Mad Scientist / Divergence Controller)**: Monotonic state transitions, lifecycle state machines, async workflows, Steins Gate verification checkpoints, anti-cheat detection (*El Psy Kongroo! 🔬*).
+- 🌸 **Mayuri (Gentle Seamstress / UX & Roster Harmony)**: Human-in-the-loop decisions (`### Human Decision Point: Option A vs Option B`), presentation cards, slash commands (`/approve`, `/reject`), gentle summaries (*Tutturu~ 🌸*).
+
+Every piece header must declare its author: `**Lead Developer:** <Persona> (<Role>)`.
+
+## META AXIOM — intelligence index floor & non-downgrade invariant
+
+**Category:** meta — agent-driven check; no machine gate.
+
+The development loop orchestrator and subagents operate as a model-agnostic, provider-agnostic system. Subagent delegation must strictly match or exceed the task's required intelligence index floor:
+
+- **Index 3 Floor (Frontier / Deep Reasoning)**: High-complexity tasks (architectural refactoring, state-machine synchronization, multi-package boundary integrations, complex AST parsers/compilers, formal gate verification). Must strictly use an Index 3 model (e.g. Claude Opus, OpenAI GPT-5/o-series, Gemini Flash-High/Pro, DeepSeek V41/R1, GLM-5, Astra).
+- **Index 2 Floor (Core Engineering)**: Medium-complexity tasks (BDD test authoring, feature implementation in `packages/` against Given/When/Then contracts, schema validation, data structures). Must strictly use an Index 2 model or higher (e.g. Claude Sonnet, OpenAI GPT-5-mini, Gemini Flash-Medium, GPT-OSS-120B, GLM-Flash, MiniMax).
+- **Index 1 Floor (Mechanical / Routine Automation)**: Purely mechanical chores (moving files to `done/`, updating markdown table rows in `README.md`, running linters, simple regex checks). Only these mechanical tasks may use Index 1 / Fast models (e.g. Gemini Flash-Low, Muse Spark, Claude Haiku, GPT-5-nano, Nemotron).
+
+**Strict No-Downgrade Invariant**: Under no circumstances may the orchestrator downgrade an Index 2 or Index 3 task to an Index 1 model to save tokens or bypass slot wait times. Weak models lack the reasoning depth to handle strict TypeScript typing, AST manipulation, and verification gates; delegating to them yields hallucinated APIs, broken invariants, and failed gates. If an Index 2 model is busy, promote UPWARD (to Index 3) or queue; NEVER downgrade downward.
+
+## META AXIOM — resilient delegation & failure recovery
+
+**Category:** meta — agent-driven check; no machine gate.
+
+The orchestrator must handle subagent crashes, gate failures, rate limits, and quota exhaustion autonomously without human intervention or loop deadlock:
+
+1. **Provider Usage Limits & Quota Exhaustion (429 / Quota Wall)**:
+   - When a model endpoint returns a rate-limit (429), quota exhaustion, or token context error, the orchestrator MUST immediately failover to the next candidate in the fallback chain for that intelligence index.
+   - *Index 2 Fallback Chain*: `opencode-go/glm-5.3-flash` → `zai/glm-5.3-flash` → `antigravity/gemini-3.8-flash-medium` → `antigravity/gpt-oss-120b-medium` → OpenRouter Free (`minimax-m3:free`, `nemotron-3.5-lightning:free`).
+   - *Upward Promotion*: If all models in the task's tier are exhausted, promote the task to an available model in a higher tier (e.g. Index 2 → Index 3). **Never downgrade to a lower tier.**
+   - *State Handover*: Re-dispatch the task with the target micro-gate path, existing worktree diff, and prior diagnostic context so zero progress is lost.
+2. **Worker Subagent Failures & Gate Rejections**:
+   - If a subagent crashes, times out, or produces code that fails Gates 1–3, extract the exact error diagnostic.
+   - The orchestrator may attempt up to **two (2) bounded retries** with targeted corrective instructions.
+   - Prior to a retry, clean corrupted worktree artifacts (`git checkout . && git clean -fd` inside `.worktrees/<piece-id>`).
+   - If a micro-gate remains unresolvable after 2 retries, mark it `blocked` in `todo_write`, record the blocking defect with `update_goal`, and immediately advance to the next independent ready micro-gate.
+3. **Slot Recycling & Leaked Worker Prevention**:
+   - Always verify and free dead or unresponsive worker slots (`subagent_list_agents`, `subagent_kill`) before allocating replacement subagents, preserving the 2–3 worker concurrency bound.
 
 ## META AXIOM — every completed task is visible to the owner
 

@@ -1148,7 +1148,7 @@ function expectCorpusInvariants(records: readonly PieceRecord[], setName: string
   expect(new Set(queues).size, 'queue positions are unique, so the order is strictly increasing').toBe(queues.length)
   const ids = records.map(record => record.id)
   expect(new Set(ids).size, 'ids are unique across the set directory and done/').toBe(ids.length)
-  expect(ids).toContain('00.01')
+  expect(ids).toContain('00.01a')
   // The declared `**Set:**` header agreeing with the directory that holds the file is
   // the load-bearing check here. A ceiling, vocabulary or path assertion would be
   // tautological: `parsePiece` already rejected any violation of the first two, and the
@@ -1319,7 +1319,7 @@ describe('real Loader composition', () => {
     const { pieces: records } = await scanSetOf(directory, '00-dev-loop')
 
     expectCorpusInvariants(records, '00-dev-loop')
-    expect((await directory.getPiece('00.01')).set).toBe('00-dev-loop')
+    expect((await directory.getPiece('00.01a')).set).toBe('00-dev-loop')
   })
 })
 

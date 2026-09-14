@@ -74,7 +74,7 @@ function modelsApi(options: {
       ? { ok: true as const, value: { groups: options.groups ?? [], failures: options.failures ?? [] } }
       : { ok: false as const, error: new RemoteError('gateway/internal', options.error, {}) }),
   }))
-  return { ctx: ctxWith({ session: { modelCatalog: models } }), models }
+  return { ctx: ctxWith({ session: { subagentModelCatalog: models } }), models }
 }
 
 function deferred<T>() {
@@ -453,6 +453,18 @@ describe('SubagentModelSelectionCardController', () => {
     ])
   })
 
+  it('preserves exact native routes when providers disappear', () => {
+    const route = { provider: 'subagent:antigravity', model: 'gemini' }
+    const selected = new Set(['subagent:antigravity\0gemini'])
+    expect(subagentModelCandidates([
+      { id: route.provider, name: 'antigravity', models: [{ id: route.model, name: 'Gemini' }] },
+    ], [route], selected)).toMatchObject([{ ...route, available: true, selected: true }])
+    expect(subagentModelCandidates([], [route], selected)).toEqual([{
+      ...route, key: 'subagent:antigravity\0gemini', providerName: route.provider,
+      modelName: route.model, available: false, selected: true,
+    }])
+  })
+
   it('loads adapter models and saves the switch and routes atomically', async () => {
     const host = stubSettingsScope<SubagentModelSelectionSettings>()
     acceptWrites(host)
@@ -673,7 +685,7 @@ describe('SubagentModelSelectionCardController', () => {
       })
       .mockImplementationOnce(() => refreshed.promise)
     const controller = new SubagentModelSelectionCardController(
-      host.scope, ctxWith({ session: { modelCatalog: models } }),
+      host.scope, ctxWith({ session: { subagentModelCatalog: models } }),
     )
     const face = controller.inject()
     const state = () => face.hooks.subagentModelSelectionCard.getSnapshot()
@@ -752,7 +764,7 @@ describe('SubagentModelSelectionCardController', () => {
         },
       })
     const controller = new SubagentModelSelectionCardController(
-      host.scope, ctxWith({ session: { modelCatalog: models } }),
+      host.scope, ctxWith({ session: { subagentModelCatalog: models } }),
     )
     const state = () => controller.inject().hooks.subagentModelSelectionCard.getSnapshot()
     await vi.waitFor(() => { expect(state().candidates[0]?.provider).toBe('alpha') })
@@ -807,7 +819,7 @@ describe('SubagentModelSelectionCardController', () => {
 
     const pending = deferred<never>()
     const models = vi.fn(() => pending.promise)
-    const controller = new SubagentModelSelectionCardController(host.scope, ctxWith({ session: { modelCatalog: models } }))
+    const controller = new SubagentModelSelectionCardController(host.scope, ctxWith({ session: { subagentModelCatalog: models } }))
     const face = controller.inject()
     face.toggleEnabled()
     face.retryCatalog()
@@ -819,7 +831,7 @@ describe('SubagentModelSelectionCardController', () => {
     const pendingResolve = deferred<never>()
     const resolving = new SubagentModelSelectionCardController(
       host.scope,
-      ctxWith({ session: { modelCatalog: () => pendingResolve.promise } }),
+      ctxWith({ session: { subagentModelCatalog: () => pendingResolve.promise } }),
     )
     const resolvingFace = resolving.inject()
     resolvingFace.toggleEnabled()

@@ -46,6 +46,8 @@ kind: "package-reference"
 
 一次性子 agent 只运行一次，并以单个结果结算，可附带可选的结构化输出与失败时的安全诊断。启动请求可以通过 `agentOptions` 覆盖子 Agent 的提供方、模型、推理强度与输出 token 上限；每个请求的选项都要求提供方声明对应能力。可继续子 agent 保留持久会话并按顺序接受后续消息：调用方收到稳定的子 agent id、发送相邻 Agent 消息，并可中断当前轮次而不销毁子 agent。工具行的 `backgroundMode` 选择形态（默认 `one-shot`，或在支持的提供方上使用 `continuable`）。
 
+原生提供者可通过可选的 `listModels(signal)` 公布自己的模型目录。该方法的存在使一次性请求可以使用 `nativeModel`，与 Host 的 `agentOptions` 独立。发现不启动对话；提供者负责取消、资源上限和清理。目录成员关系仅供参考，而不支持的选择以及所有带 `nativeModel` 的可继续请求都会在启动前拒绝。省略此字段时保留提供者的配置或原生默认值。
+
 ### 子级工作目录
 
 Host 调用方可以把 `SubagentStartRequest.cwd` 设为绝对的子级工作区路径。它优先于提供方配置的 `cwd`（ACP 与 DSH SDK），最后才取父 Session cwd。无效的显式值会在子级设置、发布或模型执行之前拒绝，且不回退。省略时保留提供方默认行为：进程内子级可以没有 cwd；进程外子级必须有可用目录。选择不会改变父 Session 或宿主进程 cwd。

@@ -1,7 +1,7 @@
 /**
  * Axiom checkers for `plans/pieces/**` specification files.
  *
- * The `axiom` blocks in `plans/AGENTS.md` name four shell checkers. Each one is
+ * The `axiom` blocks in `plans/AGENTS.md` name five shell checkers. Each one is
  * a thin wrapper over this module, and this module validates through the same
  * parser the development loop uses at runtime
  * (`@deepseek-ai/dsh-dev-loop-directory`). Sharing the parser is the point: an
@@ -18,10 +18,11 @@ import { basename, dirname, relative, resolve } from 'node:path'
 import {
   DONE_DIRECTORY,
   PieceParseError,
+  fenceMarkerAt,
   isPieceFilename,
   parsePiece,
 } from '@deepseek-ai/dsh-dev-loop-directory'
-import type { PieceFinding, PieceRecord } from '@deepseek-ai/dsh-dev-loop-directory'
+import type { FenceMarker, PieceFinding, PieceRecord } from '@deepseek-ai/dsh-dev-loop-directory'
 
 const root = resolve(import.meta.dirname, '..')
 const PIECE_GLOB = 'plans/pieces/*/**/*.md'
@@ -224,12 +225,148 @@ export function checkSetIndex(path: string, id: string, read: IndexReader = read
   return []
 }
 
+/** Non-creating `git branch` flags for listing, deletion, renaming, or querying. */
+const NON_CREATING_BRANCH_FLAGS = /^(?:-[dDamrMlv]+|--(?:delete|all|remotes|move|list|show-current|verbose|merged|no-merged|contains|no-contains|edit-description|help))$/
+
+/**
+ * Extract the contents of all inline backtick code spans from a line.
+ *
+ * Follows CommonMark code-span grammar: an opening run of N backticks is closed
+ * only by the next matching run of exactly N backticks.
+ *
+ * @param line - one physical line of markdown outside any fenced code block.
+ * @returns the code text inside each backtick span found on the line.
+ */
+export function extractInlineSpans(line: string): string[] {
+  const spans: string[] = []
+  let index = 0
+  while (index < line.length) {
+    if (line[index] === '`') {
+      let openLength = 0
+      while (index + openLength < line.length && line[index + openLength] === '`') {
+        openLength += 1
+      }
+      let closeIndex = -1
+      let search = index + openLength
+      while (search < line.length) {
+        if (line[search] === '`') {
+          let closeLength = 0
+          while (search + closeLength < line.length && line[search + closeLength] === '`') {
+            closeLength += 1
+          }
+          if (closeLength === openLength) {
+            closeIndex = search
+            break
+          }
+          search += closeLength
+        } else {
+          search += 1
+        }
+      }
+      if (closeIndex !== -1) {
+        spans.push(line.slice(index + openLength, closeIndex))
+        index = closeIndex + openLength
+      } else {
+        index += openLength
+      }
+    } else {
+      index += 1
+    }
+  }
+  return spans
+}
+
+/**
+ * Test whether a shell command snippet instructs creating a git branch.
+ *
+ * Matches branch-creating invocations of `git checkout` (-b/--branch),
+ * `git switch` (-c/--create), `git worktree add -b`, and `git branch <name>`.
+ * Non-creating forms such as bare `git branch`, listing flags (`-a`, `-r`,
+ * `--list`, `--show-current`), deletion flags (`-d`, `-D`, `--delete`),
+ * move flags (`-m`, `-M`), detached worktrees (`git worktree add --detach`),
+ * and non-branch checkout commands (`git checkout <ref>`) are excluded.
+ *
+ * @param snippet - code snippet from a fenced code block or an inline code span.
+ * @returns the matched offending command, or `undefined` when none found.
+ */
+export function findBranchCreation(snippet: string): string | undefined {
+  const gitPattern = /\bgit\s+([a-z-]+)\b([^;&|\n]*)/g
+  let match: RegExpExecArray | null
+  while ((match = gitPattern.exec(snippet)) !== null) {
+    // Both capture groups always participate when the overall match succeeds:
+    // group 1 is `[a-z-]+` and group 2 is `(...)*`, which matches empty.
+    const subcommand = match[1] ?? ''
+    const args = match[2] ?? ''
+    if (subcommand === 'checkout') {
+      if (/(?:^|\s)(?:-[bB]|--branch)(?:\s|$)/.test(args)) return match[0].trim()
+    } else if (subcommand === 'switch') {
+      if (/(?:^|\s)(?:-[cC]|--create)(?:\s|$)/.test(args)) return match[0].trim()
+    } else if (subcommand === 'worktree') {
+      if (/(?:^|\s)add\b/.test(args) && /(?:^|\s)-[bB](?:\s|$)/.test(args)) return match[0].trim()
+    } else if (subcommand === 'branch') {
+      const tokens = args.trim().split(/\s+/).filter(Boolean)
+      if (tokens.length === 0) continue
+      if (tokens.some(token => NON_CREATING_BRANCH_FLAGS.test(token))) continue
+      if (tokens.some(token => !token.startsWith('-'))) return match[0].trim()
+    }
+  }
+  return undefined
+}
+
+/**
+ * Check that no piece creates or instructs creating a git branch.
+ *
+ * Per `R-no-feature-branches`, isolation uses detached worktrees under
+ * `.worktrees/` and merges to mainline. Branch creation inside fenced code
+ * blocks or inline code spans is forbidden, while prose mentions remain allowed.
+ *
+ * @param path - repository-relative piece path.
+ * @param content - complete file text.
+ * @returns the violations observed.
+ */
+export function checkNoBranches(path: string, content: string): Violation[] {
+  const violations: Violation[] = []
+  const lines = content.split('\n')
+  let fence: FenceMarker | undefined
+
+  for (const line of lines) {
+    const marker = fenceMarkerAt(line)
+    if (fence !== undefined) {
+      if (marker !== undefined && marker.char === fence.char && marker.length >= fence.length) {
+        fence = undefined
+      } else {
+        const trigger = findBranchCreation(line)
+        if (trigger !== undefined) {
+          violations.push({ path, message: `instructs creating a git branch: \`${trigger}\`` })
+        }
+      }
+      continue
+    }
+
+    if (marker !== undefined) {
+      fence = marker
+      continue
+    }
+
+    const spans = extractInlineSpans(line)
+    for (const span of spans) {
+      const trigger = findBranchCreation(span)
+      if (trigger !== undefined) {
+        violations.push({ path, message: `instructs creating a git branch: \`${trigger}\`` })
+      }
+    }
+  }
+
+  return violations
+}
+
 /** The checker each wrapper selects. */
 const CHECKS = {
   primitive: checkPrimitive,
   sections: checkSections,
   claims: checkClaimCitations,
   done: checkDonePlacement,
+  branches: checkNoBranches,
 } as const
 
 /** Name of a checker this module exposes to its shell wrappers. */

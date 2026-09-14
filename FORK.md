@@ -34,7 +34,7 @@ Never delete an upstream gate script, test, or manifest to silence it. Deletion 
 | `scripts/fork-diff.ts` | Divergence inventory against `upstream/master`; `--strict` fails on an unmarked edit to an upstream-owned file. |
 | `scripts/check-pieces.ts` | The `plans/AGENTS.md` axiom checkers, validating through the same parser the development loop uses at runtime, so an axiom and its runtime cannot drift. |
 | `scripts/check-pieces.spec.ts` | Detection-boundary tests for those checkers, per the `scripts/AGENTS.md` rule that a source-ownership gate tests every form that moves its boundary. |
-| `scripts/check-piece-primitive.sh`, `scripts/check-piece-sections.sh`, `scripts/check-claim-citations.sh`, `scripts/check-done-pieces.sh` | The shell wrappers the `axiom` blocks name; each delegates to `check-pieces.ts`. |
+| `scripts/check-piece-primitive.sh`, `scripts/check-piece-sections.sh`, `scripts/check-claim-citations.sh`, `scripts/check-done-pieces.sh`, `scripts/check-no-branches.sh` | The shell wrappers the `axiom` blocks name; each delegates to `check-pieces.ts`. |
 | `plans/` | Fork-local specification corpus (`plans/AGENTS.md` axioms, `plans/pieces/**` piece specifications). Outside every upstream gate's scan roots. |
 | `packages/dev-loop/**` | Fork-local development-loop packages. |
 

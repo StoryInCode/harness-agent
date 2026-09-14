@@ -10,13 +10,15 @@ Status: implemented
 
 ## Decision
 
-Host 自有的 `subagent-model-selection` 设置 section 保存显式 `enabled` 开关与 `allowedModels`，后者是由精确 `{ provider, model }` 路由组成的数组。启用时必须至少有一条路由；关闭时可以保留已选路由，供以后重新启用。Plugins 设置卡通过 `session/modelCatalog` 读取实时适配器目录，让用户暂存开关与路由，再在一次带 revision 限制的设置 mutation 中保存两个字段。它不保存适配器自有的显示名称、描述或推理强度元数据。当前目录中缺失的已存或暂存路由仍显示为不可用并允许移除；某个提供方的目录失败不会阻塞其他提供方，也不会清除已存授权或未保存选择。连接重置会丢弃草稿，因为 namespace revision 只能在同一个 Host 进程内比较。
+Host 自有的 `subagent-model-selection` 设置 section 保存显式 `enabled` 开关与 `allowedModels`，后者是由精确 `{ provider, model }` 路由组成的数组。启用时必须至少有一条路由；关闭时可以保留已选路由，供以后重新启用。Plugins 设置卡通过 `session/subagentModelCatalog` 读取实时适配器目录，让用户暂存开关与路由，再在一次带 revision 限制的设置 mutation 中保存两个字段。它不保存适配器自有的显示名称、描述或推理强度元数据。当前目录中缺失的已存或暂存路由仍显示为不可用并允许移除；某个提供方的目录失败不会阻塞其他提供方，也不会清除已存授权或未保存选择。连接重置会丢弃草稿，因为 namespace revision 只能在同一个 Host 进程内比较。
 
 设置启用时，新组合的顶层 Session 会在模型可选定义进入请求之前，把路由列表快照记录为 `subagent/model-selection-policy`。事件存在就表示模型选择已启用；事件不保存全局开关。子 Session 从在线父级继承同一份精确列表，恢复的 Session 使用已记录事件而不是当前设置。因此，设置修改只影响之后组合的顶层 Session，而没有该事件的旧 Session 仍保持禁用，包括显式为空的恢复 Session。
 
 固定的 `list_subagent_models` schema 不会枚举该策略。调用时，提供方和模型列表是 Session 路由列表与适配器实时公布目录的交集。精确 provider/model 查询先要求授权，再解析适配器自有的模型元数据和全部已公布推理强度。委派执行器还会独立拒绝任何生效 provider/model 路由不在 Session 列表内的显式提供方、模型或强度选择，然后才由 `resolveCallConfig()` 校验适配器可用性与强度支持。完全没有选择字段的调用保留配置或继承路由，因为模型没有作出路由选择。
 
 模型选择不再有无限制的静态模式。默认关闭的 Host 设置是唯一授权来源，启用的 Session 始终携带精确允许列表。主 spawn 工具读取该设置；随附 fork 工具仍不公开路由选择，使继承的对话前缀继续符合提供方侧 KV Cache 复用条件。
+
+原生产品模型使用 `subagent:<provider-name>` 作为已保存的提供方 id。其目录来自 subagent 提供方，而非 LLM 适配器，父 Session 的模型选择器不包含这些模型。Antigravity 按需读取已安装 CLI 的 `models` 命令，并通过 `--model` 将显式授权的模型传给一次全新、仅含任务的委派。其工具始终绑定 Antigravity 后端；选择原生路由不能将继承对话的 fork 转为外部 CLI 运行。原生模型选择既不继承父级 LLM 选项，也不调用 LLM 路由预检。省略选择时保留 CLI 提供方配置的模型或原生默认值。共同挂载的委派工具通过 `listModelsToolName` 使用不同的发现工具名称。
 
 ## Alternatives considered
 

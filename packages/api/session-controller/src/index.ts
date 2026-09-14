@@ -20,7 +20,7 @@ import { SessionControlController } from './control.ts'
 import { SessionHistoryController } from './history.ts'
 import { SessionFileReferences } from './file-references.ts'
 import { ApiSessionList } from './list.ts'
-import { buildModelCatalog } from './catalog.ts'
+import { buildModelCatalog, buildSubagentModelCatalog } from './catalog.ts'
 import { installModelSelectionProjection } from './model-selection-projection.ts'
 import { SessionSkillCatalog } from './skill-catalog.ts'
 import { SessionMediaReferences } from './media-references.ts'
@@ -143,6 +143,8 @@ export class SessionController extends TypertRemoteService {
     ctx.plugin(SessionMediaReferences)
     ctx.plugin(SessionSkillCatalog)
 
+    ctx.on('subagent/provider-added', () => { ctx.emit('api-session/subagent-models-updated') })
+    ctx.on('subagent/provider-removed', () => { ctx.emit('api-session/subagent-models-updated') })
     ctx.on('session/created', (session) => {
       ctx.emit('api-session/added', this.listState.summaryFor(session))
     })
@@ -263,6 +265,16 @@ export class SessionController extends TypertRemoteService {
   @Remote('modelCatalog')
   modelCatalog(): Promise<ModelCatalog> {
     return buildModelCatalog(this.ctx)
+  }
+
+  /**
+   * Describe LLM and native task-only routes for subagent authorization settings.
+   * @param signal - Caller lifetime forwarded to native model discovery.
+   * @returns Provider-grouped models with isolated discovery failures.
+   */
+  @Remote('subagentModelCatalog')
+  subagentModelCatalog(signal: AbortSignal): Promise<ModelCatalog> {
+    return buildSubagentModelCatalog(this.ctx, signal)
   }
 
   /**

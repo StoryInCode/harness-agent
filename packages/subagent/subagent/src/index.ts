@@ -89,6 +89,7 @@ export type {
   ResolvedSubagentStartRequest,
   SubagentCapabilities,
   SubagentInterruptAuthority,
+  SubagentModelInfo,
   SubagentProvider,
   SubagentResult,
   SubagentRun,
@@ -226,6 +227,9 @@ export class SubagentRuntime extends TypertRemoteService {
    * @throws when continuation services are unavailable or materialization fails.
    */
   async startContinuable(spec: ContinuableStartSpec): Promise<ContinuableStart> {
+    if (spec.request.nativeModel !== undefined) {
+      throw new SubagentError('native model selection requires a one-shot subagent', 'UNSUPPORTED_CAPABILITY')
+    }
     return this.requireContinuations().startContinuable(spec)
   }
 
@@ -639,6 +643,12 @@ export class SubagentRuntime extends TypertRemoteService {
 
   /** Reject the first requested capability that the provider lacks. */
   private assertCapabilities(provider: SubagentProvider, request: SubagentStartRequest): void {
+    if (request.nativeModel !== undefined && provider.listModels === undefined) {
+      throw new SubagentError(
+        `subagent provider "${provider.name}" does not support native model selection (no listModels capability)`,
+        'UNSUPPORTED_CAPABILITY',
+      )
+    }
     const needs: { when: boolean; cap: keyof SubagentCapabilities }[] = [
       { when: request.agentOptions !== undefined, cap: 'agentOptions' },
       { when: request.outputSchema !== undefined, cap: 'outputSchema' },

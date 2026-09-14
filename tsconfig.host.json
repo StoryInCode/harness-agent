@@ -132,6 +132,7 @@
     "scripts/*.client.spec.ts",
     "scripts/client-bundle-css.spec.ts",
     "packages/typert/generator/tests/fixtures/**",
+    "packages/dev-loop/gates/tests/**",
     "scripts/client-bundle-purity.spec.ts"
   ],
   "references": [
@@ -267,6 +268,7 @@
     { "path": "./packages/code-runtime/code-runtime-worker-thread" },
     { "path": "./packages/llm/llm-deepseek" },
     { "path": "./packages/llm/llm-pi-ai" },
+    { "path": "./packages/llm/llm-antigravity" },
     { "path": "./packages/shell/bash-local" },
     { "path": "./packages/shell/shell-env" },
     { "path": "./packages/shell/pwsh-local" },

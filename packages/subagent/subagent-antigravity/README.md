@@ -47,6 +47,12 @@ Each Host provider row accepts these deployment-owned fields. Native permission 
 
 The child uses `request.cwd` when supplied, otherwise the parent Session cwd. The selected directory must be absolute and accessible; an invalid explicit value rejects without fallback before spawn. Omission still requires a usable parent workspace. The subprocess service scrubs credential-shaped and managed `DSH_*` ambient variables before applying `env`; explicit entries deliberately opt in. Ordinary native home, project settings, and cached authentication remain accessible to the CLI.
 
+### Native model selection
+
+The provider advertises native models by running `agy models` in the Host working directory, without starting a conversation. Discovery uses the same executable, explicit environment, deadline, output cap, and termination grace as delegation. Cancellation and provider removal terminate discovery and await managed-tree cleanup. Empty, malformed, duplicate, truncated, or unsuccessful output fails safely without exposing stderr.
+
+A one-shot `nativeModel` request overrides the configured `model`; omission preserves the configured or native default. The selected id is passed directly to `--model`, and the CLI validates it. Native models are independent of Host LLM routes and never inherit the parent's model or reasoning effort. A preset can enable model selection through the [delegation tool's settings policy](../tool-subagent/README.md); this provider grants no selection authority by itself.
+
 ### Results and failures
 
 The provider sends one NDJSON user message through stdin and immediately closes input. It accepts exactly one nested `result` with `status: SUCCESS`, nonblank `response`, and no `error` field, only after exit code zero, no signal, no timeout, complete stdout, and managed-tree cleanup. Malformed output, missing or duplicate results, unsuccessful status, output overflow, and process failures produce fixed diagnostics without copying stderr or raw error text.

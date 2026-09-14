@@ -39,6 +39,7 @@ const TEST_ALLOWED_MODELS = [
   { provider: 'alpha', model },
   { provider: 'current-provider', model },
   { provider: 'missing', model },
+  { provider: 'subagent:mock', model },
 ])
 
 export async function setup(toolConfig: SetupConfig, mockConfig: Partial<mock.Config> = {}): Promise<Context> {
