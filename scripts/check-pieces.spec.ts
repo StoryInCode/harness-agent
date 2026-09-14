@@ -139,11 +139,26 @@ describe('required sections', () => {
     const fenced = { Contracts: ['```markdown', '## Acceptance', '## Summary', '```'] }
     expect(checkSections('p.md', piece({ extra: fenced }))).toEqual([])
   })
+
+  it('accepts Architecture fit as an equivalent to Harness fit', () => {
+    const text = piece().replace('## Harness fit', '## Architecture fit')
+    expect(checkSections('p.md', text)).toEqual([])
+  })
 })
 
 describe('declared primitive', () => {
   it('accepts a primitive from the closed vocabulary with a named package', () => {
     expect(checkPrimitive('p.md', piece())).toEqual([])
+  })
+
+  it('accepts generalized **Primitive:** and **Module:** syntax', () => {
+    const line = '**Primitive:** Module · **Module:** `core-auth`'
+    expect(checkPrimitive('p.md', piece({ primitiveLine: line }))).toEqual([])
+  })
+
+  it('accepts generalized **Component:** syntax', () => {
+    const line = '**Primitive:** Component · **Component:** `Button`'
+    expect(checkPrimitive('p.md', piece({ primitiveLine: line }))).toEqual([])
   })
 
   it('rejects a primitive outside the vocabulary', () => {
