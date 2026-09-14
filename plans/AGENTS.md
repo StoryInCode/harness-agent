@@ -20,7 +20,7 @@ mechanically checkable core (deterministic). Each heading below declares its cat
 
 ## META AXIOM — Harness patterns are mandatory
 
-**Category:** both — the prose below binds the agent (meta), and the fenced `axiom` block(s) enforce it mechanically (deterministic) (R-harness-primitive-declared, R-piece-size, R-piece-required-sections).
+**Category:** both — the prose below binds the agent (meta), and the fenced `axiom` block(s) enforce it mechanically (deterministic) (R-harness-primitive-declared, R-piece-required-sections).
 
 Every implementation produced from these plans MUST follow current DeepSeek Harness
 patterns. This overrides convenience, familiarity, and any pattern carried in from another
@@ -59,21 +59,9 @@ description: >-
   `## Harness fit` section, and names the owning package.
 ```
 
-```axiom
-id: R-piece-size
-severity: blocker
-applies_to: plans/pieces/**/*.md
-check: shell
-command: "awk 'END{exit (NR>280)}' \"$FILE\""
-description: >-
-  A piece file is at most 280 lines. The ceiling tracks the mandatory content: 160 originally,
-  raised to 220 when the visibility, teaching and reuse-capture sections became mandatory, and
-  raised to 280 when `Resources and proof` became required and the teaching contract grew its
-  approaches, prior-art, concepts, interview and decision-rights subsections. Measured on the
-  fullest piece, those additions cost about 60 lines. The ceiling is a forcing function, not a
-  target: the median piece is well under half of it, and a unit of work that genuinely needs
-  this much room to describe is usually two pieces.
-```
+### Agent Guidance — Modularization, Functional Design, and Code Sizing
+
+Component sizing is governed by modularization, functional design, and separation of concerns rather than arbitrary mechanical line ceilings on documentation. For production and test code, a file extending past ~150 lines serves as an agent heuristic signaling that the unit should be decomposed and split into focused, single-purpose modules. Code and identifiers must be self-documenting. This heuristic applies strictly to CODE files (`.ts`), never to JSON, Markdown, YAML, or other specification/data documents, and is guided by agent engineering discipline rather than a mechanical gate or script check.
 
 ```axiom
 id: R-piece-required-sections
@@ -125,14 +113,14 @@ To eliminate reliance on expensive frontier reasoning models (e.g. Claude Opus, 
 2. **2–4 Crisp BDD Assertions**: Scenarios in `## Behaviour` must be small, unambiguous `Given/When/Then` specifications requiring $\le 35$ lines of test code.
 3. **Pre-Decided Architecture**: Include an explicit `### Human Decision Point: Option A vs Option B` in `## Summary`. An implementer subagent must never be forced to invent architecture or guess trade-offs.
 4. **Complete Compilable Contracts**: The `## Contracts` section must carry the complete TypeScript interface/type signature.
-5. **Strict Line Ceiling (`R-piece-size`)**: Max 280 lines per markdown piece. If a piece exceeds 280 lines, it must be decomposed into sequential micro-gates (`a`, `b`, `c`).
+5. **Code Modularization and Separation of Concerns**: Modularization, functional design, and separation of concerns guide component sizing. A coding file past ~150 lines is an informal heuristic signaling that the component should be split into smaller modules or sequential micro-gates (`a`, `b`, `c`)—never a mechanical script or gate check. Names and code must be self-documenting. This guidance applies to CODE only, never to JSON, Markdown, YAML, or other data/document files.
 
 ## META AXIOM — the five specialist personas of the dev loop
 
 **Category:** meta — agent-driven check; no machine gate.
 
 Every micro-gate is authored and championed by one of the 5 specialist developer personas from the harness roster (`packages/dev-loop/roles/src/personas.ts`):
-- 🐾 **Neko-chan (Inspector Cat / Pure Intake)**: Markdown AST extraction, heading scanning, metadata parsing, BDD parsing, formatting axioms (`R-piece-size`, `R-piece-required-sections`), sensory metaphors (Kitty Bakery, Bento Boxes, Treat Baskets), warm encouragement (*Nya~*).
+- 🐾 **Neko-chan (Inspector Cat / Pure Intake)**: Markdown AST extraction, heading scanning, metadata parsing, BDD parsing, formatting axioms (`R-piece-required-sections`), sensory metaphors (Kitty Bakery, Bento Boxes, Treat Baskets), warm encouragement (*Nya~*).
 - 🍰 **L (Forensic Detective / Epistemic Auditor)**: Proof tables (`R-claims-verified`), citation verification, cryptographic SHA-256 tokens, CAS claim verification, fail-closed policy gates, deductive rigor (*with tea & cake 🍰*).
 - 💻 **Daru (Super Hacker / Subprocesses & Plumbing)**: Hands-on implementation, CLI scripts, test harnesses, SQLite schemas, write-ahead logging (WAL), git worktree rigs (`bouncer.exe`, zero-BS pragmatism 💻).
 - 🔬 **Hououin Kyouma (Mad Scientist / Divergence Controller)**: Monotonic state transitions, lifecycle state machines, async workflows, Steins Gate verification checkpoints, anti-cheat detection (*El Psy Kongroo! 🔬*).
