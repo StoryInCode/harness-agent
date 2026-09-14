@@ -43,9 +43,14 @@ Every micro-gate MUST carry all 11 canonical sections in exact order:
 # NN.MM[a-z] — <Title>
 
 **Set:** <set name> · **Queue:** <sequential number> · **Depends on:** <piece ids, or none>
-**Lead Developer:** <Persona> (<Role>)
+**Lead Developer:** <Persona or Role>
 **Status:** todo | pending | done | blocked  (a `done` piece lives in `<set>/done/`; `blocked` is set by the loop when a gate or subagent fails)
-**Harness primitive:** <one of the closed vocabulary> · **Package:** `@deepseek-ai/dsh-<name>`
+**Primitive:** <primitive> · **Package:** `<package or module>`
+
+> **Header generalization**:
+> - `**Primitive:**` (or `**Harness primitive:**`): Architectural primitive, matching standard modular software primitives (`Service`, `Module`, `Package`, `Library`, `Component`, `Function`, `CLI`, `API`, `Hook`, `Plugin`, `Store`, `Worker`, `Workflow`) or framework-specific primitives.
+> - `**Package:**` (or `**Module:**` or `**Component:**`): Owning package, module, or component name.
+> - `**Lead Developer:**` (or `**Lead:**` or `**Author:**`): Responsible persona or engineering role.
 
 ## Summary
 
@@ -60,9 +65,9 @@ What it does (2-4 sentences in the authoring persona's voice) and how it does it
 Given / When / Then BDD scenarios (2-6 scenarios). Each scenario is an executable test specification:
 - **Given** <initial state> **When** <trigger or input> **Then** <observable outcome>
 
-## Harness fit
+## Architecture fit
 
-Why this primitive and seam were chosen. Mentions the host or agent plane, service entry point, and extension contract.
+Why this primitive and seam were chosen. Mentions the system architectural plane, service entry point, and extension contract (written as `## Architecture fit` or `## Harness fit`).
 
 ## Contracts
 

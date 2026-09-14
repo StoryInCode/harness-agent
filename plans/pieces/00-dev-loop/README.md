@@ -4,6 +4,7 @@ The autonomous development loop decomposed into 46 verified micro-gates authored
 
 | ID | Title | Lead | Package | Depends on | Queue | Status |
 | --- | --- | --- | --- | --- | --- | --- |
+| `00.00a` | [DeepSeek Harness Dev Loop Orchestrator Setup](done/00.00a-orchestrator-setup.md) | 🔬 Hououin Kyouma (Mad Scientist) | `@deepseek-ai/dsh-dev-loop-preset` | `none` | 1 | done |
 | `00.01a` | [Heading Scanner and ATX Markdown Parsing](done/00.01a-heading-scanner.md) | 🐾 Neko-chan (Inspector Cat) | `@deepseek-ai/dsh-dev-loop-directory` | `none` | 1 | done |
 | `00.01b` | [Dotted Header Metadata and Field Extraction](done/00.01b-metadata-parser.md) | 🍰 L (Forensic Detective) | `@deepseek-ai/dsh-dev-loop-directory` | `00.01a` | 2 | done |
 | `00.01c` | [Line Ceiling and Primitive Enforcement](done/00.01c-piece-validator.md) | 💻 Daru (Super Hacker) | `@deepseek-ai/dsh-dev-loop-directory` | `00.01a, 00.01b` | 3 | done |

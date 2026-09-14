@@ -67,8 +67,10 @@ export interface PieceMetadata {
   readonly status: PieceStatus
   /** Declared Harness primitive, validated against the closed vocabulary. */
   readonly primitive: string
-  /** Single owning workspace package name. */
+  /** Single owning workspace package or module name. */
   readonly pkg: string
+  /** Lead developer, author, or persona champion if declared. */
+  readonly lead?: string | undefined
 }
 
 /** A parsed, validated piece file together with the evidence of its validation. */
@@ -144,6 +146,36 @@ export const HARNESS_PRIMITIVES: readonly string[] = [
   'client UI extension',
 ]
 
+/**
+ * General software architectural primitives for arbitrary repositories.
+ * Extends the Harness vocabulary with standard modular software patterns.
+ */
+export const GENERAL_PRIMITIVES: readonly string[] = [
+  ...HARNESS_PRIMITIVES,
+  'Service',
+  'Provider',
+  'Consumer',
+  'Module',
+  'Package',
+  'Library',
+  'Component',
+  'Function',
+  'CLI',
+  'CLI Command',
+  'API',
+  'API Endpoint',
+  'Hook',
+  'Store',
+  'Schema',
+  'Database Schema',
+  'Worker',
+  'Workflow',
+  'Test Suite',
+  'Config',
+  'Adapter',
+  'Middleware',
+]
+
 /** Line ceiling `R-piece-size` enforces, inclusive. */
 export const PIECE_MAX_LINES = 280
 
@@ -182,7 +214,7 @@ export class PieceParseError extends Error {
 export interface PieceParseOptions {
   /** Inclusive line ceiling; defaults to {@link PIECE_MAX_LINES}. */
   readonly maxLines?: number
-  /** Accepted Harness primitives; defaults to {@link HARNESS_PRIMITIVES}. */
+  /** Accepted primitives; defaults to {@link GENERAL_PRIMITIVES}. */
   readonly primitives?: readonly string[]
 }
 
@@ -207,16 +239,6 @@ const CANONICAL_SECTIONS: readonly string[] = [
 
 /** The one canonical section whose absence warns instead of rejecting, per `R-piece-reuse-capture`. */
 const RECOMMENDED_SECTION = 'Reuse capture'
-
-/** Labelled header fields every piece declares above its first section. */
-const REQUIRED_HEADER_FIELDS: readonly string[] = [
-  'Set',
-  'Queue',
-  'Depends on',
-  'Status',
-  'Harness primitive',
-  'Package',
-]
 
 /** Closed lifecycle vocabulary a piece's `**Status:**` line must name. */
 const PIECE_STATUSES: readonly PieceStatus[] = ['todo', 'pending', 'done', 'blocked']
@@ -375,6 +397,30 @@ function headerField(fields: ReadonlyMap<string, string>, label: string): string
 }
 
 /**
+ * Return whether any of the candidate labels is declared in the header.
+ * @param fields - fields the header declared.
+ * @param labels - candidate labels to search for.
+ * @returns true if at least one candidate label is present.
+ */
+function hasHeaderField(fields: ReadonlyMap<string, string>, ...labels: string[]): boolean {
+  return labels.some(label => fields.has(label))
+}
+
+/**
+ * Read the value of the first matching header field among candidate labels.
+ * @param fields - fields the header declared.
+ * @param labels - candidate labels in priority order.
+ * @returns the first non-empty declared value, or `''` if none found.
+ */
+function getHeaderField(fields: ReadonlyMap<string, string>, ...labels: string[]): string {
+  for (const label of labels) {
+    const val = fields.get(label)
+    if (val !== undefined && val.length > 0) return val
+  }
+  return ''
+}
+
+/**
  * Validate one header field's value, but only when its label is declared.
  *
  * An absent label is already reported once as a malformed header, so judging
@@ -459,6 +505,19 @@ function isPieceStatus(value: string): value is PieceStatus {
 }
 
 /**
+ * Return the canonical section index for a section heading.
+ * Admits "Architecture fit", "System fit", and "Component fit" as generalized equivalents of "Harness fit".
+ * @param title - section heading text.
+ * @returns the canonical slot index (0-10), or -1 if not a canonical section.
+ */
+function canonicalSectionIndex(title: string): number {
+  if (title === 'Harness fit' || title === 'Architecture fit' || title === 'System fit' || title === 'Component fit' || title === 'Design fit') {
+    return 2
+  }
+  return CANONICAL_SECTIONS.indexOf(title)
+}
+
+/**
  * Record every canonical section that is absent or out of order.
  *
  * One forward pass with a monotone cursor reports both defects: a heading whose
@@ -469,11 +528,11 @@ function isPieceStatus(value: string): value is PieceStatus {
  * @param findings - list each observation is appended to.
  */
 function checkSectionOrder(sections: readonly SectionSpan[], findings: PieceFinding[]): void {
-  const seen = new Set<string>()
+  const seenSlots = new Set<number>()
   let lastIndex = -1
   let lastTitle = ''
   for (const section of sections) {
-    const canonicalIndex = CANONICAL_SECTIONS.indexOf(section.title)
+    const canonicalIndex = canonicalSectionIndex(section.title)
     if (canonicalIndex < 0) continue
     if (canonicalIndex < lastIndex) {
       findings.push({
@@ -484,10 +543,11 @@ function checkSectionOrder(sections: readonly SectionSpan[], findings: PieceFind
     }
     lastIndex = canonicalIndex
     lastTitle = section.title
-    seen.add(section.title)
+    seenSlots.add(canonicalIndex)
   }
-  for (const section of CANONICAL_SECTIONS) {
-    if (seen.has(section)) continue
+  for (let i = 0; i < CANONICAL_SECTIONS.length; i++) {
+    if (seenSlots.has(i)) continue
+    const section = CANONICAL_SECTIONS[i] ?? ''
     if (section === RECOMMENDED_SECTION) {
       findings.push({
         code: 'MISSING_RECOMMENDED_SECTION',
@@ -543,7 +603,7 @@ function validatePiece(
   options: PieceParseOptions,
 ): { record: PieceRecord; findings: readonly PieceFinding[] } {
   const maxLines = options.maxLines ?? PIECE_MAX_LINES
-  const primitives = options.primitives ?? HARNESS_PRIMITIVES
+  const primitives = options.primitives ?? GENERAL_PRIMITIVES
   const split = content.split('\n')
   // A single trailing newline terminates the last line rather than starting one,
   // so the count matches `wc -l`.
@@ -560,14 +620,26 @@ function validatePiece(
 
   const { header, sections } = splitSections(lines)
   const fields = readHeaderFields(header)
-  for (const label of REQUIRED_HEADER_FIELDS) {
-    if (!fields.has(label)) {
-      findings.push({
-        code: 'MALFORMED_PIECE_HEADER',
-        severity: 'blocker',
-        message: `header declares no **${label}:** field`,
-      })
-    }
+  const hasPrimitiveField = hasHeaderField(fields, 'Harness primitive', 'Primitive', 'Component primitive')
+  const hasPkgField = hasHeaderField(fields, 'Package', 'Module', 'Component')
+
+  if (!fields.has('Set')) {
+    findings.push({ code: 'MALFORMED_PIECE_HEADER', severity: 'blocker', message: 'header declares no **Set:** field' })
+  }
+  if (!fields.has('Queue')) {
+    findings.push({ code: 'MALFORMED_PIECE_HEADER', severity: 'blocker', message: 'header declares no **Queue:** field' })
+  }
+  if (!fields.has('Depends on')) {
+    findings.push({ code: 'MALFORMED_PIECE_HEADER', severity: 'blocker', message: 'header declares no **Depends on:** field' })
+  }
+  if (!fields.has('Status')) {
+    findings.push({ code: 'MALFORMED_PIECE_HEADER', severity: 'blocker', message: 'header declares no **Status:** field' })
+  }
+  if (!hasPrimitiveField) {
+    findings.push({ code: 'MALFORMED_PIECE_HEADER', severity: 'blocker', message: 'header declares no **Primitive:** or **Harness primitive:** field' })
+  }
+  if (!hasPkgField) {
+    findings.push({ code: 'MALFORMED_PIECE_HEADER', severity: 'blocker', message: 'header declares no **Package:**, **Module:**, or **Component:** field' })
   }
 
   const titleBody = findTitleLine(header).slice(TITLE_PREFIX.length).trim()
@@ -608,14 +680,18 @@ function validatePiece(
     message: `status "${value}" is not one of ${PIECE_STATUSES.join(', ')}`,
   }])
 
-  const primitive = headerField(fields, 'Harness primitive')
-  checkDeclaredField(fields, 'Harness primitive', findings, value => primitives.includes(value) ? [] : [{
+  const primitive = getHeaderField(fields, 'Harness primitive', 'Primitive', 'Component primitive')
+  const primitiveFieldLabel = fields.has('Harness primitive') ? 'Harness primitive' : 'Primitive'
+  checkDeclaredField(fields, primitiveFieldLabel, findings, value => primitives.includes(value) ? [] : [{
     code: 'INVALID_HARNESS_PRIMITIVE',
     severity: 'blocker',
-    message: `Harness primitive "${value}" is not one of ${primitives.join(', ')}`,
+    message: `primitive "${value}" is not one of ${primitives.join(', ')}`,
   }])
 
   checkSectionOrder(sections, findings)
+
+  const lead = getHeaderField(fields, 'Lead Developer', 'Lead', 'Author', 'Owner')
+  const pkg = getHeaderField(fields, 'Package', 'Module', 'Component').replaceAll('`', '')
 
   const record: PieceRecord = {
     id,
@@ -625,7 +701,8 @@ function validatePiece(
     dependsOn: readDependsOn(headerField(fields, 'Depends on')),
     status: statusValid ? statusText : 'todo',
     primitive,
-    pkg: headerField(fields, 'Package').replaceAll('`', ''),
+    pkg,
+    ...(lead.length > 0 ? { lead } : {}),
     path,
     lineCount: lines.length,
     summary: sectionBody(sections, lines, 'Summary').join('\n').trim(),
